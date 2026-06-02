@@ -1,6 +1,6 @@
 
 
-class ChunkService:
+class Chunker:
 
     def __init__(self, overlap: int = 20, batch_size: int = 100):
         self.overlap = overlap
