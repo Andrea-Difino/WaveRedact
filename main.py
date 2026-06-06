@@ -20,10 +20,17 @@ from utils.chunk import Chunker
 from models.gguf_model import GGUFModel
 from services.llama_server import LlamaServerService
 import yaml
+import logging
+
+logger = logging.getLogger(__name__)
+FORMAT = '%(asctime)s %(message)s'
+logging.basicConfig(datefmt=FORMAT,level=logging.INFO, force=True)
+
 
 def main() -> None:
     # VARIABLES
     MAKER_MODEL_NAME = "Meta-Llama-3-8B-Instruct-Q5_K_S.gguf"
+    REPO_ID = "bartowski/Meta-Llama-3-8B-Instruct-GGUF"
     SERVER_PORT = 8080
 
     #MODELS INITIALIZATION
@@ -34,7 +41,7 @@ def main() -> None:
         prompts = yaml.safe_load(f)
 
     transcribe_serv = TranscribeService(model)
-    maker = GGUFModel(prompts["maker"]["default"]["system_prompt"], MAKER_MODEL_NAME, server_port=SERVER_PORT)
+    maker = GGUFModel(prompts["maker"]["default"]["system_prompt"], MAKER_MODEL_NAME, REPO_ID, server_port=SERVER_PORT)
     #checker = GGUFModel(prompts["checker"]["default"]["system_prompt"], MAKER_MODEL_NAME, server)
 
     # SERVER INITIALIZATION
@@ -52,7 +59,8 @@ def main() -> None:
         print(transcribe_serv.iw_pair)
         chunk_man = Chunker()
         chunks = chunk_man.chunk_text(transcribe_serv.iw_pair)
-        for chunk in chunks:
+        for i,chunk in enumerate(chunks):
+            logger.info(f"Running chunk: {i+1}")
             res = maker.run_model(chunk)
             print(res)
             if len(res["redact_ids"]) != 0:

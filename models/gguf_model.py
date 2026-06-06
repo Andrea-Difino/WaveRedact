@@ -4,14 +4,19 @@ from huggingface_hub import hf_hub_download
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
+logger = logging.getLogger(__name__)
+FORMAT = '%(asctime)s %(message)s'
+logging.basicConfig(datefmt=FORMAT,level=logging.INFO, force=True)
 
 class GGUFModel(Model):
-    def __init__(self, sys_prompt: str, gguf_file_name: str, model_dir: str = "./files/gguf_models", server_port: int = 8080):
+    def __init__(self, sys_prompt: str, gguf_file_name: str, repo_id: str ,model_dir: str = "./files/gguf_models", server_port: int = 8080):
         self.file_gguf = gguf_file_name
         self.model_dir = os.path.abspath(model_dir)
         self.path = f"{self.model_dir}/{self.file_gguf}"
+        self.repo_id = repo_id
 
         self.sys_prompt = sys_prompt
         self.check_existance()
@@ -26,9 +31,9 @@ class GGUFModel(Model):
             print("Model not finded. Download... (it could take some minutes)...")
 
             download = hf_hub_download(
-                repo_id="bartowski/Meta-Llama-3-8B-Instruct-GGUF",
+                repo_id=self.repo_id,
                 filename=self.file_gguf,  
-                local_dir="./files/gguf_models/",  
+                local_dir=self.model_dir,  
                 token=os.environ["HF_TOKEN"]             
             )
             print("Download completed!")
@@ -44,7 +49,7 @@ class GGUFModel(Model):
         
         try:
             response = self.client.chat.completions.create(
-                model="local-model", # Il nome non importa con llama.cpp
+                model="local-model",
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": f"Testo da analizzare: '{prompt}'"}
@@ -55,8 +60,8 @@ class GGUFModel(Model):
             
             risposta_testo = response.choices[0].message.content
 
-            lista_censure = json.loads(risposta_testo)
-            return lista_censure
+            list_sensitive_ids = json.loads(risposta_testo)
+            return list_sensitive_ids
 
         except Exception as e:
             print(f"Errore during LLM inference: {e}")
