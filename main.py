@@ -4,8 +4,7 @@ if sys.platform.startswith('win'):
     try:
         import torch
         torch_lib_path = os.path.join(os.path.dirname(torch.__file__), "lib")
-        
-        # Aggiungiamo la cartella se esiste
+
         if os.path.exists(torch_lib_path):
             os.add_dll_directory(torch_lib_path)
             print(f"✅ DLL NVIDIA caricate con successo da: {torch_lib_path}")
@@ -19,9 +18,13 @@ from audio_manager import AudioManager
 from services.transcribe import TranscribeService
 from utils.chunk import Chunker
 from models.llama8B import Llama8B
+from services.llama_server import LlamaServerService
 import yaml
 
 def main() -> None:
+    # SERVER INITIALIZATION
+    server = LlamaServerService()
+
     model_name = "large-v3-turbo"
     model = WhisperModel(model_name, device="cuda", compute_type="int8_float16")
 
