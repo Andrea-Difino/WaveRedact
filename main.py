@@ -17,29 +17,35 @@ from faster_whisper import WhisperModel
 from audio_manager import AudioManager
 from services.transcribe import TranscribeService
 from utils.chunk import Chunker
-from models.llama8B import Llama8B
+from models.gguf_model import GGUFModel
 from services.llama_server import LlamaServerService
 import yaml
 
 def main() -> None:
-    # SERVER INITIALIZATION
-    server = LlamaServerService()
+    # VARIABLES
+    MAKER_MODEL_NAME = "Meta-Llama-3-8B-Instruct-Q5_K_S.gguf"
+    SERVER_PORT = 8080
 
+    #MODELS INITIALIZATION
     model_name = "large-v3-turbo"
     model = WhisperModel(model_name, device="cuda", compute_type="int8_float16")
+
+    with open("prompts.yaml", "r") as f:
+        prompts = yaml.safe_load(f)
+
+    transcribe_serv = TranscribeService(model)
+    maker = GGUFModel(prompts["maker"]["default"]["system_prompt"], MAKER_MODEL_NAME, server_port=SERVER_PORT)
+    #checker = GGUFModel(prompts["checker"]["default"]["system_prompt"], MAKER_MODEL_NAME, server)
+
+    # SERVER INITIALIZATION
+    server = LlamaServerService(MAKER_MODEL_NAME, server_port=SERVER_PORT)
+    server.start_server()
 
     audio_manager = AudioManager()
     audios = audio_manager.get_audio()
     if len(audios) == 0:
         print("There's no audio to process. Terminating process...")
         return
-    
-    with open("prompts.yaml", "r") as f:
-        prompts = yaml.safe_load(f)
-
-    transcribe_serv = TranscribeService(model)
-    maker = Llama8B(prompts["maker"]["default"]["system_prompt"])
-    checker = Llama8B(prompts["checker"]["default"]["system_prompt"])
 
     for audio_path in audios:
         transcribe_serv.transcribe_audio(audio_path)
@@ -48,6 +54,7 @@ def main() -> None:
         chunks = chunk_man.chunk_text(transcribe_serv.iw_pair)
         for chunk in chunks:
             res = maker.run_model(chunk)
+            print(res)
             if len(res["redact_ids"]) != 0:
                 #passare dati al modello checker
                 ...

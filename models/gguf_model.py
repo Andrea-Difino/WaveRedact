@@ -2,39 +2,38 @@ import json
 from models.model import Model
 from huggingface_hub import hf_hub_download
 import os
-import subprocess
-import time
-import urllib.request
-import zipfile
-import requests
-import atexit
 from openai import OpenAI
+from dotenv import load_dotenv
 
-class Llama8B(Model):
-    def __init__(self, sys_prompt: str):
-        self.file_gguf = "Meta-Llama-3.1-8B-Instruct-Q5_K_S.gguf"
-        self.model_dir = "./files/gguf_models"
+load_dotenv()
+
+class GGUFModel(Model):
+    def __init__(self, sys_prompt: str, gguf_file_name: str, model_dir: str = "./files/gguf_models", server_port: int = 8080):
+        self.file_gguf = gguf_file_name
+        self.model_dir = os.path.abspath(model_dir)
         self.path = f"{self.model_dir}/{self.file_gguf}"
 
-        self.server_dir = "./files/server"
-        self.server_exe = os.path.join(self.server_dir, "llama-server.exe")
-
         self.sys_prompt = sys_prompt
-        self.process = None
         self.check_existance()
+
+        self.client = OpenAI(
+            base_url=f"http://localhost:{server_port}/v1", 
+            api_key="locale"
+        )
 
     def check_existance(self) -> None:
         if not os.path.exists(self.path):
             print("Model not finded. Download... (it could take some minutes)...")
 
             download = hf_hub_download(
-                repo_id="bartowski/Meta-Llama-3-8B-Instruct-GGUF", 
-                filename=self.file_gguf,                          
-                local_dir="./files/gguf_models/",                    
+                repo_id="bartowski/Meta-Llama-3-8B-Instruct-GGUF",
+                filename=self.file_gguf,  
+                local_dir="./files/gguf_models/",  
+                token=os.environ["HF_TOKEN"]             
             )
-            print("✅ Download completato con successo!")
+            print("Download completed!")
         else:
-            print("✅ Modello già presente sul PC.")
+            print("Model already downloaded")
 
     def run_model(self, chunk: dict[int,str]) -> dict:
         system_prompt = self.sys_prompt
@@ -60,5 +59,5 @@ class Llama8B(Model):
             return lista_censure
 
         except Exception as e:
-            print(f"Errore durante l'interrogazione dell'LLM: {e}")
-            return []
+            print(f"Errore during LLM inference: {e}")
+            return {}
