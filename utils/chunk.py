@@ -7,8 +7,15 @@ class Chunker:
         self.batch_size = batch_size
 
     def chunk_text(self, full_text: dict[int,str]) -> list[dict[int,str]]:
-
         step = self.batch_size - self.overlap
-        chunks = [dict(list(full_text.items())[i:i + self.batch_size]) for i in range(0, len(full_text), step)]
+        items = list(full_text.items())
+        chunks = []
+
+        for i in range(0, len(items), step):
+            chunk = dict(items[i : i + self.batch_size])
+            chunks.append(chunk)
+
+            if i + self.batch_size >= len(items):
+                break
 
         return chunks

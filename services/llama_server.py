@@ -41,26 +41,35 @@ class LlamaServerService:
         if self.exe_path:
             return None
             
-        logger.info("Downloading AI engine (llama.cpp)...")
+        logger.info("Downloading AI engine and NVIDIA drivers...")
         os.makedirs(self.destination_folder, exist_ok=True)
 
-        url_zip = "https://github.com/ggml-org/llama.cpp/releases/download/b9538/llama-b9538-bin-win-cuda-12.4-x64.zip"
-        zip_path = os.path.join(self.destination_folder, "llama.zip")
-        
-        urllib.request.urlretrieve(url_zip, zip_path)
+        url_exe = "https://github.com/ggml-org/llama.cpp/releases/download/b9538/llama-b9538-bin-win-cuda-12.4-x64.zip"
+        zip_exe_path = os.path.join(self.destination_folder, "llama_exe.zip")
+        urllib.request.urlretrieve(url_exe, zip_exe_path)
 
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        url_dll = "https://github.com/ggml-org/llama.cpp/releases/download/b9538/cudart-llama-bin-win-cuda-12.4-x64.zip"
+        zip_dll_path = os.path.join(self.destination_folder, "llama_dll.zip")
+        urllib.request.urlretrieve(url_dll, zip_dll_path)
+
+        logger.info("Extracting and merging files...")
+
+        with zipfile.ZipFile(zip_exe_path, 'r') as zip_ref:
+            zip_ref.extractall(self.destination_folder)
+            
+        with zipfile.ZipFile(zip_dll_path, 'r') as zip_ref:
             zip_ref.extractall(self.destination_folder)
 
-        os.remove(zip_path)
-        logger.info("llama server downloaded!")
+        os.remove(zip_exe_path)
+        os.remove(zip_dll_path)
+        logger.info("llama server and CUDA drivers installed successfully!")
 
         self.exe_path = self._find_executable()
 
         if not self.exe_path:
             raise FileNotFoundError("Critical error: llama-server.exe not found even after extraction.")
             
-        logger.info("llama server extracted!")
+        logger.info("llama server ready to run!")
 
     def start_server(self):
         logger.info("Starting Llama server...")
