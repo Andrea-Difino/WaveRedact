@@ -26,8 +26,8 @@
   {
     "id": 5,
     "text": "My IBAN is GB12CPBK08321012345678 and the BIC is CPBKGB22.",
-    "target_indices": [3],
-    "extracted_pii": ["GB12CPBK08321012345678"]
+    "target_indices": [3, 8],
+    "extracted_pii": ["GB12CPBK08321012345678", "CPBKGB22"]
   },
   {
     "id": 6,
@@ -236,7 +236,7 @@
   {
     "id": 40,
     "text": "During the routine internal security audit, we discovered that employee Peter Parker accidentally left his corporate Platinum Visa card 4000 1234 5678 9010 exposed on his desk at 20 Ingram Street, Queens, alongside a printed document displaying the company's master IBAN GB20BARC20000055555555 wide open.",
-    "target_indices": [10, 11, 19, 20, 21, 22, 28, 29, 30, 31, 41],
-    "extracted_pii": ["Peter", "Parker", "4000", "1234", "5678", "9010", "20", "Ingram", "Street,", "Queens,", "GB20BARC20000055555555"]
+    "target_indices": [10, 11, 19, 20, 21, 22, 28, 29, 30, 41],
+    "extracted_pii": ["Peter", "Parker", "4000", "1234", "5678", "9010", "20", "Ingram", "Street,", "GB20BARC20000055555555"]
   }
 ]
