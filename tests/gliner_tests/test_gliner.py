@@ -86,7 +86,7 @@ def main():
         indici_regex = estrai_con_regex(text)
         indici_totali.update(indici_regex)
 
-        entities = model.predict_entities(text, labels, threshold=0.46)
+        entities = model.predict_entities(text, labels, threshold=0.47)
         for entity in entities:
             indici_gliner = converti_caratteri_in_indici(text, entity["start"], entity["end"])
             indici_totali.update(indici_gliner)
