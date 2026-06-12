@@ -1,0 +1,242 @@
+[
+  {
+    "id": 1,
+    "text": "Hello, my name is Alice Smith and I live in London.",
+    "target_indices": [4, 5, 10],
+    "extracted_pii": ["Alice", "Smith", "London."]
+  },
+  {
+    "id": 2,
+    "text": "Please send the invoice to billing@example.com before Friday.",
+    "target_indices": [5],
+    "extracted_pii": ["billing@example.com"]
+  },
+  {
+    "id": 3,
+    "text": "Call me at +1-555-0198 if you have any issues with account 899012.",
+    "target_indices": [3, 11],
+    "extracted_pii": ["+1-555-0198", "899012."]
+  },
+  {
+    "id": 4,
+    "text": "The package was shipped to 123 Main Street, Springfield.",
+    "target_indices": [5, 6, 7, 8],
+    "extracted_pii": ["123", "Main", "Street,", "Springfield."]
+  },
+  {
+    "id": 5,
+    "text": "My IBAN is GB12CPBK08321012345678 and the BIC is CPBKGB22.",
+    "target_indices": [3, 8],
+    "extracted_pii": ["GB12CPBK08321012345678", "CPBKGB22"]
+  },
+  {
+    "id": 6,
+    "text": "Login using the username johndoe88 and the password SuperSecret123! to access the server.",
+    "target_indices": [4, 8],
+    "extracted_pii": ["johndoe88", "SuperSecret123!"]
+  },
+  {
+    "id": 7,
+    "text": "Dr. Robert Johnson works at the Seattle General Hospital.",
+    "target_indices": [1, 2, 6],
+    "extracted_pii": ["Robert", "Johnson", "Seattle"]
+  },
+  {
+    "id": 8,
+    "text": "Can you confirm if the credit card ending in 4111 2222 3333 4444 is still active?",
+    "target_indices": [9, 10, 11, 12],
+    "extracted_pii": ["4111", "2222", "3333", "4444"]
+  },
+  {
+    "id": 9,
+    "text": "We met Sarah Connor at the coffee shop in Los Angeles last week.",
+    "target_indices": [2, 3, 9, 10],
+    "extracted_pii": ["Sarah", "Connor", "Los", "Angeles"]
+  },
+  {
+    "id": 10,
+    "text": "Forward the documents to David.Brown@company.co.uk immediately.",
+    "target_indices": [4],
+    "extracted_pii": ["David.Brown@company.co.uk"]
+  },
+  {
+    "id": 11,
+    "text": "Her new phone number is 212-555-7890 so update your contacts.",
+    "target_indices": [5],
+    "extracted_pii": ["212-555-7890"]
+  },
+  {
+    "id": 12,
+    "text": "He transferred the funds to routing number 123456789 yesterday.",
+    "target_indices": [7],
+    "extracted_pii": ["123456789"]
+  },
+  {
+    "id": 13,
+    "text": "I left my wallet at 456 Elm Ave, Apt 4B, Chicago.",
+    "target_indices": [5, 6, 7, 8, 9, 10],
+    "extracted_pii": ["456", "Elm", "Ave,", "Apt", "4B,", "Chicago."]
+  },
+  {
+    "id": 14,
+    "text": "Mr. James Bond has the password AstonMartin! for his account.",
+    "target_indices": [1, 2, 6],
+    "extracted_pii": ["James", "Bond", "AstonMartin!"]
+  },
+  {
+    "id": 15,
+    "text": "The event will be hosted by Emily White in Paris next month.",
+    "target_indices": [6, 7, 9],
+    "extracted_pii": ["Emily", "White", "Paris"]
+  },
+  {
+    "id": 16,
+    "text": "Please wire the money to account IT99C0200805364000100000000 by tomorrow.",
+    "target_indices": [6],
+    "extracted_pii": ["IT99C0200805364000100000000"]
+  },
+  {
+    "id": 17,
+    "text": "Contact our support team at 1-800-555-0199 or email help@support.net for assistance.",
+    "target_indices": [5, 8],
+    "extracted_pii": ["1-800-555-0199", "help@support.net"]
+  },
+  {
+    "id": 18,
+    "text": "Thomas Anderson lives at 314 Matrix Blvd, Zion.",
+    "target_indices": [0, 1, 4, 5, 6, 7],
+    "extracted_pii": ["Thomas", "Anderson", "314", "Matrix", "Blvd,", "Zion."]
+  },
+  {
+    "id": 19,
+    "text": "Your temporary password is TempPass#2024 and it expires in 24 hours.",
+    "target_indices": [4],
+    "extracted_pii": ["TempPass#2024"]
+  },
+  {
+    "id": 20,
+    "text": "Maria Garcia paid using Visa card 4532-1111-2222-3333 today.",
+    "target_indices": [0, 1, 6],
+    "extracted_pii": ["Maria", "Garcia", "4532-1111-2222-3333"]
+  },
+  {
+    "id": 21,
+    "text": "Following our recent telephone conversation regarding the ongoing property dispute, please be advised that Mr. Alexander Worthington can be reached at his primary residence located at 742 Evergreen Terrace, Springfield, or via his direct cellular line at +1-555-867-5309 during standard business hours.",
+    "target_indices": [15, 16, 26, 27, 28, 29, 37],
+    "extracted_pii": ["Alexander", "Worthington", "742", "Evergreen", "Terrace,", "Springfield,", "+1-555-867-5309"]
+  },
+  {
+    "id": 22,
+    "text": "The accounting department requires written confirmation from Dr. Henrietta Baskerville before we can successfully initiate the wire transfer of the remaining project funds to the specified international bank account, which uses the IBAN format DE89370400440532013000, so please email her at h.baskerville@medical-research.org.",
+    "target_indices": [8, 9, 34, 40],
+    "extracted_pii": ["Henrietta", "Baskerville", "DE89370400440532013000,", "h.baskerville@medical-research.org."]
+  },
+  {
+    "id": 23,
+    "text": "In order to complete the premium subscription upgrade for your corporate account, you must enter the Mastercard ending in 5555 4444 3333 2222 that belongs to Jonathan Pine, and then authenticate the transaction using the temporary security password SecureAuth#2026! generated by the authenticator application.",
+    "target_indices": [19, 20, 21, 22, 26, 27, 38],
+    "extracted_pii": ["5555", "4444", "3333", "2222", "Jonathan", "Pine,", "SecureAuth#2026!"]
+  },
+  {
+    "id": 24,
+    "text": "We are currently reviewing the extensive insurance claim submitted last Thursday regarding the severe water damage incident that occurred at the commercial warehouse located at 894 Industrial Boulevard, Building C, Detroit, Michigan, and we have linked this claim directly to policy account number POL-9988776655.",
+    "target_indices": [25, 26, 27, 28, 29, 30, 31, 43],
+    "extracted_pii": ["894", "Industrial", "Boulevard,", "Building", "C,", "Detroit,", "Michigan,", "POL-9988776655."]
+  },
+  {
+    "id": 25,
+    "text": "During the quarterly board meeting held yesterday afternoon, it was unanimously decided that Samantha Carter will be taking over the European market operations based in Geneva, so all future strategic correspondence should be directed to her new corporate email address which is samantha.carter@global-logistics.com.",
+    "target_indices": [13, 14, 25, 42],
+    "extracted_pii": ["Samantha", "Carter", "Geneva,", "samantha.carter@global-logistics.com."]
+  },
+  {
+    "id": 26,
+    "text": "If you encounter any further billing discrepancies on your monthly statement, please do not hesitate to contact our customer success representative Michael O'Sullivan at his desk phone 1-800-444-9999, ensuring you have the Visa card ending in 1234 5678 9012 3456 ready to verify the transaction details.",
+    "target_indices": [21, 22, 27, 36, 37, 38, 39],
+    "extracted_pii": ["Michael", "O'Sullivan", "1-800-444-9999,", "1234", "5678", "9012", "3456"]
+  },
+  {
+    "id": 27,
+    "text": "The IT administration team has strongly advised all local employees working out of the Toronto office to immediately update their system login credentials, specifically recommending that they avoid using easily guessable strings like Password123! or their own names like Christopher Columbus in their passwords.",
+    "target_indices": [14, 33, 39, 40],
+    "extracted_pii": ["Toronto", "Password123!", "Christopher", "Columbus"]
+  },
+  {
+    "id": 28,
+    "text": "Please ensure that the heavily confidential legal settlement paperwork is couriered directly to Attorney Elizabeth Swann's private chambers located at 15 Port Royal Avenue, Kingston, and the corresponding settlement funds must be wired utilizing routing number 9876543210 by the end of the business day.",
+    "target_indices": [14, 15, 20, 21, 22, 23, 24, 36],
+    "extracted_pii": ["Elizabeth", "Swann's", "15", "Port", "Royal", "Avenue,", "Kingston,", "9876543210"]
+  },
+  {
+    "id": 29,
+    "text": "As part of our rigorous new onboarding process for freelance contractors, both Penelope Cruz and Javier Bardem will need to submit their signed non-disclosure agreements to the human resources compliance portal, or they can simply email the scanned PDF documents directly to hr-compliance@megacorp-industries.com.",
+    "target_indices": [12, 13, 15, 16, 42],
+    "extracted_pii": ["Penelope", "Cruz", "Javier", "Bardem", "hr-compliance@megacorp-industries.com."]
+  },
+  {
+    "id": 30,
+    "text": "The independent auditors have flagged a highly suspicious transaction made by Mr. Arthur Pendragon, who apparently registered his primary business address as 42 Avalon Way, Camelot, and regularly transfers large sums to an offshore account with the IBAN designation CH9300000000000000000 every single month.",
+    "target_indices": [12, 13, 22, 23, 24, 25, 39],
+    "extracted_pii": ["Arthur", "Pendragon,", "42", "Avalon", "Way,", "Camelot,", "CH9300000000000000000"]
+  },
+  {
+    "id": 31,
+    "text": "When planning the logistics for the upcoming software developer conference in San Francisco, please remember that our keynote speaker Linus Torvalds prefers to be contacted on his personal mobile device at +1-415-987-6543, rather than through his public institutional email address linus.t@linux-foundation.org.",
+    "target_indices": [11, 12, 19, 20, 31, 40],
+    "extracted_pii": ["San", "Francisco,", "Linus", "Torvalds", "+1-415-987-6543,", "linus.t@linux-foundation.org."]
+  },
+  {
+    "id": 32,
+    "text": "A formal notification letter outlining the new contractual terms has been dispatched via certified mail to Mrs. Eleanor Rigby at her long-time residence located at 12 Abbey Road, London, and her associated investment portfolio account ID number INV-5544332211 has been temporarily frozen pending her signature.",
+    "target_indices": [17, 18, 25, 26, 27, 28, 37],
+    "extracted_pii": ["Eleanor", "Rigby", "12", "Abbey", "Road,", "London,", "INV-5544332211"]
+  },
+  {
+    "id": 33,
+    "text": "Because of the recent data breach affecting our primary servers, Margaret Thatcher and Winston Churchill must completely reset their administrator access profiles, ensuring they do not reuse the compromised master password LondonBridgeIsDown1965! or provide their corporate Amex card 3782 111122 33334 again.",
+    "target_indices": [10, 11, 13, 14, 31, 38, 39, 40],
+    "extracted_pii": ["Margaret", "Thatcher", "Winston", "Churchill", "LondonBridgeIsDown1965!", "3782", "111122", "33334"]
+  },
+  {
+    "id": 34,
+    "text": "The logistics coordinator confirmed that the heavy machinery replacement parts were mistakenly delivered to the secondary facility at 987 Corporate Parkway Suite 200, Atlanta, Georgia 30301, instead of the main manufacturing plant, causing a significant delay in the production schedule for the entire month.",
+    "target_indices": [18, 19, 20, 21, 22, 23, 24, 25],
+    "extracted_pii": ["987", "Corporate", "Parkway", "Suite", "200,", "Atlanta,", "Georgia", "30301,"]
+  },
+  {
+    "id": 35,
+    "text": "If the patient experiences any severe allergic reactions to the prescribed medication, they should immediately contact Dr. Gregory House at the Princeton-Plainsboro diagnostic clinic by calling 555-010-9999, or by dispatching an urgent message to his private email inbox at g.house@diagnostic-medicine.edu.",
+    "target_indices": [17, 18, 21, 26, 39],
+    "extracted_pii": ["Gregory", "House", "Princeton-Plainsboro", "555-010-9999,", "g.house@diagnostic-medicine.edu."]
+  },
+  {
+    "id": 36,
+    "text": "The incredibly complex international merger acquisition requires the immediate transfer of three million dollars to the holding company's primary European account, which is officially registered under the name Bruce Wayne, utilizing the IBAN code FR7630006000011234567890188 and the SWIFT identifier BNPFRPPXXX.",
+    "target_indices": [28, 29, 34, 39],
+    "extracted_pii": ["Bruce", "Wayne,", "FR7630006000011234567890188", "BNPFRPPXXX."]
+  },
+  {
+    "id": 37,
+    "text": "Please remind all new remote employees that their default gateway access code has been temporarily set to WelcomeToTheTeam2025! and that any issues regarding multi-factor authentication should be reported to tech-support@enterprise-cloud.net or by texting the emergency IT hotline at +44-7700-900077 immediately.",
+    "target_indices": [17, 29, 38],
+    "extracted_pii": ["WelcomeToTheTeam2025!", "tech-support@enterprise-cloud.net", "+44-7700-900077"]
+  },
+  {
+    "id": 38,
+    "text": "The highly anticipated annual shareholders meeting is scheduled to take place at the Grand Hyatt hotel in downtown Seattle, Washington, where CEO Tony Stark will present the final fiscal year revenue reports associated with the overarching corporate ledger identified by account number ACC-777-888-999-000.",
+    "target_indices": [18, 19, 22, 23, 42],
+    "extracted_pii": ["Seattle,", "Washington,", "Tony", "Stark", "ACC-777-888-999-000."]
+  },
+  {
+    "id": 39,
+    "text": "For all matters pertaining to the upcoming neighborhood zoning changes and property tax adjustments, citizens are encouraged to visit the municipal planning office located at 500 Civic Center Drive, Suite 4B, or they can call the direct community hotline at 800-555-1234 or email zoning-board@city-council.gov.",
+    "target_indices": [25, 26, 27, 28, 29, 30, 40, 43],
+    "extracted_pii": ["500", "Civic", "Center", "Drive,", "Suite", "4B,", "800-555-1234", "zoning-board@city-council.gov."]
+  },
+  {
+    "id": 40,
+    "text": "During the routine internal security audit, we discovered that employee Peter Parker accidentally left his corporate Platinum Visa card 4000 1234 5678 9010 exposed on his desk at 20 Ingram Street, Queens, alongside a printed document displaying the company's master IBAN GB20BARC20000055555555 wide open.",
+    "target_indices": [10, 11, 19, 20, 21, 22, 28, 29, 30, 41],
+    "extracted_pii": ["Peter", "Parker", "4000", "1234", "5678", "9010", "20", "Ingram", "Street,", "GB20BARC20000055555555"]
+  }
+]
