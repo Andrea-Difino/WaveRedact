@@ -31,6 +31,9 @@ from pipeline.gliner import GlinerModel
 #from services.llama_server import LlamaServerService
 #import yaml
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 FORMAT = '%(asctime)s %(message)s'
