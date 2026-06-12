@@ -60,7 +60,7 @@ class GGUFModel(Model):
             
             risposta_testo = response.choices[0].message.content
 
-            list_sensitive_ids = json.loads(risposta_testo)
+            list_sensitive_ids = json.loads(risposta_testo if risposta_testo else "")
             return list_sensitive_ids
 
         except Exception as e:
