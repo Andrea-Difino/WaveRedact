@@ -30,7 +30,7 @@ class GGUFModel(Model):
         if not os.path.exists(self.path):
             print("Model not finded. Download... (it could take some minutes)...")
 
-            download = hf_hub_download(
+            _ = hf_hub_download(
                 repo_id=self.repo_id,
                 filename=self.file_gguf,  
                 local_dir=self.model_dir,  
