@@ -8,7 +8,7 @@ from safewave.utils.audio_manager import AudioManager
 from safewave.services.transcribe import TranscribeService
 from safewave.utils.chunk import Chunker
 #from models.gguf_model import GGUFModel
-from safewave.pipeline.gliner import GlinerModel
+from safewave.pipeline.orchestrator import DataPrivacyPipeline
 #from services.llama_server import LlamaServerService
 #import yaml
 import logging
@@ -39,7 +39,7 @@ def main() -> None:
     model_name = "large-v3-turbo"
     model = WhisperModel(model_name, device="cuda", compute_type="int8_float16")
 
-    gliner_model = GlinerModel()
+    gliner_model = DataPrivacyPipeline()
 
     #with open("prompts.yaml", "r") as f:
     #    prompts = yaml.safe_load(f)
@@ -64,6 +64,9 @@ def main() -> None:
         chunk_man = Chunker()
         chunks = chunk_man.chunk_text(transcribe_serv.iw_pair)
         len_chunks = len(chunks)
+
+        print(transcribe_serv.iw_pair)
+        print(transcribe_serv.full_text)
 
         for i, chunk in enumerate(chunks):
             logger.info(f"Running chunk: {i+1}")

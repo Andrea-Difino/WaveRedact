@@ -24,6 +24,7 @@ web = [
 
 [project.scripts]
 safewave = "cli.main:main"
+safewave-web = "web.app:start_server"
 
 [tool.setuptools]
-packages = ["safewave", "cli"]
+packages = ["safewave", "cli", "web"]
