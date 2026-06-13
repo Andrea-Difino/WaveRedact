@@ -1,33 +1,14 @@
-import os
-import sys
+from safewave.utils.gpu_setup import GPUEnvironmentManager
 
-if sys.platform.startswith('win'):
-    try:
-        import torch
-        site_packages = os.path.dirname(os.path.dirname(torch.__file__))
-        
-        percorsi_dll = [
-            os.path.join(os.path.dirname(torch.__file__), "lib"),
-            os.path.join(site_packages, "nvidia", "cublas", "bin"),
-            os.path.join(site_packages, "nvidia", "cudnn", "bin")
-        ]
-        
-        for percorso in percorsi_dll:
-            if os.path.exists(percorso):
-                os.add_dll_directory(percorso)
-                # For C++
-                os.environ["PATH"] = f"{percorso};{os.environ.get('PATH', '')}"
-                
-        print("✅ Variabili d'ambiente e DLL NVIDIA configurate per faster-whisper.")
-    except ImportError:
-        print("⚠️ Impossibile importare PyTorch per trovare le DLL.")
+gpu_manager = GPUEnvironmentManager()
+gpu_manager.ensure_gpu_ready()
 
 from faster_whisper import WhisperModel
-from audio_manager import AudioManager
-from services.transcribe import TranscribeService
-from utils.chunk import Chunker
+from safewave.utils.audio_manager import AudioManager
+from safewave.services.transcribe import TranscribeService
+from safewave.utils.chunk import Chunker
 #from models.gguf_model import GGUFModel
-from pipeline.gliner import GlinerModel
+from safewave.pipeline.gliner import GlinerModel
 #from services.llama_server import LlamaServerService
 #import yaml
 import logging
@@ -78,7 +59,7 @@ def main() -> None:
         return
 
     for audio_path in audios:
-        transcribe_serv.transcribe_audio(audio_path)
+        transcribe_serv.transcribe_audio(str(audio_path))
 
         chunk_man = Chunker()
         chunks = chunk_man.chunk_text(transcribe_serv.iw_pair)
