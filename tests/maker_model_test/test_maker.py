@@ -1,10 +1,10 @@
 import json
-from models.gguf_model import GGUFModel
+from safewave.models.gguf_model import GGUFModel
 import yaml
-from services.llama_server import LlamaServerService
+from safewave.services.llama_server import LlamaServerService
 import pandas as pd
 import logging
-from utils.chunk import Chunker
+from safewave.utils.chunk import Chunker
 
 logger = logging.getLogger(__name__)
 FORMAT = '%(asctime)s %(message)s'
