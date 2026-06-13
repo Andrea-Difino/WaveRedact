@@ -1,7 +1,7 @@
 [project]
 name = "safewave"
 version = "0.1.0"
-description = "Add your description here"
+description = "A local data privacy pipeline."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -14,3 +14,16 @@ dependencies = [
     "requests>=2.34.2",
     "transformers>=5.10.1",
 ]
+
+[project.optional-dependencies]
+web = [
+    "fastapi>=0.136.3",
+    "python-multipart>=0.0.32",
+    "uvicorn>=0.49.0",
+]
+
+[project.scripts]
+safewave = "cli.main:main"
+
+[tool.setuptools]
+packages = ["safewave", "cli"]
