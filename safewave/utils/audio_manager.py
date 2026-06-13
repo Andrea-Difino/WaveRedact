@@ -9,10 +9,12 @@ class AudioManager:
     SUPPORTED_EXTENSIONS = {'.mp3', '.wav', '.flac', '.m4a', '.aac', '.ogg', '.mp4', '.mkv', '.mov'}
 
     def __init__(self):
-        self.path = "./audio/"
+        project_root = Path(__file__).resolve().parent.parent.parent
+        safe_audio_dir = project_root / "audio"
+        self.path = str(safe_audio_dir)
         self.audio_mask: AudioMaskTypes = AudioMaskTypes.BEEP
 
-    def get_audio(self) -> list[str]:
+    def get_audio(self) -> list[Path]:
         audio_files = []
         for file_path in Path(self.path).glob("*"):
 

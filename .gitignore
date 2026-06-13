@@ -183,3 +183,4 @@ cython_debug/
 
 audio/prova.*
 files/*
+test_result.csv
