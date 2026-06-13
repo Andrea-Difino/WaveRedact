@@ -5,7 +5,7 @@ from .extractors.regex_extractor import RegexExtractor
 from .mapper import ChunkMapper
 from pathlib import Path
 
-class GlinerModel:
+class DataPrivacyPipeline:
     def __init__(
             self,
             model_id: str = "urchade/gliner_medium-v2.1", 
@@ -16,7 +16,7 @@ class GlinerModel:
         target_labels = target_labels if target_labels else [
             "person", "first name", "last name", "password",
             "street address", "city", "state", "hospital",
-            "bank account number",
+            "bank account number", "email"
         ]
         
         if not cache_dir:
