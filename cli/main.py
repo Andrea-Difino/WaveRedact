@@ -65,6 +65,7 @@ def main() -> None:
         chunks = chunk_man.chunk_text(transcribe_serv.iw_pair)
         len_chunks = len(chunks)
 
+        print(transcribe_serv.iw_pair)
         print(transcribe_serv.full_text)
 
         for i, chunk in enumerate(chunks):

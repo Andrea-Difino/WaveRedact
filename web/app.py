@@ -76,7 +76,6 @@ async def process_audio(file: UploadFile = File(...)):
         # chunks = chunk_man.chunk_text(segments)
         # Per ora simuliamo un dizionario di chunk inviato alla pipeline
 
-        print(transcribe_serv.iw_pair)
         chunk_man = Chunker()
         chunks = chunk_man.chunk_text(transcribe_serv.iw_pair)
 
