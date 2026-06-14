@@ -321,5 +321,5 @@ body.light-theme .upload-btn:hover .ub-icon {
     box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
 }
 
-footer{text-align:center;padding:20px 20px;font-size:12px;color:var(--text-secondary);letter-spacing: 0.02em;position: fixed;bottom: 0;}
+footer{text-align:center;padding:20px 20px;font-size:12px;color:var(--text-secondary);letter-spacing: 0.02em;position: fixed;bottom: 0; display: flex; align-items: center;}
 footer a{color:var(--ml-cyan);text-decoration: none; font-weight: 500;}
