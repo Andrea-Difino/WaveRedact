@@ -12,9 +12,9 @@ class AudioMaskTypes(Enum):
     SILENCE = "silence"
 
 class AudioCensor:
-    def __init__(self):
+    def __init__(self, rel_output_dir: str = "audio/censored"):
         project_root = Path(__file__).resolve().parent.parent.parent
-        safe_output_dir = project_root / "audio" / "censored"
+        safe_output_dir = project_root / rel_output_dir
         self.output_dir = str(safe_output_dir)
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -60,5 +60,5 @@ class AudioCensor:
 
         audio.export(output_path, format=format_export)
         
-        logger.info(f"✅ File saved: {output_path}")
+        logger.info(f"✅ File saved: {output_path}\n\n")
         return output_path
