@@ -30,3 +30,8 @@ safewave-web = "web.app:start_server"
 
 [tool.setuptools]
 packages = ["safewave", "cli", "web"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.0",
+]
