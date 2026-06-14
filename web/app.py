@@ -8,7 +8,8 @@ from pathlib import Path
 
 from safewave.utils.gpu_setup import GPUEnvironmentManager
 from safewave.utils.chunk import Chunker
-from safewave.pipeline.orchestrator import DataPrivacyPipeline
+from safewave.pipeline.mapper import ChunkMapper
+from safewave.pipeline.privacy_pipeline import DataPrivacyPipeline
 from safewave.services.transcribe import TranscribeService
 from faster_whisper import WhisperModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -82,8 +83,10 @@ async def process_audio(file: UploadFile = File(...)):
 
         words_finded_all = []
         
-        for i, chunk in enumerate(chunks):
-            res = pipeline.extract_sensitive_data(chunk)
+        for chunk in chunks:
+
+            mapper = ChunkMapper(chunk)
+            res = pipeline.extract_sensitive_data(mapper)
 
             words_finded = [transcribe_serv.iw_pair[idx] for idx in sorted(res)]
             words_finded_all.append(words_finded)

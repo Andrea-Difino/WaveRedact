@@ -1,47 +1,57 @@
-from typing import Dict, List, Set
-from .extractors.base_extractor import BaseExtractor
-from .extractors.gliner_extractor import GlinerExtractor
-from .extractors.regex_extractor import RegexExtractor
-from .mapper import ChunkMapper
 from pathlib import Path
+from safewave.pipeline.mapper import ChunkMapper
+from safewave.pipeline.privacy_pipeline import DataPrivacyPipeline
+from safewave.utils.chunk import Chunker
+import logging
 
-class DataPrivacyPipeline:
+logger = logging.getLogger(__name__)
+FORMAT = "%(asctime)s %(message)s"
+
+
+class Orchestrator:
     def __init__(
-            self,
-            model_id: str = "urchade/gliner_medium-v2.1", 
-            cache_dir: str | None = None,
-            target_labels: List[str] | None = None,
-            threshold: float = 0.47
-        ):
-        target_labels = target_labels if target_labels else [
-            "person", "first name", "last name", "password",
-            "street address", "city", "state", "hospital",
-            "bank account number", "email"
-        ]
-        
-        if not cache_dir:
-            project_root = Path(__file__).resolve().parent.parent.parent
+        self,
+        *,
+        mappers: list[ChunkMapper],
+        data_pipeline: DataPrivacyPipeline,
+    ):
+        self.mappers = mappers
+        self.data_pipeline = data_pipeline
 
-            safe_cache_dir = project_root / "files" / "gliner_models"
+    def run_audio_chunks(
+        self, iw_pair: dict[int, str]
+    ) -> set[int]:
+        full_idx: set[int] = set()
+        n_chunks = len(self.mappers)
 
-            self.cache_dir = str(safe_cache_dir)
-        else:
-            self.cache_dir = cache_dir
+        for i in range(n_chunks):
+            logger.info(f"Running chunk: {i + 1}")
 
-        self.extractors: List[BaseExtractor] = [
-            RegexExtractor(),
-            GlinerExtractor(model_id, self.cache_dir, target_labels, threshold)
-        ]
+            res = self.data_pipeline.extract_sensitive_data(self.mappers[i])
 
-    def extract_sensitive_data(self, chunk: Dict[int, str]) -> Set[int]:
-    
-        mapper = ChunkMapper(chunk)
-        total_idx: Set[int] = set()
+            words_finded = [iw_pair[idx] for idx in sorted(res)]
+            full_idx.update(res)
 
-        for extractor in self.extractors:
-            coords = extractor.extract(mapper.text)
+            self._human_approval(i, n_chunks, words_finded)
 
-            for start, end in coords:
-                total_idx.update(mapper.get_original_idxs(start, end))
+        return full_idx
 
-        return total_idx
+    def _human_approval(self, pos: int, n_chunks: int, sensitive_words: list[str]):
+        while True:
+            user_question = input(
+                f"\nThese are the words found by the first model:\n{sensitive_words}\n\nAre they right (Y/N)? "
+            )
+
+            if user_question.upper() == "Y":
+                if pos + 1 == n_chunks:
+                    print("Thanks for using SafeWave!")
+                else:
+                    print("Continue with the next chunk...")
+                break
+            elif user_question.upper() == "N":
+                print("Second check activated! Passaggio all'LLM...")
+                # TODO passare chunks a due LLM . Il primo é un modello piú piccolo e cerca di censurare le parole. Il secondo é più potente, fa quello che ha fatto il primo e sistema/aggiusta le censure. I due risultati che contengono gli id delle parole da censurare vengono messi in un set in modo da togliere i duplicati
+
+                break
+            else:
+                print("⚠️ Invalid input. Please enter Y or N.")
