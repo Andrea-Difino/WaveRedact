@@ -4,9 +4,9 @@ from pathlib import Path
 class IOAudioManager:
     SUPPORTED_EXTENSIONS = {'.mp3', '.wav', '.flac', '.m4a', '.ogg'}
 
-    def __init__(self):
+    def __init__(self, audio_path: str = "audio"):
         project_root = Path(__file__).resolve().parent.parent.parent
-        safe_audio_dir = project_root / "audio"
+        safe_audio_dir = project_root / audio_path
         self.path = str(safe_audio_dir)
 
     def get_audio(self) -> list[Path]:
