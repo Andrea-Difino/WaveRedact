@@ -80,13 +80,8 @@ def main() -> None:
 
         full_idx = orchestrator.run_audio_chunks(transcribe_serv.iw_pair)
 
-        intervals_to_censor = []
-        for idx in full_idx:
-            start_str, end_str = transcribe_serv.ival_pair[idx].split("-")
-            intervals_to_censor.append((float(start_str), float(end_str)))
-
-        censor_manager = AudioCensor()
-        censor_manager.censor_file(str(audio_path), intervals_to_censor)
+        censor_manager = AudioCensor(transcribe_serv.ival_pair, full_idx)
+        censor_manager.censor_file(str(audio_path))
 
 
 if __name__ == "__main__":
