@@ -12,7 +12,8 @@ class TestAudioCensor:
     def audio_censor(self, tmp_path):
         """tmp_path for the censored test audio"""
         test_dir = str(tmp_path / "censored_test_output")
-        return AudioCensor(rel_output_dir=test_dir)
+        timestamps = {0:"1.0-2.0"}
+        return AudioCensor(timestamps, {0}, rel_output_dir=test_dir)
 
     @pytest.fixture
     def dummy_audio_file(self, tmp_path):
@@ -35,13 +36,11 @@ class TestAudioCensor:
         """
         Verify if censor is correctly applied to the audio
         """
-
-        start_sec, end_sec = 1.0, 2.0
-        timestamps = [(start_sec, end_sec)]
+        start_sec = 1.0
+        end_sec = 2.0
 
         output_path = audio_censor.censor_file(
-            input_path=dummy_audio_file, 
-            timestamps=timestamps, 
+            input_path=dummy_audio_file,
             mode=mode
         )
         
