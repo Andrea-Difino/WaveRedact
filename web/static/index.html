@@ -15,13 +15,14 @@
     </button>
 
     <header>
-        <div class="logo">
+        <img id="long-logo" src="./static/imgs/white_png.png" alt="logo" width="350">
+        <!--<div class="logo">
             <div class="logo-wave">
                 <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
             </div>
             <span class="logo-name">Safe<span class="logo-second-part">Wave</span></span>
-        </div>
-        <span class="badge-ai">ML PIPELINE V0.1.0</span>
+        </div>-->
+        <span class="badge-ai">ML PIPELINE V0.2.0</span>
     </header>
 
     <main>
@@ -78,7 +79,7 @@
     </div>
 
     <footer>
-        <img id="logo-img" src="./static/imgs/logo_quadrato.png" alt="logo" width="50">
+        <img id="logo-img" src="./static/imgs/small_white.png" alt="logo" width="50">
         ML pipeline · Open source · <a href="https://github.com/Andrea-Difino/SafeWave/" target="_blank">GitHub</a> · MIT License
     </footer>
 
@@ -86,6 +87,17 @@
 
     function toggleTheme() {
         document.body.classList.toggle('light-theme');
+
+        const logo = document.getElementById("logo-img");
+        const long_logo = document.getElementById("long-logo");
+
+        if (document.body.classList.contains("light-theme")) {
+            logo.src = "./static/imgs/small_blue.png";
+            long_logo.src = "./static/imgs/blue_png_2.png";
+        } else {
+            logo.src = "./static/imgs/small_white.png";
+            long_logo.src = "./static/imgs/white_png.png";
+        }
     }
 
     function startProcess() {
