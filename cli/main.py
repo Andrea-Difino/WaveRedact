@@ -9,7 +9,7 @@ from safewave.utils.audio_manager import IOAudioManager
 from safewave.utils.audio_censor import AudioCensor
 from safewave.utils.chunk import Chunker
 from safewave.pipeline.orchestrator import Orchestrator
-
+from safewave.factories.gliner_factory import GlinerFactory
 # from models.gguf_model import GGUFModel
 from safewave.pipeline.privacy_pipeline import DataPrivacyPipeline
 from safewave.pipeline.mapper import ChunkMapper
@@ -36,15 +36,16 @@ logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
 
 def main() -> None:
     # VARIABLES
-    # MAKER_MODEL_NAME = "Meta-Llama-3-8B-Instruct-Q5_K_S.gguf"
-    # REPO_ID = "bartowski/Meta-Llama-3-8B-Instruct-GGUF"
+    # MAKER_MODEL_NAME = "Qwen2.5-14B-Instruct-Q5_K_S.gguf"
+    # REPO_ID = "bartowski/Qwen2.5-14B-Instruct-GGUF"
     # SERVER_PORT = 8080
 
     # MODELS INITIALIZATION
     model_name = "large-v3-turbo"
     model = WhisperModel(model_name, device="cuda", compute_type="int8_float16")
 
-    privacy_pipeline = DataPrivacyPipeline()
+    gliner_factory = GlinerFactory()
+    privacy_pipeline = DataPrivacyPipeline(gliner_factory)
 
     # with open("prompts.yaml", "r") as f:
     #    prompts = yaml.safe_load(f)
