@@ -19,7 +19,8 @@ class Orchestrator:
         self.data_pipeline = data_pipeline
 
     def run_audio_chunks(
-        self, iw_pair: dict[int, str]
+        self, 
+        iw_pair: dict[int, str]
     ) -> set[int]:
         full_idx: set[int] = set()
         n_chunks = len(self.mappers)
