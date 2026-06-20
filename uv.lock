@@ -1577,7 +1577,6 @@ source = { virtual = "." }
 dependencies = [
     { name = "faster-whisper" },
     { name = "ffmpeg-python" },
-    { name = "gliner" },
     { name = "gliner2" },
     { name = "huggingface-hub" },
     { name = "openai" },
@@ -1605,7 +1604,6 @@ requires-dist = [
     { name = "fastapi", marker = "extra == 'web'", specifier = ">=0.136.3" },
     { name = "faster-whisper", specifier = ">=1.2.1" },
     { name = "ffmpeg-python", specifier = ">=0.2.0" },
-    { name = "gliner", specifier = ">=0.2.24" },
     { name = "gliner2", specifier = ">=1.3.1" },
     { name = "huggingface-hub", specifier = ">=1.17.0" },
     { name = "openai", specifier = ">=2.41.0" },
