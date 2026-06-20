@@ -1571,7 +1571,7 @@ wheels = [
 ]
 
 [[package]]
-name = "safewave"
+name = "waveredact"
 version = "0.2.0"
 source = { virtual = "." }
 dependencies = [

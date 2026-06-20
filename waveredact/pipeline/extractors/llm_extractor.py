@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from safewave.pipeline.extractors.base_extractor import BaseExtractor
+from waveredact.pipeline.extractors.base_extractor import BaseExtractor
 
 class LlmExtractor(BaseExtractor):
 

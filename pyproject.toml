@@ -1,5 +1,5 @@
 [project]
-name = "safewave"
+name = "waveredact"
 version = "0.2.0"
 description = "A local data privacy pipeline."
 readme = "README.md"
@@ -25,11 +25,11 @@ web = [
 ]
 
 [project.scripts]
-safewave = "cli.main:main"
-safewave-web = "web.app:start_server"
+waveredact = "cli.main:main"
+waveredact-web = "web.app:start_server"
 
 [tool.setuptools]
-packages = ["safewave", "cli", "web"]
+packages = ["waveredact", "cli", "web"]
 
 [dependency-groups]
 dev = [

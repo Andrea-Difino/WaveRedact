@@ -1,4 +1,4 @@
-from safewave.pipeline.mapper import ChunkMapper
+from waveredact.pipeline.mapper import ChunkMapper
 import pytest
 
 
