@@ -1,7 +1,7 @@
 from pathlib import Path
-from safewave.pipeline.mapper import ChunkMapper
-from safewave.pipeline.privacy_pipeline import DataPrivacyPipeline
-from safewave.utils.chunk import Chunker
+from waveredact.pipeline.mapper import ChunkMapper
+from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
+from waveredact.utils.chunk import Chunker
 import logging
 
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class Orchestrator:
 
             if user_question.upper() == "Y":
                 if pos + 1 == n_chunks:
-                    print("Thanks for using SafeWave!")
+                    print("Thanks for using waveredact!")
                 else:
                     print("Continue with the next chunk...")
                 break

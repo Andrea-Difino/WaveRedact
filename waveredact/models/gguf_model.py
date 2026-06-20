@@ -1,5 +1,5 @@
 import json
-from safewave.models.model import Model
+from waveredact.models.model import Model
 from huggingface_hub import hf_hub_download
 import os
 from openai import OpenAI

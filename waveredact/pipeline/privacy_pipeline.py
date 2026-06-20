@@ -2,7 +2,7 @@ from typing import List, Set
 from .extractors.base_extractor import BaseExtractor
 from .extractors.regex_extractor import RegexExtractor
 from .mapper import ChunkMapper
-from safewave.factories.gliner_factory import GlinerFactory
+from waveredact.factories.gliner_factory import GlinerFactory
 
 class DataPrivacyPipeline:
     def __init__(

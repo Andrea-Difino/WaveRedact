@@ -6,18 +6,18 @@ import shutil
 import os
 from pathlib import Path
 
-from safewave.utils.gpu_setup import GPUEnvironmentManager
-from safewave.utils.chunk import Chunker
-from safewave.pipeline.mapper import ChunkMapper
-from safewave.pipeline.privacy_pipeline import DataPrivacyPipeline
-from safewave.services.transcribe import TranscribeService
+from waveredact.utils.gpu_setup import GPUEnvironmentManager
+from waveredact.utils.chunk import Chunker
+from waveredact.pipeline.mapper import ChunkMapper
+from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
+from waveredact.services.transcribe import TranscribeService
 from faster_whisper import WhisperModel
 from fastapi.middleware.cors import CORSMiddleware
 
 gpu_manager = GPUEnvironmentManager()
 gpu_manager.ensure_gpu_ready()
 
-app = FastAPI(title="SafeWave API", description="Local Data Privacy Pipeline API")
+app = FastAPI(title="waveredact API", description="Local Data Privacy Pipeline API")
 
 app.add_middleware(
     CORSMiddleware,

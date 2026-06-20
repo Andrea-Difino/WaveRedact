@@ -1,5 +1,5 @@
 from pathlib import Path
-from safewave.pipeline.extractors.gliner_extractor import GlinerExtractor
+from waveredact.pipeline.extractors.gliner_extractor import GlinerExtractor
 
 class GlinerFactory:
 

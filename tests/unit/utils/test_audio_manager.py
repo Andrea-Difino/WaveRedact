@@ -1,5 +1,5 @@
 import pytest
-from safewave.utils.audio_manager import IOAudioManager
+from waveredact.utils.audio_manager import IOAudioManager
 from pydub.generators import Sine
 
 class TestAudioManager:

@@ -1,18 +1,18 @@
-from safewave.utils.gpu_setup import GPUEnvironmentManager
+from waveredact.utils.gpu_setup import GPUEnvironmentManager
 
 gpu_manager = GPUEnvironmentManager()
 gpu_manager.ensure_gpu_ready()
 
 from faster_whisper import WhisperModel
-from safewave.services.transcribe import TranscribeService
-from safewave.utils.audio_manager import IOAudioManager
-from safewave.utils.audio_censor import AudioCensor
-from safewave.utils.chunk import Chunker
-from safewave.pipeline.orchestrator import Orchestrator
-from safewave.factories.gliner_factory import GlinerFactory
+from waveredact.services.transcribe import TranscribeService
+from waveredact.utils.audio_manager import IOAudioManager
+from waveredact.utils.audio_censor import AudioCensor
+from waveredact.utils.chunk import Chunker
+from waveredact.pipeline.orchestrator import Orchestrator
+from waveredact.factories.gliner_factory import GlinerFactory
 # from models.gguf_model import GGUFModel
-from safewave.pipeline.privacy_pipeline import DataPrivacyPipeline
-from safewave.pipeline.mapper import ChunkMapper
+from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
+from waveredact.pipeline.mapper import ChunkMapper
 
 # from services.llama_server import LlamaServerService
 # import yaml
