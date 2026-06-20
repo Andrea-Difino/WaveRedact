@@ -188,3 +188,4 @@ test_result.csv
 tests/gliner_test/*
 tests/maker_model_test/*
 tests/*.json
+test_imgs/
