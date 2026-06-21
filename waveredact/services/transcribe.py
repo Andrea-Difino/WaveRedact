@@ -9,9 +9,8 @@ class TranscribeService:
         self.full_text: str
 
     def transcribe_audio(self, audio_path: str):
-        style_prompt = "mario.rossi@gmail.com. info@azienda.it. test@hotmail.com."
 
-        segments, _ = self.model.transcribe(audio_path, beam_size=5, word_timestamps=True, initial_prompt=style_prompt)
+        segments, _ = self.model.transcribe(audio_path, beam_size=5, word_timestamps=True)
         words_list: list[str] = []
         intervals_list: list[str] = []
 
