@@ -4,7 +4,7 @@ import pytest
 from pydub import AudioSegment
 from pydub.generators import Sine
 
-from safewave.utils.audio_censor import AudioCensor, AudioMaskTypes
+from waveredact.utils.audio_censor import AudioCensor, AudioMaskTypes
 
 class TestAudioCensor:
 

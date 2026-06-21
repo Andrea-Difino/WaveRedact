@@ -1,18 +1,18 @@
-from safewave.utils.gpu_setup import GPUEnvironmentManager
+from waveredact.utils.gpu_setup import GPUEnvironmentManager
 
 gpu_manager = GPUEnvironmentManager()
 gpu_manager.ensure_gpu_ready()
 
 from faster_whisper import WhisperModel
-from safewave.services.transcribe import TranscribeService
-from safewave.utils.audio_manager import IOAudioManager
-from safewave.utils.audio_censor import AudioCensor
-from safewave.utils.chunk import Chunker
-from safewave.pipeline.orchestrator import Orchestrator
-
+from waveredact.services.transcribe import TranscribeService
+from waveredact.utils.audio_manager import IOAudioManager
+from waveredact.utils.audio_censor import AudioCensor
+from waveredact.utils.chunk import Chunker
+from waveredact.pipeline.orchestrator import Orchestrator
+from waveredact.factories.gliner_factory import GlinerFactory
 # from models.gguf_model import GGUFModel
-from safewave.pipeline.privacy_pipeline import DataPrivacyPipeline
-from safewave.pipeline.mapper import ChunkMapper
+from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
+from waveredact.pipeline.mapper import ChunkMapper
 
 # from services.llama_server import LlamaServerService
 # import yaml
@@ -36,15 +36,16 @@ logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
 
 def main() -> None:
     # VARIABLES
-    # MAKER_MODEL_NAME = "Meta-Llama-3-8B-Instruct-Q5_K_S.gguf"
-    # REPO_ID = "bartowski/Meta-Llama-3-8B-Instruct-GGUF"
+    # MAKER_MODEL_NAME = "Qwen2.5-14B-Instruct-Q5_K_S.gguf"
+    # REPO_ID = "bartowski/Qwen2.5-14B-Instruct-GGUF"
     # SERVER_PORT = 8080
 
     # MODELS INITIALIZATION
     model_name = "large-v3-turbo"
     model = WhisperModel(model_name, device="cuda", compute_type="int8_float16")
 
-    privacy_pipeline = DataPrivacyPipeline()
+    gliner_factory = GlinerFactory()
+    privacy_pipeline = DataPrivacyPipeline(gliner_factory)
 
     # with open("prompts.yaml", "r") as f:
     #    prompts = yaml.safe_load(f)
