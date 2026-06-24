@@ -3,6 +3,8 @@
 class Chunker:
 
     def __init__(self, overlap: int = 20, batch_size: int = 100):
+        if overlap > batch_size:
+            raise ValueError("overlap must be lower than batch_size")
         self.overlap = overlap
         self.batch_size = batch_size
 
