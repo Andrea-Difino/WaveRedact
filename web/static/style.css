@@ -12,7 +12,7 @@
     --btn-bg: rgba(15, 19, 34, 0.75);
     --btn-border: rgba(59, 130, 246, 0.6);
     --btn-hover-bg: rgba(26, 34, 56, 0.9);
-    --btn-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 20px 0 rgba(59, 130, 246, 0.15);
+    --btn-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 20px 0 rgba(196, 198, 201, 0.15);
 
     --glow-opacity-1: 0.22;
     --glow-opacity-2: 0.12;
@@ -70,6 +70,10 @@ body{
     overflow: hidden;
     position: relative;
     transition: background 0.3s ease, color 0.3s ease;
+}
+
+span{
+    font-family:var(--font-jakarta);
 }
 
 .theme-toggle {
@@ -173,81 +177,46 @@ h1 em{font-style:normal;background: linear-gradient(135deg, var(--ml-cyan), var(
     margin:0 auto;
 }
 
-
-.orbit-wrap::before {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 340px;
-    height: 340px;
-    background: radial-gradient(circle, rgba(6, 182, 212, var(--glow-opacity-1)) 0%, rgba(139, 92, 246, var(--glow-opacity-2)) 40%, transparent 70%);
-    filter: blur(15px);
-    pointer-events: none;
-    z-index: 1;
-    transition: background 0.3s ease;
-}
-
 .ring{position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%); pointer-events: none; transition: border-color 0.3s ease;}
 .ring-1{width:45rem;height:45rem;border:1px dashed var(--ring-1);}
 .ring-2{width:70rem;height:70rem;border:1px solid var(--ring-2);}
 .ring-3{width:100rem;height:100rem;border:1px solid var(--ring-3);}
 
 .upload-btn{
-    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    width:145px;height:145px;
-    border-radius:50%;
-    background: var(--btn-bg);
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:145px;
+    height:fit-content;
+    background: transparent;
     border: none;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: var(--btn-shadow);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
     cursor:pointer;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
     z-index:10;
+    transition: 200ms linear;
 }
 
 
 
 .upload-btn:hover{
-    background: var(--btn-hover-bg);
-    border-color: var(--ml-cyan);
     transform: translate(-50%,-50%) scale(1.06);
-    box-shadow: 
-        0 0 35px rgba(6, 182, 212, 0.35),
-        0 0 15px rgba(139, 92, 246, 0.25);
-}
-body.light-theme .upload-btn:hover {
-    box-shadow: 
-        0 12px 30px rgba(6, 182, 212, 0.2),
-        0 4px 14px rgba(139, 92, 246, 0.15);
 }
 
 .upload-btn:active{
     transform: translate(-50%,-50%) scale(0.96);
 }
 
-.ub-icon{
-    width:34px;height:34px;
-    stroke: var(--ml-cyan);
-    fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
-    transition:transform 0.3s, stroke 0.2s;
-}
-.upload-btn:hover .ub-icon {
-    transform: translateY(-2px);
-    stroke: var(--ml-blue);
-    filter: drop-shadow(0 0 2px var(--ml-cyan));
-}
-body.light-theme .upload-btn:hover .ub-icon {
-    stroke: var(--ml-blue);
-    filter: none;
-}
 
 .ub-label{
-    font-size:11px;font-weight:700;
+    font-size:1.5rem;
+    font-weight:500;
     color: var(--text-primary);
-    letter-spacing:0.08em;
+    letter-spacing:0.06em;
     transition:color .22s
 }
 
