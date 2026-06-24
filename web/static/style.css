@@ -1,9 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 :root{
-    /* ==========================================================================
-       TEMA SCURO (DEFAULT - CYBER LAB)
-       ========================================================================== */
     --bg-dark: #070913;
     --bg-card: #0f1322;
     --ml-blue: #3b82f6;
@@ -11,23 +8,19 @@
     --ml-cyan: #06b6d4;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
-    
-    /* Configurazione elementi centrali */
+
     --btn-bg: rgba(15, 19, 34, 0.75);
     --btn-border: rgba(59, 130, 246, 0.6);
     --btn-hover-bg: rgba(26, 34, 56, 0.9);
     --btn-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 20px 0 rgba(59, 130, 246, 0.15);
-    
-    /* Opacità del gradiente concentrato centrale */
+
     --glow-opacity-1: 0.22;
     --glow-opacity-2: 0.12;
-    
-    /* Anelli dell'orbita */
+
     --ring-1: rgba(59, 130, 246, 0.25);
     --ring-2: rgba(139, 92, 246, 0.15);
     --ring-3: rgba(255, 255, 255, 0.04);
-    
-    /* Area risultati e Tag */
+
     --result-bg: rgba(15, 19, 34, 0.5);
     --result-border: rgba(255, 255, 255, 0.05);
     --tag-bg: rgba(59, 130, 246, 0.1);
@@ -39,30 +32,23 @@
 }
 
 body.light-theme {
-    /* ==========================================================================
-       TEMA CHIARO (MODERNO - AI RESEARCH LAB)
-       ========================================================================== */
     --bg-dark: #f8fafc;
     --bg-card: #ffffff;
     --text-primary: #0f172a;
     --text-secondary: #475569;
-    
-    /* Configurazione elementi centrali */
+
     --btn-bg: rgba(255, 255, 255, 0.85);
     --btn-border: rgba(59, 130, 246, 0.4);
     --btn-hover-bg: rgba(241, 245, 249, 0.95);
     --btn-shadow: 0 10px 30px 0 rgba(148, 163, 184, 0.18), 0 0 15px 0 rgba(59, 130, 246, 0.08);
-    
-    /* Opacità gradiente centrale più delicata per sfondo chiaro */
+
     --glow-opacity-1: 0.14;
     --glow-opacity-2: 0.07;
-    
-    /* Anelli dell'orbita */
+
     --ring-1: rgba(59, 130, 246, 0.18);
     --ring-2: rgba(139, 92, 246, 0.12);
     --ring-3: rgba(15, 23, 42, 0.04);
-    
-    /* Area risultati e Tag */
+
     --result-bg: rgba(255, 255, 255, 0.8);
     --result-border: rgba(15, 23, 42, 0.06);
     --tag-bg: rgba(59, 130, 246, 0.06);
@@ -81,11 +67,11 @@ body{
     font-family:var(--font-jakarta);
     color:var(--text-primary);
     min-height: 100vh;
-    overflow-x: hidden;
+    overflow: hidden;
+    position: relative;
     transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* INTERRUTTORE DI TEMA SNELLO ED ELEGANTE */
 .theme-toggle {
     position: absolute;
     top: 24px;
@@ -112,24 +98,30 @@ body{
     width: 18px;
     height: 18px;
 }
-/* Logica icone Sole/Luna basata sul tema attivo */
+
 .theme-toggle .moon-icon { display: none; }
 .theme-toggle .sun-icon { display: block; }
 body.light-theme .theme-toggle .moon-icon { display: block; }
 body.light-theme .theme-toggle .sun-icon { display: none; }
 
 header{
-    text-align:center;
+    text-align:left;
     display: flex;
     flex-direction: column;
     width: fit-content;
-    align-items: center;
+    align-items: flex-start;
     margin: 0px auto 20px auto;
     padding:24px 24px 0;
+    position: absolute;
+}
+
+header h1{
+    width: 30rem;
 }
 
 main{
     text-align: center;
+    height: 100vh;
 }
 
 .logo{
@@ -170,18 +162,18 @@ main{
     letter-spacing: 0.05em;
 }
 
-h1{font-size:42px;font-weight:700;line-height:1.15;margin-bottom:16px;letter-spacing: -0.03em;}
+h1{font-size:60px;font-weight:700;line-height:1.15;margin-bottom:16px;letter-spacing: -0.03em;}
 h1 em{font-style:normal;background: linear-gradient(135deg, var(--ml-cyan), var(--ml-blue), var(--ml-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
-.subtitle{font-size:15px;color:var(--text-secondary);line-height:1.6;max-width:440px;margin:0 auto 52px}
+.subtitle{font-size:20px;color:var(--text-secondary);line-height:1.6;max-width:440px;}
 
 .orbit-wrap{
     position:relative;
     width:380px;
-    height:380px;
+    height:100%;
     margin:0 auto;
 }
 
-/* IL GRADIENTE CENTRALE SFUMATO AUTOMATICO ATTORNIO AL BOTTONE */
+
 .orbit-wrap::before {
     content: '';
     position: absolute;
@@ -197,17 +189,16 @@ h1 em{font-style:normal;background: linear-gradient(135deg, var(--ml-cyan), var(
 }
 
 .ring{position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%); pointer-events: none; transition: border-color 0.3s ease;}
-.ring-1{width:180px;height:180px;border:1px dashed var(--ring-1);}
-.ring-2{width:290px;height:290px;border:1px solid var(--ring-2);}
-.ring-3{width:380px;height:380px;border:1px solid var(--ring-3);}
+.ring-1{width:45rem;height:45rem;border:1px dashed var(--ring-1);}
+.ring-2{width:70rem;height:70rem;border:1px solid var(--ring-2);}
+.ring-3{width:100rem;height:100rem;border:1px solid var(--ring-3);}
 
-/* PULSANTE AD ALTA VALORIZZAZIONE ML */
 .upload-btn{
     position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
     width:145px;height:145px;
     border-radius:50%;
     background: var(--btn-bg);
-    border: 2px solid var(--btn-border);
+    border: none;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: var(--btn-shadow);
@@ -217,20 +208,7 @@ h1 em{font-style:normal;background: linear-gradient(135deg, var(--ml-cyan), var(
     z-index:10;
 }
 
-.btn-pulse {
-    position: absolute;
-    width: 100%; height: 100%;
-    border-radius: 50%;
-    border: 2px solid var(--ml-cyan);
-    opacity: 0;
-    animation: pulseRadar 2.5s infinite;
-    pointer-events: none;
-    z-index: -1;
-}
-@keyframes pulseRadar {
-    0% { transform: scale(1); opacity: 0.35; }
-    100% { transform: scale(1.3); opacity: 0; }
-}
+
 
 .upload-btn:hover{
     background: var(--btn-hover-bg);
