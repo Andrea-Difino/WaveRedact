@@ -7,23 +7,27 @@ MODULE_PATH = "waveredact.pipeline.extractors.gliner_extractor"
 
 class TestGlinerExtractor:
 
-    @patch(f"{MODULE_PATH}.GLiNER2")
-    def test_init_loads_model_correctly(self, mock_gliner):
-        mock_model_instance = MagicMock()
-        mock_gliner.from_pretrained.return_value = mock_model_instance
+    def test_init_sets_attributes_correctly(self):
+        """Verify that constructur save everything correctly"""
+
+        mock_model = MagicMock()
         
-        extractor = GlinerExtractor("fake", "fake", ["access_token"], 0.85)
-        
+        extractor = GlinerExtractor(
+            model=mock_model,
+            target_labels=["access_token"],
+            threshold=0.85
+        )
+
+        assert extractor.model == mock_model
         assert extractor.target_labels == ["access_token"]
         assert extractor.threshold == 0.85
 
 
-    @patch(f"{MODULE_PATH}.GLiNER2")
-    def test_extract_returns_correct_tuples_from_nested_dict(self, mock_gliner):
-        mock_model_instance = MagicMock()
-        mock_gliner.from_pretrained.return_value = mock_model_instance
-        
-        mock_model_instance.extract_entities.return_value = {
+    def test_extract_returns_correct_tuples(self):
+        """Verify coordinates extraction and the use include_spans=True."""
+        mock_model = MagicMock()
+
+        mock_model.extract_entities.return_value = {
             "entities": {
                 "access_token": [
                     {"text": "Bearer_12345", "start": 38, "end": 50}
@@ -35,34 +39,49 @@ class TestGlinerExtractor:
             }
         }
         
-        extractor = GlinerExtractor("fake", "fake", ["access_token", "email", "password"], 0.8)
-        text_input = "Mario l'email mario@email.com e token Bearer_12345"
+        extractor = GlinerExtractor(
+            model=mock_model, 
+            target_labels=["access_token", "email", "password"], 
+            threshold=0.8
+        )
         
+        text_input = "Mario l'email mario@email.com e token Bearer_12345"
         result = extractor.extract(text_input)
+
+        mock_model.extract_entities.assert_called_once_with(
+            text_input, 
+            ["access_token", "email", "password"], 
+            threshold=0.8,
+            include_spans=True
+        )
 
         assert result == [(14, 29), (38, 50)]
 
 
-    @patch(f"{MODULE_PATH}.GLiNER2")
-    def test_extract_handles_duplicates_safely(self, mock_gliner):
-        mock_model_instance = MagicMock()
-        mock_gliner.from_pretrained.return_value = mock_model_instance
+    def test_extract_handles_duplicates(self):
 
-        mock_model_instance.extract_entities.return_value = {
+        mock_model = MagicMock()
+        mock_model.extract_entities.return_value = {
             "entities": {
-                "secret": [
-                    {"text": "12345", "start": 12, "end": 17}
-                ],
-                "password": [
-                    {"text": "12345", "start": 12, "end": 17}
-                ]
+                "secret": [{"text": "12345", "start": 12, "end": 17}],
+                "password": [{"text": "12345", "start": 12, "end": 17}]
             }
         }
         
-        extractor = GlinerExtractor("fake", "fake", ["secret", "password"], 0.8)
-        text_input = "Il codice è 12345"
-        
-        result = extractor.extract(text_input)
+        extractor = GlinerExtractor(mock_model, ["secret", "password"], 0.8)
+        result = extractor.extract("Il codice è 12345")
 
         assert len(result) == 1
         assert result == [(12, 17)]
+
+
+    def test_extract_empty_results(self):
+        """Verify sensibility in case of text without sensitive data"""
+        mock_model = MagicMock()
+
+        mock_model.extract_entities.return_value = {"entities": {}}
+        
+        extractor = GlinerExtractor(mock_model, ["email"], 0.8)
+        result = extractor.extract("Testo completamente anonimo e pulito.")
+        
+        assert result == []

@@ -1,9 +1,10 @@
 from pathlib import Path
-from waveredact.pipeline.extractors.gliner_extractor import GlinerExtractor
+from gliner2 import GLiNER2
+import os
 
 class GlinerFactory:
 
-    def __init__(self, model_id: str = "fastino/gliner2-privacy-filter-PII-multi", cache_dir: str | None = None, target_labels: list[str] | None = None, threshold: float = 0.54):
+    def __init__(self, model_id: str = "fastino/gliner2-privacy-filter-PII-multi", cache_dir: str = "", target_labels: list[str] | None = None, threshold: float = 0.54):
         self.model_id = model_id
         self.threshold = threshold
 
@@ -20,10 +21,18 @@ class GlinerFactory:
             "bank_account", "account_number", "email"
         ]
 
-    def build(self) -> GlinerExtractor:
-        return GlinerExtractor(
-            self.model_id,
-            self.cache_dir,
-            self.target_labels,
-            self.threshold
-        )
+    def build(self) -> GLiNER2:
+        if os.path.exists(self.cache_dir) and os.listdir(self.cache_dir):
+            print(f"📦 [WaveRedact] Finded model '{self.cache_dir}'. Offline loading...")
+
+            model = GLiNER2.from_pretrained(self.cache_dir, local_files_only=True)
+        else:
+            print(f"🌐 [WaveRedact] Model not finded locally. Downloading '{self.model_id}'... (Could take some minutes)")
+
+            os.makedirs(self.cache_dir, exist_ok=True)
+
+            model = GLiNER2.from_pretrained(self.model_id)
+            model.save_pretrained(self.cache_dir)
+            print(f"✅ [WaveRedact] Modello scaricato con successo e salvato in '{self.cache_dir}'!")
+
+        return model
