@@ -31,7 +31,43 @@ waveredact-web = "web.app:start_server"
 [tool.setuptools]
 packages = ["waveredact", "cli", "web"]
 
+[tool.pytest.ini_options]
+addopts = "--cov=waveredact --cov-report=term-missing"
+pythonpath = ["."]
+
+testpaths = ["tests"]
+
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+norecursedirs = [
+    "gliner_test", 
+    "maker_model_test", 
+    "venv", 
+    "env", 
+    ".venv", 
+    ".git", 
+    "__pycache__"
+]
+
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
+
+[tool.coverage.run]
+source = ["waveredact"]
+omit = [
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "@abstractmethod"
+]
+
 [dependency-groups]
 dev = [
     "pytest>=9.1.0",
+    "pytest-cov>=7.1.0",
 ]
