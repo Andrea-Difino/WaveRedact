@@ -1,18 +1,18 @@
 from typing import List, Set
 from .extractors.base_extractor import BaseExtractor
 from .extractors.regex_extractor import RegexExtractor
+from .extractors.gliner_extractor import GlinerExtractor
 from .mapper import ChunkMapper
-from waveredact.factories.gliner_factory import GlinerFactory
 
 class DataPrivacyPipeline:
     def __init__(
             self,
-            gliner_factory: GlinerFactory,
+            gliner_extractor: GlinerExtractor,
         ):
 
         self.extractors: List[BaseExtractor] = [
             RegexExtractor(),
-            gliner_factory.build()
+            gliner_extractor
         ]
 
     def extract_sensitive_data(self, mapper: ChunkMapper) -> Set[int]:

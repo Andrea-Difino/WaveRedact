@@ -10,6 +10,8 @@ from waveredact.utils.audio_censor import AudioCensor
 from waveredact.utils.chunk import Chunker
 from waveredact.pipeline.orchestrator import Orchestrator
 from waveredact.factories.gliner_factory import GlinerFactory
+from waveredact.pipeline.extractors.gliner_extractor import GlinerExtractor
+
 # from models.gguf_model import GGUFModel
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
 from waveredact.pipeline.mapper import ChunkMapper
@@ -45,7 +47,13 @@ def main() -> None:
     model = WhisperModel(model_name, device="cuda", compute_type="int8_float16")
 
     gliner_factory = GlinerFactory()
-    privacy_pipeline = DataPrivacyPipeline(gliner_factory)
+    privacy_pipeline = DataPrivacyPipeline(
+        GlinerExtractor(
+            gliner_factory.build(),
+            gliner_factory.target_labels,
+            gliner_factory.threshold,
+        )
+    )
 
     # with open("prompts.yaml", "r") as f:
     #    prompts = yaml.safe_load(f)
@@ -71,7 +79,7 @@ def main() -> None:
         chunks = chunk_man.chunk_text(transcribe_serv.iw_pair)
 
         mappers = [ChunkMapper(chunk) for chunk in chunks]
-        
+
         orchestrator = Orchestrator(
             mappers=mappers,
             data_pipeline=privacy_pipeline,

@@ -44,20 +44,29 @@ class AudioCensor:
 
         timestamps = sorted(timestamps, key=lambda x: x[0])
 
+        pad_start = 50
+        pad_end = 100
+
         for start_sec, end_sec in timestamps:
             start_ms = int(start_sec * 1000)
-            end_ms = int(end_sec * 1000)
-            duration_ms = end_ms - start_ms
+            safe_start = max(0, start_ms - pad_start)
 
-            if duration_ms <= 0:
+            end_ms = int(end_sec * 1000)
+            safe_end = min(len(audio), end_ms + pad_end)
+
+            safe_duration = safe_end - safe_start
+
+            if safe_duration <= 0:
                 continue
 
             if mode.value == "beep":
-                censor = Sine(600).to_audio_segment(duration=duration_ms).apply_gain(-15)
+                censor = Sine(600).to_audio_segment(duration=safe_duration).apply_gain(-15)
             else:
-                censor = AudioSegment.silent(duration=duration_ms)
+                censor = AudioSegment.silent(duration=safe_duration)
+                
+            censor = censor.fade_in(10).fade_out(10)
 
-            audio = audio[:start_ms] + censor + audio[end_ms:]
+            audio = audio[:safe_start] + censor + audio[safe_end:]
         
         return self._handle_file(audio, input_path)
     
