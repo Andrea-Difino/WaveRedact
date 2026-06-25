@@ -61,11 +61,6 @@ omit = [
     "*/__init__.py",
 ]
 
-[tool.coverage.report]
-exclude_lines = [
-    "@abstractmethod"
-]
-
 [dependency-groups]
 dev = [
     "pytest>=9.1.0",
