@@ -81,13 +81,14 @@ def main() -> None:
         mappers = [ChunkMapper(chunk) for chunk in chunks]
 
         orchestrator = Orchestrator(
+            index_word_pair=transcribe_serv.iw_pair,
             mappers=mappers,
             data_pipeline=privacy_pipeline,
         )
 
         print("Complete sentence:", transcribe_serv.full_text.strip(), "\n")
 
-        full_idx = orchestrator.run_audio_chunks(transcribe_serv.iw_pair)
+        full_idx = orchestrator.run_audio_chunks()
 
         censor_manager = AudioCensor(transcribe_serv.ival_pair, full_idx)
         censor_manager.censor_file(str(audio_path))

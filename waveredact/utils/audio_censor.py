@@ -12,7 +12,7 @@ class AudioMaskTypes(Enum):
     SILENCE = "silence"
 
 class AudioCensor:
-    def __init__(self, all_intervals: dict[int, str], idx_for_censor: set[int], rel_output_dir: str = "audio/censored"):
+    def __init__(self, all_intervals: dict[int, str], idx_for_censor: list[int], rel_output_dir: str = "audio/censored"):
         project_root = Path(__file__).resolve().parent.parent.parent
         safe_output_dir = project_root / rel_output_dir
         self.output_dir = str(safe_output_dir)
