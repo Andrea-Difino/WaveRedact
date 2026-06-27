@@ -36,7 +36,7 @@ class Orchestrator:
             full_idx.update(res)
 
         ordered_idx = sorted(full_idx)
-        print(ordered_idx)
+
         is_approved = self._human_approval(words_found)
         if is_approved:
             return ordered_idx

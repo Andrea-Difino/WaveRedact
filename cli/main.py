@@ -1,4 +1,5 @@
 from waveredact.utils.gpu_setup import GPUEnvironmentManager
+from waveredact.utils.level import LevelSetter
 
 gpu_manager = GPUEnvironmentManager()
 gpu_manager.ensure_gpu_ready()
@@ -11,13 +12,15 @@ from waveredact.utils.chunk import Chunker
 from waveredact.pipeline.orchestrator import Orchestrator
 from waveredact.factories.gliner_factory import GlinerFactory
 from waveredact.pipeline.extractors.gliner_extractor import GlinerExtractor
+from waveredact.pipeline.extractors.llm_extractor import LlmExtractor
 
-# from models.gguf_model import GGUFModel
+
+from waveredact.models.gguf_model import GGUFModel
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
 from waveredact.pipeline.mapper import ChunkMapper
 
-# from services.llama_server import LlamaServerService
-# import yaml
+from waveredact.services.llama_server import LlamaServerService
+import yaml
 import logging
 from dotenv import load_dotenv
 
@@ -38,33 +41,24 @@ logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
 
 def main() -> None:
     # VARIABLES
-    # MAKER_MODEL_NAME = "Qwen2.5-14B-Instruct-Q5_K_S.gguf"
-    # REPO_ID = "bartowski/Qwen2.5-14B-Instruct-GGUF"
-    # SERVER_PORT = 8080
+    MAKER_MODEL_NAME = "Qwen2.5-14B-Instruct-Q5_K_S.gguf"
+    REPO_ID = "bartowski/Qwen2.5-14B-Instruct-GGUF"
+    SERVER_PORT = 8080
 
     # MODELS INITIALIZATION
     model_name = "large-v3-turbo"
     model = WhisperModel(model_name, device="cuda", compute_type="int8_float16")
 
-    gliner_factory = GlinerFactory()
-    privacy_pipeline = DataPrivacyPipeline(
-        GlinerExtractor(
-            gliner_factory.build(),
-            gliner_factory.target_labels,
-            gliner_factory.threshold,
-        )
-    )
-
-    # with open("prompts.yaml", "r") as f:
-    #    prompts = yaml.safe_load(f)
+    with open("prompts.yaml", "r") as f:
+        prompts = yaml.safe_load(f)
 
     transcribe_serv = TranscribeService(model)
-    # maker = GGUFModel(prompts["maker"]["default"]["system_prompt"], MAKER_MODEL_NAME, REPO_ID, server_port=SERVER_PORT)
+    maker = GGUFModel(prompts["maker"]["default"]["system_prompt"], MAKER_MODEL_NAME, REPO_ID, server_port=SERVER_PORT)
     # checker = GGUFModel(prompts["checker"]["default"]["system_prompt"], MAKER_MODEL_NAME, server)
 
     # SERVER INITIALIZATION
-    # server = LlamaServerService(MAKER_MODEL_NAME, server_port=SERVER_PORT)
-    # server.start_server()
+    server = LlamaServerService(MAKER_MODEL_NAME, server_port=SERVER_PORT)
+    server.start_server()
 
     audio_manager = IOAudioManager()
     audios = audio_manager.get_audio()
@@ -79,6 +73,19 @@ def main() -> None:
         chunks = chunk_man.chunk_text(transcribe_serv.iw_pair)
 
         mappers = [ChunkMapper(chunk) for chunk in chunks]
+        
+        levels_setter = LevelSetter()
+
+        gliner_factory = GlinerFactory(target_labels=levels_setter.target_labels)
+        llm_extractor = LlmExtractor(model=maker)
+        privacy_pipeline = DataPrivacyPipeline(
+            GlinerExtractor(
+                gliner_factory.build(),
+                gliner_factory.target_labels,
+                gliner_factory.threshold,
+            ),
+            llm_extractor
+        )
 
         orchestrator = Orchestrator(
             index_word_pair=transcribe_serv.iw_pair,

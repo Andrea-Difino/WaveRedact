@@ -11,5 +11,5 @@ class RegexExtractor(BaseExtractor):
         pattern_cap = r'\b\d{5}\b'
         self.regex_totale = f"({pattern_email})|({pattern_iban})|({pattern_carte})|({pattern_tel})|({pattern_cap})"
 
-    def extract(self, text: str) -> List[Tuple[int, int]]:
+    def extract(self, text: str, old_idx: list[int] | None = None) -> List[Tuple[int, int]]:
         return [(match.start(), match.end()) for match in re.finditer(self.regex_totale, text)]

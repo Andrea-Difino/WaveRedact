@@ -9,6 +9,7 @@ class DataPrivacyPipeline:
     def __init__(
             self,
             gliner_extractor: GlinerExtractor,
+            llm_extractor: LlmExtractor
         ):
 
         self.simple_extractors: List[BaseExtractor] = [
@@ -17,7 +18,7 @@ class DataPrivacyPipeline:
         ]
 
         self.llm_extractors: List[BaseExtractor] = [
-            LlmExtractor()
+            llm_extractor
         ]
 
     def extract_sensitive_data(self, mapper: ChunkMapper) -> Set[int]:
