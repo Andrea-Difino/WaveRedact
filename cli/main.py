@@ -12,8 +12,6 @@ from waveredact.utils.chunk import Chunker
 from waveredact.pipeline.orchestrator import Orchestrator
 from waveredact.factories.gliner_factory import GlinerFactory
 from waveredact.pipeline.extractors.gliner_extractor import GlinerExtractor
-from waveredact.pipeline.extractors.llm_extractor import LlmExtractor
-
 
 from waveredact.models.gguf_model import GGUFModel
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
@@ -49,11 +47,8 @@ def main() -> None:
     model_name = "large-v3-turbo"
     model = WhisperModel(model_name, device="cuda", compute_type="int8_float16")
 
-    with open("prompts.yaml", "r") as f:
-        prompts = yaml.safe_load(f)
-
     transcribe_serv = TranscribeService(model)
-    maker = GGUFModel(prompts["maker"]["default"]["system_prompt"], MAKER_MODEL_NAME, REPO_ID, server_port=SERVER_PORT)
+    maker = GGUFModel(MAKER_MODEL_NAME, REPO_ID, server_port=SERVER_PORT)
     # checker = GGUFModel(prompts["checker"]["default"]["system_prompt"], MAKER_MODEL_NAME, server)
 
     # SERVER INITIALIZATION
@@ -77,14 +72,15 @@ def main() -> None:
         levels_setter = LevelSetter()
 
         gliner_factory = GlinerFactory(target_labels=levels_setter.target_labels)
-        llm_extractor = LlmExtractor(model=maker)
+        maker.labels = levels_setter.target_labels
+
         privacy_pipeline = DataPrivacyPipeline(
             GlinerExtractor(
                 gliner_factory.build(),
                 gliner_factory.target_labels,
                 gliner_factory.threshold,
             ),
-            llm_extractor
+            maker
         )
 
         orchestrator = Orchestrator(
@@ -99,6 +95,8 @@ def main() -> None:
 
         censor_manager = AudioCensor(transcribe_serv.ival_pair, full_idx)
         censor_manager.censor_file(str(audio_path))
+
+    print("\nThanks for using waveredact!")
 
 
 if __name__ == "__main__":

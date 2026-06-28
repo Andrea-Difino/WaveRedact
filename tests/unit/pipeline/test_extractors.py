@@ -30,10 +30,10 @@ class TestGlinerExtractor:
         mock_model.extract_entities.return_value = {
             "entities": {
                 "access_token": [
-                    {"text": "Bearer_12345", "start": 38, "end": 50}
+                    {"text": "Bearer_12345", "start": 38, "end": 50, "confidence": 0.90}
                 ],
                 "email": [
-                    {"text": "mario@email.com", "start": 14, "end": 29}
+                    {"text": "mario@email.com", "start": 14, "end": 29, "confidence": 0.90}
                 ],
                 "password": []
             }
@@ -52,10 +52,11 @@ class TestGlinerExtractor:
             text_input, 
             ["access_token", "email", "password"], 
             threshold=0.8,
-            include_spans=True
+            include_spans=True,
+            include_confidence=True
         )
 
-        assert result == [(14, 29), (38, 50)]
+        assert result == [(14, 29, 0.0), (38, 50, 0.0)]
 
 
     def test_extract_handles_duplicates(self):
@@ -63,8 +64,8 @@ class TestGlinerExtractor:
         mock_model = MagicMock()
         mock_model.extract_entities.return_value = {
             "entities": {
-                "secret": [{"text": "12345", "start": 12, "end": 17}],
-                "password": [{"text": "12345", "start": 12, "end": 17}]
+                "secret": [{"text": "12345", "start": 12, "end": 17, "confidence": 0.90}],
+                "password": [{"text": "12345", "start": 12, "end": 17, "confidence": 0.90}]
             }
         }
         
@@ -72,7 +73,7 @@ class TestGlinerExtractor:
         result = extractor.extract("Il codice è 12345")
 
         assert len(result) == 1
-        assert result == [(12, 17)]
+        assert result == [(12, 17, 0.0)]
 
 
     def test_extract_empty_results(self):

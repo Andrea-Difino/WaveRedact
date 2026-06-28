@@ -17,7 +17,7 @@ class ChunkMapper:
             curr_char = end_char
 
     def get_original_idxs(self, char_start: int, char_end: int) -> List[int]:
-        """Converte le posizioni in caratteri nei veri ID di Whisper."""
+        """Convert  char position in the true Whsiper IDs"""
         found_idxs = []
         for idx, (w_start, w_end) in self.char_mapping.items():
             if char_start < w_end and char_end > w_start:
