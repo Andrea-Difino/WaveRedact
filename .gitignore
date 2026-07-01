@@ -182,6 +182,8 @@ cython_debug/
 
 
 audio/*
+!audio/.gitkeep
+audio/censored/*
 files/*
 test_result.csv
 

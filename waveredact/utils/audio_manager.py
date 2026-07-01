@@ -7,6 +7,7 @@ class IOAudioManager:
     def __init__(self, audio_path: str = "audio"):
         project_root = Path(__file__).resolve().parent.parent.parent
         safe_audio_dir = project_root / audio_path
+        safe_audio_dir.mkdir(parents=True, exist_ok=True)
         self.path = str(safe_audio_dir)
 
     def get_audio(self) -> list[Path]:

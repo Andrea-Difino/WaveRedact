@@ -13,7 +13,7 @@ class TestAudioCensor:
         """tmp_path for the censored test audio"""
         test_dir = str(tmp_path / "censored_test_output")
         timestamps = {0:"1.0-2.0"}
-        return AudioCensor(timestamps, {0}, rel_output_dir=test_dir)
+        return AudioCensor(timestamps, [0], rel_output_dir=test_dir)
 
     @pytest.fixture
     def dummy_audio_file(self, tmp_path):

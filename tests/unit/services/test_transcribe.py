@@ -1,5 +1,16 @@
-import pytest
+import importlib
+import sys
+import types
 from unittest.mock import MagicMock
+
+import pytest
+
+
+sys.modules.pop("faster_whisper", None)
+fake_faster_whisper = types.ModuleType("faster_whisper")
+fake_faster_whisper.WhisperModel = object
+sys.modules["faster_whisper"] = fake_faster_whisper
+
 from waveredact.services.transcribe import TranscribeService
 
 
