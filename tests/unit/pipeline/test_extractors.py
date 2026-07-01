@@ -56,7 +56,7 @@ class TestGlinerExtractor:
             include_confidence=True
         )
 
-        assert result == [(14, 29, 0.0), (38, 50, 0.0)]
+        assert result == [(14, 29, 0.9), (38, 50, 0.9)]
 
 
     def test_extract_handles_duplicates(self):
@@ -73,7 +73,7 @@ class TestGlinerExtractor:
         result = extractor.extract("Il codice è 12345")
 
         assert len(result) == 1
-        assert result == [(12, 17, 0.0)]
+        assert result == [(12, 17, 0.9)]
 
 
     def test_extract_empty_results(self):

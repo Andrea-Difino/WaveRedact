@@ -2,9 +2,9 @@ import logging
 
 import click
 from dotenv import load_dotenv
-from faster_whisper import WhisperModel
 
 from waveredact.factories.gliner_factory import GlinerFactory
+from waveredact.factories.whisper_factory import WhisperFactory
 from waveredact.models.gguf_model import GGUFModel
 from waveredact.pipeline.extractors.gliner_extractor import GlinerExtractor
 from waveredact.pipeline.mapper import ChunkMapper
@@ -29,17 +29,6 @@ logging.getLogger("gliner.model").setLevel(logging.WARNING)
 logging.getLogger("transformers").setLevel(logging.ERROR)
 logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
 
-
-def _build_whisper_model() -> WhisperModel:
-    model_name = "large-v3-turbo"
-    try:
-        gpu_manager = GPUEnvironmentManager()
-        gpu_manager.ensure_gpu_ready()
-        return WhisperModel(model_name, device="cuda", compute_type="int8_float16")
-    except Exception as exc:
-        logger.warning("CUDA unavailable for Whisper, falling back to CPU: %s", exc)
-        return WhisperModel(model_name, device="cpu", compute_type="int8")
-
 @click.command()
 @click.option('--level', type=click.Choice(['base', 'medium', 'total'], case_sensitive=False), default='total', help='Level of PII censor. Used only if --auto is applied')
 @click.option('--auto', is_flag=True, help='Disable interactive mode (no confirm required).')
@@ -54,9 +43,11 @@ def main(level: str, auto: bool, use_llm: bool) -> None:
     click.secho(f"Starting WaveRedact - Auto: {auto} | LLM: {use_llm}", fg="cyan")
 
     # MODELS INITIALIZATION
-    model = _build_whisper_model()
+    gpu_setup = GPUEnvironmentManager()
+    whisper_factory = WhisperFactory(gpu_setup)
+    whisper_model = whisper_factory.build()
 
-    transcribe_serv = TranscribeService(model)
+    transcribe_serv = TranscribeService(whisper_model)
     maker = None
 
     if use_llm:
