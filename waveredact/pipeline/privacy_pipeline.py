@@ -1,25 +1,24 @@
 from typing import List, Set, Tuple
+
 from .extractors.base_extractor import BaseExtractor
-from .extractors.regex_extractor import RegexExtractor
 from .extractors.gliner_extractor import GlinerExtractor
-from waveredact.models.model import Model
+from .extractors.regex_extractor import RegexExtractor
 from .mapper import ChunkMapper
+from waveredact.models.model import Model
+
 
 class DataPrivacyPipeline:
     def __init__(
-            self,
-            gliner_extractor: GlinerExtractor,
-            llm_extractor: Model
-        ):
-
+        self,
+        gliner_extractor: GlinerExtractor,
+        llm_extractor: Model | None = None,
+    ):
         self.simple_extractors: List[BaseExtractor] = [
             RegexExtractor(),
-            gliner_extractor
+            gliner_extractor,
         ]
 
-        self.llm_extractors: List[Model] = [
-            llm_extractor
-        ]
+        self.llm_extractors: List[Model] = [llm_extractor] if llm_extractor else []
 
     def extract_sensitive_data(self, mapper: ChunkMapper, lock_threshold: float = 0.90) -> Tuple[Set[int], Set[int]]:
         total_idx: Set[int] = set()
@@ -36,7 +35,7 @@ class DataPrivacyPipeline:
                     locked_idx.update(word_indices)
 
         return total_idx, locked_idx
-    
+
     def extract_sensitive_with_llm(self, mapper: ChunkMapper, ambiguous_idx: List[int]) -> Set[int]:
         total_idx: Set[int] = set()
 

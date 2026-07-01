@@ -75,7 +75,6 @@ class GGUFModel(Model):
             )
             
             risposta_testo = response.choices[0].message.content
-            print(risposta_testo)
 
             list_sensitive_ids: list[int] = json.loads(risposta_testo if risposta_testo else "")["final_indices"]
             return list_sensitive_ids

@@ -86,5 +86,5 @@ class AudioCensor:
 
         audio.export(output_path, format=format_export)
         
-        logger.info(f"✅ File saved: {output_path}\n\n")
+        print(f"✅ File saved: {output_path}\n")
         return output_path

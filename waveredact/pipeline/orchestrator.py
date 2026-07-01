@@ -46,12 +46,14 @@ class Orchestrator:
         ambiguous_idx = full_idx - full_locked_idx
         if self.interactive_mode:
             is_approved = self._human_approval(words_found)
-            if is_approved:
+            if is_approved or not self.data_pipeline.llm_extractors:
+                if not is_approved and not self.data_pipeline.llm_extractors:
+                    logger.info("LLM bypassed because no LLM extractor is configured.")
                 return ordered_idx
             else:
                 return self.run_llm_extraction(sorted(ambiguous_idx), full_locked_idx)
         else:
-            if self.auto_llm:
+            if self.auto_llm and self.data_pipeline.llm_extractors:
                 logger.info("Automatic mode: Executing LLM to maximize security...")
                 return self.run_llm_extraction(sorted(ambiguous_idx), full_locked_idx)
             else:
