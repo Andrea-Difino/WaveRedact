@@ -1,5 +1,15 @@
-import pytest
+import sys
+import types
 from unittest.mock import patch, MagicMock
+
+import pytest
+
+
+sys.modules.pop("gliner2", None)
+fake_gliner2 = types.ModuleType("gliner2")
+fake_gliner2.GLiNER2 = object
+sys.modules["gliner2"] = fake_gliner2
+
 from waveredact.pipeline.extractors.gliner_extractor import GlinerExtractor
 
 MODULE_PATH = "waveredact.pipeline.extractors.gliner_extractor"
