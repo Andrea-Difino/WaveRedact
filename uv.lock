@@ -2041,6 +2041,7 @@ name = "waveredact"
 version = "0.2.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "click" },
     { name = "faster-whisper" },
     { name = "ffmpeg-python" },
     { name = "gliner2" },
@@ -2068,6 +2069,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "click", specifier = ">=8.4.1" },
     { name = "fastapi", marker = "extra == 'web'", specifier = ">=0.136.3" },
     { name = "faster-whisper", specifier = ">=1.2.1" },
     { name = "ffmpeg-python", specifier = ">=0.2.0" },

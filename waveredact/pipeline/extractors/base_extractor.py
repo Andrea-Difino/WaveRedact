@@ -3,6 +3,15 @@ from typing import List, Tuple
 
 class BaseExtractor(ABC):
     @abstractmethod
-    def extract(self, text: str, old_idx: list[int] | None = None) -> List[Tuple[int, int]]:
-        """Every extractor must return a list of coordinates: [(start, end)]"""
+    def extract(self, text: str) -> List[Tuple[int, int, float]]:
+        """
+        Extract coordinates corresponding to the position of sensitive data
+
+        Params:
+        text    - str text of the current chunk
+        old_idx - list of the previous extracted indices. Used to check if the previous step made some errors
+        
+        Return:
+        list of coordinates and confidence score: [(start, end, score)]
+        """
         pass

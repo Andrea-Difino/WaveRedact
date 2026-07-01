@@ -23,16 +23,16 @@ class GlinerFactory:
 
     def build(self) -> GLiNER2:
         if os.path.exists(self.cache_dir) and os.listdir(self.cache_dir):
-            print(f"📦 [WaveRedact] Finded model '{self.cache_dir}'. Offline loading...")
+            print(f"\n📦 Finded model '{self.cache_dir}'. Offline loading...")
 
             model = GLiNER2.from_pretrained(self.cache_dir, local_files_only=True)
         else:
-            print(f"🌐 [WaveRedact] Model not finded locally. Downloading '{self.model_id}'... (Could take some minutes)")
+            print(f"\n🌐 Model not finded locally. Downloading '{self.model_id}'... (Could take some minutes)")
 
             os.makedirs(self.cache_dir, exist_ok=True)
 
             model = GLiNER2.from_pretrained(self.model_id)
             model.save_pretrained(self.cache_dir)
-            print(f"✅ [WaveRedact] Modello scaricato con successo e salvato in '{self.cache_dir}'!")
+            print(f"\n✅ Model downloaded successfully and saved in '{self.cache_dir}'!")
 
         return model
