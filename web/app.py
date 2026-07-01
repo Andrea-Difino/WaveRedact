@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
     audio_service.load_models()
     yield
 
-    print("Spegnimento e pulizia VRAM...")
+    print("Shutting down server and cleaning VRAM...")
 
 def create_app() -> FastAPI:
     project_root = Path(__file__).resolve().parent.parent

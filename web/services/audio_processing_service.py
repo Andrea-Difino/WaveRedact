@@ -26,13 +26,11 @@ class AudioProcessingService:
         self.censored_dir = project_root / "audio" / "censored"
         self.censored_dir.mkdir(parents=True, exist_ok=True)
 
-        self._whisper_model = None
-        self._gliner_model = None 
         self._chunker = Chunker()
 
     def load_models(self) -> None:
         """Method called once at server start"""
-        logger.info("Caricamento modelli in VRAM...")
+        logger.info("Loading models in VRAM...")
         
         gpu_setup = GPUEnvironmentManager()
         gpu_setup.ensure_gpu_ready()

@@ -74,9 +74,9 @@
                         Tsunami
                     </button>
 
-                    <button data-level="custom">
+                    <!--<button data-level="custom">
                         Custom
-                    </button>
+                    </button>-->
                 </div>
 
                 <div class="security-info">
@@ -93,14 +93,14 @@
                         Beyond protecting accounts and identities, it eliminates every trace of geographic and temporal context—removing addresses, cities, states, and any dates mentioned in the audio—thereby rendering the conversation completely decontextualized.
                     </p>
 
-                    <ul class="preset-list" id="custom-list">
+                    <!--<ul class="preset-list" id="custom-list">
                         <select id="sensitive-data-list">
                             <option value="volvo">Person</option>
                             <option value="saab">First name</option>
                             <option value="opel">Last name</option>
                             <option value="audi">Email</option>
                         </select>
-                    </ul>
+                    </ul>-->
 
                 </div>
             </div>
@@ -124,7 +124,7 @@
                 style="display: none;" onchange="handleFileUpload(event)">
         </div>
     </main>
-    
+
     <footer>
         <img id="logo-img" src="./static/imgs/small_blue.png" alt="logo" width="40">
         ML pipeline · Open source · <a href="https://github.com/Andrea-Difino/WaveRedact/" target="_blank">GitHub</a> ·
@@ -132,81 +132,6 @@
     </footer>
 
     <script>
-        const securityButtons =
-            document.querySelectorAll(".security-tabs button");
-
-        const slider =
-            document.querySelector(".security-tabs .slider");
-
-        const lists =
-            document.querySelectorAll(".preset-list");
-
-        securityButtons.forEach((btn, index) => {
-
-            btn.addEventListener("click", () => {
-
-                securityButtons.forEach(b =>
-                    b.classList.remove("active")
-                );
-
-                btn.classList.add("active");
-
-                slider.style.transform =
-                    `translateX(${index * 100}%)`;
-
-                lists.forEach(l =>
-                    l.classList.remove("active")
-                );
-
-                document
-                    .getElementById(
-                        btn.dataset.level + "-list"
-                    )
-                    .classList.add("active");
-
-            });
-
-        });
-
-        const modeButtons =
-            document.querySelectorAll(".mode-tabs button");
-
-        const modeSlider =
-            document.querySelector(".mode-tabs .slider");
-
-        modeButtons.forEach((btn, index) => {
-
-            btn.addEventListener("click", () => {
-
-                modeButtons.forEach(b =>
-                    b.classList.remove("active")
-                );
-
-                btn.classList.add("active");
-
-                modeSlider.style.transform =
-                    `translateX(${index * 100}%)`;
-
-            });
-
-        });
-
-        const buttons = document.querySelectorAll('.segmented button');
-        const securityInfo = document.querySelector('.security-info');
-
-        let revealed = false;
-
-        buttons.forEach(btn => {
-            btn.addEventListener('click', () => {
-
-                if (!revealed) {
-                    securityInfo.classList.add('visible');
-                    revealed = true;
-                }
-
-            });
-        });
-
         function toggleTheme() {
             document.body.classList.toggle('light-theme');
 
@@ -221,52 +146,10 @@
                 long_logo.src = "./static/imgs/logo_grande_Senza_scritta_bianco.png";
             }
         }
-
-        function startProcess() {
-            document.getElementById('audioInput').click();
-        }
-
-        function getActiveSecurityLevel() {
-            const activeLevelButton = document.querySelector('.security-tabs button.active');
-            return activeLevelButton?.value || 'total';
-        }
-
-        function getActiveCensorMode() {
-            const activeModeButton = document.querySelector('.mode-tabs button.active');
-            return activeModeButton?.value || 'muted';
-        }
-
-
-        async function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("level", getActiveSecurityLevel());
-            formData.append("censor_mode", getActiveCensorMode());
-
-            try {
-                const response = await fetch("http://127.0.0.1:8000/api/v1/audio/process", {
-                    method: "POST",
-                    body: formData
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log("Processing completed:", data);
-
-
-                } else {
-                    console.error("Error in server elaboration.");
-                }
-            } catch (error) {
-                console.error("Network or offline server error:", error);
-            } finally {
-                event.target.value = "";
-            }
-        }
     </script>
+
+    <script src="static/js/buttons.js"></script>
+    <script src="static/js/upload_file.js" async></script>
 
 </body>
 
