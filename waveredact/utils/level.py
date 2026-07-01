@@ -38,8 +38,16 @@ class Levels(Enum):
 
 class LevelSetter:
 
-    def __init__(self):
-        self.level: Levels = LevelSetter._ask_level()
+    def __init__(self, interactive: bool, level_name: str = ""):
+        if not interactive:
+            if level_name.lower() == "base":
+                self.level = Levels.BASE
+            elif level_name.lower() == "medium":
+                self.level = Levels.MEDIUM
+            else:
+                self.level = Levels.TOTAL
+        else:
+            self.level: Levels = LevelSetter._ask_level()
         self.target_labels: list[str] = self.level.labels
 
     @staticmethod

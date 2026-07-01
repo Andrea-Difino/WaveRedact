@@ -14,10 +14,14 @@ class Orchestrator:
         index_word_pair: dict[int, str], 
         mappers: list[ChunkMapper],
         data_pipeline: DataPrivacyPipeline,
+        auto_llm: bool = False,
+        interactive_mode: bool = True
     ):  
         self.iw_pair = index_word_pair
         self.mappers = mappers
         self.data_pipeline = data_pipeline
+        self.auto_llm = auto_llm
+        self.interactive_mode = interactive_mode
 
     def run_audio_chunks(
         self
@@ -39,16 +43,22 @@ class Orchestrator:
 
         ordered_idx = sorted(full_idx)
 
-        is_approved = self._human_approval(words_found)
-        if is_approved:
-            return ordered_idx
+        ambiguous_idx = full_idx - full_locked_idx
+        if self.interactive_mode:
+            is_approved = self._human_approval(words_found)
+            if is_approved:
+                return ordered_idx
+            else:
+                return self.run_llm_extraction(sorted(ambiguous_idx), full_locked_idx)
         else:
-            ambiguous_idx = full_idx - full_locked_idx
-            return self.run_llm_extraction(sorted(ambiguous_idx), full_locked_idx)
+            if self.auto_llm:
+                logger.info("Automatic mode: Executing LLM to maximize security...")
+                return self.run_llm_extraction(sorted(ambiguous_idx), full_locked_idx)
+            else:
+                logger.info("Fast mode: LLM bypassed.\n")
+                return ordered_idx
         
     def run_llm_extraction(self, ambiguous_idx: list[int], locked_idx: set[int]) -> list[int]:
-        print("Using LLM to check data...")
-
         checked_idx: set[int] = set()
         n_chunks = len(self.mappers)
 

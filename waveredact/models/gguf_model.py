@@ -10,7 +10,7 @@ import yaml
 load_dotenv()
 logger = logging.getLogger(__name__)
 FORMAT = '%(asctime)s %(message)s'
-logging.basicConfig(datefmt=FORMAT,level=logging.INFO, force=True)
+logging.basicConfig(datefmt=FORMAT,level=logging.WARNING, force=True)
 
 class GGUFModel(Model):
     def __init__(self, gguf_file_name: str, repo_id: str ,model_dir: str = "./files/gguf_models", server_port: int = 8080):
@@ -42,7 +42,7 @@ class GGUFModel(Model):
 
     def check_existance(self) -> None:
         if not os.path.exists(self.path):
-            print("Model not finded. Download... (it could take some minutes)...")
+            print("Model not found. Download... (it could take some minutes)...")
 
             _ = hf_hub_download(
                 repo_id=self.repo_id,
@@ -75,10 +75,11 @@ class GGUFModel(Model):
             )
             
             risposta_testo = response.choices[0].message.content
+            print(risposta_testo)
 
             list_sensitive_ids: list[int] = json.loads(risposta_testo if risposta_testo else "")["final_indices"]
             return list_sensitive_ids
 
         except Exception as e:
-            print(f"Errore during LLM inference: {e}")
+            logger.warning(f"Error during LLM inference: {e}")
             return []

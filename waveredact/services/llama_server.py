@@ -10,7 +10,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 FORMAT = '%(asctime)s %(message)s'
-logging.basicConfig(datefmt=FORMAT,level=logging.INFO, force=True)
+logging.basicConfig(datefmt=FORMAT,level=logging.WARNING, force=True)
 
 
 class LlamaServerService:
@@ -90,7 +90,7 @@ class LlamaServerService:
                 time.sleep(1)
         
         if not server_ready:
-            logger.error("Server didn't work in time")
+            logger.error("Server didn't start in time")
             raise RuntimeError("Server didn't start in time")
 
         logger.info("Server ready")

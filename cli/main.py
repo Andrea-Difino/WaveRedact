@@ -1,5 +1,6 @@
 from waveredact.utils.gpu_setup import GPUEnvironmentManager
 from waveredact.utils.level import LevelSetter
+import click
 
 gpu_manager = GPUEnvironmentManager()
 gpu_manager.ensure_gpu_ready()
@@ -18,7 +19,6 @@ from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
 from waveredact.pipeline.mapper import ChunkMapper
 
 from waveredact.services.llama_server import LlamaServerService
-import yaml
 import logging
 from dotenv import load_dotenv
 
@@ -27,21 +27,22 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(message)s"
 logging.basicConfig(datefmt=FORMAT, level=logging.INFO, force=True)
-
 logging.getLogger("httpx").setLevel(logging.WARNING)
-
-
 logging.getLogger("gliner").setLevel(logging.WARNING)
 logging.getLogger("gliner.model").setLevel(logging.WARNING)
-
 logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
 
-
-def main() -> None:
+@click.command()
+@click.option('--level', type=click.Choice(['base', 'medium', 'total'], case_sensitive=False), default='total', help='Level of PII censor. Used only if --auto is applied')
+@click.option('--auto', is_flag=True, help='Disable interactive mode (no confirm required).')
+@click.option('--use-llm', is_flag=True, help="Execute LLM to maximize precision.")
+def main(level: str, auto: bool, use_llm: bool) -> None:
     # VARIABLES
     MAKER_MODEL_NAME = "Qwen2.5-14B-Instruct-Q5_K_S.gguf"
     REPO_ID = "bartowski/Qwen2.5-14B-Instruct-GGUF"
     SERVER_PORT = 8080
+
+    click.secho(f"Starting WaveRedact - Auto: {auto} | LLM: {use_llm}", fg="cyan")
 
     # MODELS INITIALIZATION
     model_name = "large-v3-turbo"
@@ -58,7 +59,7 @@ def main() -> None:
     audio_manager = IOAudioManager()
     audios = audio_manager.get_audio()
     if len(audios) == 0:
-        print("There's no audio to process. Terminating process...")
+        click.secho("There's no audio to process. Terminating process...", fg="yellow")
         return
 
     for audio_path in audios:
@@ -69,7 +70,7 @@ def main() -> None:
 
         mappers = [ChunkMapper(chunk) for chunk in chunks]
         
-        levels_setter = LevelSetter()
+        levels_setter = LevelSetter(not auto, level_name=level)
 
         gliner_factory = GlinerFactory(target_labels=levels_setter.target_labels)
         maker.labels = levels_setter.target_labels
@@ -87,6 +88,8 @@ def main() -> None:
             index_word_pair=transcribe_serv.iw_pair,
             mappers=mappers,
             data_pipeline=privacy_pipeline,
+            auto_llm=use_llm,             
+            interactive_mode=not auto
         )
 
         print("Complete sentence:", transcribe_serv.full_text.strip(), "\n")

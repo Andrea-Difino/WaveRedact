@@ -14,7 +14,6 @@ class GlinerExtractor(BaseExtractor):
         output = self.model.extract_entities(text, self.target_labels, threshold=self.threshold, include_spans=True, include_confidence=True)
 
         entities_dict = output.get("entities", {})
-        print(entities_dict)
 
         extracted_tuples = set()
         
@@ -25,5 +24,6 @@ class GlinerExtractor(BaseExtractor):
                 print(f"{entity['text']} => {label}")
                 score = float(entity.get("confidence", 0.0))
                 extracted_tuples.add((entity["start"], entity["end"], score))
+        print("")
 
         return sorted(list(extracted_tuples), key=lambda x: x[0])
