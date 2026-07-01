@@ -62,15 +62,15 @@
                         </div>
                     </div>
 
-                    <button class="active" data-level="light">
+                    <button class="active" value="base" data-level="light">
                         Light
                     </button>
 
-                    <button data-level="deep">
+                    <button data-level="deep" value="medium">
                         Deep
                     </button>
 
-                    <button data-level="tsunami">
+                    <button data-level="tsunami" value="total">
                         Tsunami
                     </button>
 
@@ -113,8 +113,8 @@
                 <span class="section-title">Redaction Style</span>
                 <div class="segmented mode-tabs">
                     <div class="slider"></div>
-                    <button class="active">🔇 MUTED</button>
-                    <button>🔊 BEEP</button>
+                    <button class="active" value="muted">🔇 MUTED</button>
+                    <button value="beep">🔊 BEEP</button>
                 </div>
             </div>
 
@@ -124,18 +124,7 @@
                 style="display: none;" onchange="handleFileUpload(event)">
         </div>
     </main>
-
-    <div class="result-area" id="resultArea">
-        <div class="result-title">
-            <i class="ti ti-circle-check" aria-hidden="true"></i>
-            4 dati sensibili rimossi dall'algoritmo
-        </div>
-        <div class="tags"> <!--LISTA DATI SENSIBILI-->
-            <span class="tag">Data</span>
-        </div>
-        <button class="dl-btn"><i class="ti ti-download" aria-hidden="true"></i> Scarica audio censurato</button>
-    </div>
-
+    
     <footer>
         <img id="logo-img" src="./static/imgs/small_blue.png" alt="logo" width="40">
         ML pipeline · Open source · <a href="https://github.com/Andrea-Difino/WaveRedact/" target="_blank">GitHub</a> ·
@@ -237,32 +226,44 @@
             document.getElementById('audioInput').click();
         }
 
+        function getActiveSecurityLevel() {
+            const activeLevelButton = document.querySelector('.security-tabs button.active');
+            return activeLevelButton?.value || 'total';
+        }
+
+        function getActiveCensorMode() {
+            const activeModeButton = document.querySelector('.mode-tabs button.active');
+            return activeModeButton?.value || 'muted';
+        }
+
+
         async function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            // Wrap animation
-
             const formData = new FormData();
             formData.append("file", file);
+            formData.append("level", getActiveSecurityLevel());
+            formData.append("censor_mode", getActiveCensorMode());
 
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/v1/process-audio", {
+                const response = await fetch("http://127.0.0.1:8000/api/v1/audio/process", {
                     method: "POST",
                     body: formData
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log("Elaborazione completata:", data);
+                    console.log("Processing completed:", data);
 
-                    //pipeline logs in the UI
 
                 } else {
-                    console.error("Errore nell'elaborazione del server");
+                    console.error("Error in server elaboration.");
                 }
             } catch (error) {
-                console.error("Errore di rete o server offline:", error);
+                console.error("Network or offline server error:", error);
+            } finally {
+                event.target.value = "";
             }
         }
     </script>

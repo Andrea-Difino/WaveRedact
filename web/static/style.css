@@ -418,28 +418,6 @@ h1 em {
     background-position: -120% center;
 }
 
-.result-area {
-    text-align: center;
-    padding: 48px 24px;
-    display: none;
-    max-width: 500px;
-    margin: 40px auto 0;
-    background: var(--result-bg);
-    border: 1px solid var(--result-border);
-    border-radius: 16px;
-    transition: background 0.3s ease, border-color 0.3s ease;
-}
-
-.result-title {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: #22c55e;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px
-}
 
 .tags {
     display: flex;

@@ -1,17 +1,32 @@
 import uvicorn
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from web.api.audio_api import AudioAPI
 from web.services.audio_processing_service import AudioProcessingService
+from web.api.routers import frontend_router, audio_router
+
+audio_service = AudioProcessingService()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    audio_service.load_models()
+    yield
+
+    print("Spegnimento e pulizia VRAM...")
 
 def create_app() -> FastAPI:
     project_root = Path(__file__).resolve().parent.parent
     static_dir = project_root / "web" / "static"
 
-    app = FastAPI(title="waveredact API", description="Local Data Privacy Pipeline API")
+    app = FastAPI(
+        title="WaveRedact API", 
+        description="Local Data Privacy Pipeline",
+        lifespan=lifespan
+    )
+    
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -21,14 +36,12 @@ def create_app() -> FastAPI:
     )
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
-    audio_service = AudioProcessingService()
-    audio_api = AudioAPI(audio_service, static_dir)
-    app.include_router(audio_api.router)
+    app.include_router(frontend_router.router)
+    app.include_router(audio_router.router)
 
     return app
-
 
 app = create_app()
 
 def start_server():
-    uvicorn.run("web.app:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("web.app:app", host="127.0.0.1", port=8000)
