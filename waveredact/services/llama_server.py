@@ -8,9 +8,9 @@ import atexit
 import logging
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
 FORMAT = '%(asctime)s %(message)s'
-logging.basicConfig(datefmt=FORMAT,level=logging.INFO, force=True)
+logging.basicConfig(datefmt=FORMAT,level=logging.WARNING, force=True)
+logger = logging.getLogger(__name__)
 
 
 class LlamaServerService:
@@ -62,13 +62,15 @@ class LlamaServerService:
         logger.info("Llama server ready to run!")
 
     def start_server(self):
-        logger.info("Starting Llama server...")
+        print("Starting Llama server...")
 
         command = [
             self.exe_path,
             "--model", self.path,
             "-ngl", "99",
-            "--port", f"{self.server_port}"
+            "--port", f"{self.server_port}",
+            "--flash-attn", "auto",
+            "-c", "4096"
         ]
 
         self.process = subprocess.Popen(
@@ -77,7 +79,7 @@ class LlamaServerService:
             stderr=subprocess.DEVNULL
         )
 
-        logger.info("Waiting for server...")
+        print("Waiting for server...")
         server_ready = False
         for _ in range(30):
             try:
@@ -90,7 +92,7 @@ class LlamaServerService:
                 time.sleep(1)
         
         if not server_ready:
-            logger.error("Server didn't work in time")
+            logger.error("Server didn't start in time")
             raise RuntimeError("Server didn't start in time")
 
         logger.info("Server ready")
