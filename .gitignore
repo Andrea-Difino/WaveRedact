@@ -183,9 +183,7 @@ cython_debug/
 
 audio/*
 !audio/.gitkeep
-!audio/censored/
 audio/censored/*
-!audio/censored/.gitkeep
 files/*
 test_result.csv
 
