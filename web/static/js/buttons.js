@@ -51,7 +51,7 @@ modeButtons.forEach((btn, index) => {
 
 });
 
-const buttons = document.querySelectorAll('.segmented button');
+const buttons = document.querySelectorAll('.security-tabs button');
 const securityInfo = document.querySelector('.security-info');
 
 let revealed = false;
