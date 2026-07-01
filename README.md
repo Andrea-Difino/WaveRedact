@@ -63,7 +63,7 @@ waveredact --level total --auto
 waveredact --use-llm
 ```
 
-- `--auto` disables interactive mode and applies the selected level without asking for confirmation.
+- `--auto` disables interactive mode and applies the "total" level as default without asking for confirmation.
 - `--level` defines how aggressive the redaction should be when using `--auto`.
 - `base` removes secrets and payment data.
 - `medium` adds names, email addresses, phone numbers, and documents.
