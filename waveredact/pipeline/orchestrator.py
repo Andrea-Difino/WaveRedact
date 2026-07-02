@@ -73,11 +73,15 @@ class Orchestrator:
         checked_idx.update(locked_idx)
         final_words_found = [self.iw_pair[idx] for idx in sorted(checked_idx)]
 
-        is_approved = self._human_approval(final_words_found)
-        if is_approved:
-            return sorted(checked_idx)
+        if self.interactive_mode:
+            is_approved = self._human_approval(final_words_found)
+            if is_approved:
+                return sorted(checked_idx)
+            else:
+                return sorted(locked_idx)
         else:
-            return sorted(locked_idx)
+            logger.info("Automatic mode: accepting LLM final results")
+            return sorted(checked_idx)
     
     def _human_approval(self, sensitive_words: list[str]) -> bool:
         while True:
