@@ -48,7 +48,7 @@ class GGUFModel(Model):
                 repo_id=self.repo_id,
                 filename=self.file_gguf,  
                 local_dir=self.model_dir,  
-                token=os.environ["HF_TOKEN"]             
+                token=os.environ.get("HF_TOKEN")             
             )
             print("Download completed!")
         else:

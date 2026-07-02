@@ -86,6 +86,25 @@ class TestGGUFModel:
             token="secret-token",
         )
 
+    def test_init_downloads_missing_model_without_hf_token(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+        module = _import_gguf_model(monkeypatch)
+        mock_client = MagicMock()
+        monkeypatch.setattr(module, "OpenAI", MagicMock(return_value=mock_client))
+        download_mock = MagicMock(return_value=str(tmp_path / "model.gguf"))
+        monkeypatch.setattr(module, "hf_hub_download", download_mock)
+        monkeypatch.setattr(module.os.path, "exists", lambda _path: False)
+        monkeypatch.delenv("HF_TOKEN", raising=False)
+        monkeypatch.setattr("builtins.open", mock_open(read_data=json.dumps(PROMPTS)))
+
+        module.GGUFModel("model.gguf", "repo/name", model_dir=str(tmp_path))
+
+        download_mock.assert_called_once_with(
+            repo_id="repo/name",
+            filename="model.gguf",
+            local_dir=str(tmp_path.resolve()),
+            token=None,
+        )
+
     def test_labels_property_round_trip(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
         module = _import_gguf_model(monkeypatch)
         mock_client = MagicMock()
