@@ -1,126 +1,156 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WaveRedact</title>
     <link rel="stylesheet" href="./static/style.css">
 </head>
+
 <body>
-    <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">WaveRedact — censura dati sensibili dagli audio via Machine Learning</h2>
+    <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">WaveRedact — censura dati
+        sensibili dagli audio via Machine Learning</h2>
 
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Cambia tema">
-        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.22" x2="5.64" y2="17.78"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.22" x2="5.64" y2="17.78"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
     </button>
 
     <header>
-        <div class="logo">
-            <div class="logo-wave">
-                <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-            </div>
-            <span class="logo-name">Wave<span class="logo-second-part">Redact</span></span>
+        <img id="long-logo" src="./static/imgs/logo_grande_Senza_scritta_bianco.png" alt="logo" width="750">
+        <div id="site-scoop">
+            <h1>Protect <em>every sensitive data</em> of your audio</h1>
+            <p class="subtitle">Load an audio. WaveRedact detect, isolate and remove automatically <b>PII
+                    informations</b> returning a <b>censored</b> audio.</p>
         </div>
-        <span class="badge-ai">ML PIPELINE V0.1.0</span>
     </header>
 
     <main>
-
-        <h1>Protect<br><em>every sensitive data</em> of your audio</h1>
-        <p class="subtitle">Load an audio. WaveRedact detect, isolate and remove automatically <b>PII informations</b> returning a <b>censored</b> audio.</p>
-
         <div class="orbit-wrap" id="orbitWrap">
-        <div class="ring ring-3"></div>
-        <div class="ring ring-2"></div>
-        <div class="ring ring-1"></div>
+            <div class="ring ring-3"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-1"></div>
 
-        <button class="upload-btn" id="uploadBtn" onclick="startProcess()" aria-label="Carica audio">
-            <div class="btn-pulse"></div>
-            <svg class="ub-icon" viewBox="0 0 24 24"><path d="M4 15v4a1 1 0 001 1h14a1 1 0 001-1v-4M8 11l4-4 4 4M12 7v9"/></svg>
-            <span class="ub-label">ELABORA AUDIO</span>
-        </button>
-        <input type="file" id="audioInput" accept="audio/mp3, audio/wav, audio/flac, audio/m4a, audio/aac, audio/ogg, audio/mp4" style="display: none;" onchange="handleFileUpload(event)">
+            <div class="security-panel">
 
-        <!--<div class="process-wrap" id="processWrap">
-            <div class="proc-item" id="p1">
-            <div class="proc-dot" id="d1"><i class="ti ti-check" aria-hidden="true"></i></div>
-            <span class="proc-text">Caricamento file…</span>
+                <span class="section-title">Security Level</span>
+
+                <div class="segmented security-tabs">
+                    <div class="slider">
+                        <div class="wave-track">
+                            <svg class="wave" viewBox="0 0 120 20" preserveAspectRatio="none">
+                                <path d="M0 10 C15 0 30 20 45 10 S75 0 90 10 S105 20 120 10"/>
+                            </svg>
+                            <svg class="wave" viewBox="0 0 120 20" preserveAspectRatio="none">
+                                <path d="M0 10 C15 0 30 20 45 10 S75 0 90 10 S105 20 120 10"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <button class="active" value="base" data-level="light">
+                        Light
+                    </button>
+
+                    <button data-level="deep" value="medium">
+                        Deep
+                    </button>
+
+                    <button data-level="tsunami" value="total">
+                        Tsunami
+                    </button>
+
+                    <!--<button data-level="custom">
+                        Custom
+                    </button>-->
+                </div>
+
+                <div class="security-info">
+
+                    <p class="preset-list active" id="light-list">
+                        Immediately redact sensitive information that could compromise the security of your accounts or savings. Remove passwords, digital access keys, tokens, and banking or credit card details.
+                    </p>
+
+                    <p class="preset-list" id="deep-list">
+                        It extends Level 1 to ensure maximum compliance with privacy regulations. It removes any data that could directly identify you or other individuals, such as names, email addresses, phone numbers, and identification documents.
+                    </p>
+
+                    <p class="preset-list" id="tsunami-list">
+                        Beyond protecting accounts and identities, it eliminates every trace of geographic and temporal context—removing addresses, cities, states, and any dates mentioned in the audio—thereby rendering the conversation completely decontextualized.
+                    </p>
+
+                    <!--<ul class="preset-list" id="custom-list">
+                        <select id="sensitive-data-list">
+                            <option value="volvo">Person</option>
+                            <option value="saab">First name</option>
+                            <option value="opel">Last name</option>
+                            <option value="audi">Email</option>
+                        </select>
+                    </ul>-->
+
+                </div>
             </div>
-            <div class="proc-item" id="p2">
-            <div class="proc-dot" id="d2"><i class="ti ti-check" aria-hidden="true"></i></div>
-            <span class="proc-text">Trascrizione audio (Whisper)…</span>
+
+            <button class="upload-btn" id="uploadBtn" onclick="startProcess()" aria-label="Carica audio">
+                <span class="ub-label">Start the pipeline</span>
+            </button>
+
+            <div class="redaction-panel">
+                <span class="section-title">Redaction Style</span>
+                <div class="segmented mode-tabs">
+                    <div class="slider"></div>
+                    <button class="active" value="muted">🔇 MUTED</button>
+                    <button value="beep">🔊 BEEP</button>
+                </div>
             </div>
-            <div class="proc-item" id="p3">
-            <div class="proc-dot" id="d3"><i class="ti ti-check" aria-hidden="true"></i></div>
-            <span class="proc-text">Rilevamento entità (NER Model)…</span>
-            </div>
-            <div class="proc-item" id="p4">
-            <div class="proc-dot" id="d4"><i class="ti ti-check" aria-hidden="true"></i></div>
-            <span class="proc-text">Applicazione censura audio…</span>
-            </div>
-            <div class="proc-item" id="p5">
-            <div class="proc-dot" id="d5"><i class="ti ti-check" aria-hidden="true"></i></div>
-            <span class="proc-text">Generazione file finale…</span>
-            </div>
-        </div>-->
+
+
+            <input type="file" id="audioInput"
+                accept="audio/mp3, audio/wav, audio/flac, audio/m4a, audio/aac, audio/ogg, audio/mp4"
+                style="display: none;" onchange="handleFileUpload(event)">
         </div>
     </main>
 
-    <div class="result-area" id="resultArea">
-        <div class="result-title">
-        <i class="ti ti-circle-check" aria-hidden="true"></i>
-        4 dati sensibili rimossi dall'algoritmo
-        </div>
-        <div class="tags"> <!--LISTA DATI SENSIBILI-->
-            <span class="tag">Data</span>
-        </div>
-        <button class="dl-btn"><i class="ti ti-download" aria-hidden="true"></i> Scarica audio censurato</button>
-    </div>
-
     <footer>
-        <img id="logo-img" src="./static/imgs/logo_quadrato.png" alt="logo" width="50">
-        ML pipeline · Open source · <a href="https://github.com/Andrea-Difino/WaveRedact/" target="_blank">GitHub</a> · MIT License
+        <img id="logo-img" src="./static/imgs/small_blue.png" alt="logo" width="40">
+        ML pipeline · Open source · <a href="https://github.com/Andrea-Difino/WaveRedact/" target="_blank">GitHub</a> ·
+        MIT License
     </footer>
 
     <script>
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
 
-    function toggleTheme() {
-        document.body.classList.toggle('light-theme');
-    }
+            const logo = document.getElementById("logo-img");
+            const long_logo = document.getElementById("long-logo");
 
-    function startProcess() {
-        document.getElementById('audioInput').click();
-    }
-
-    async function handleFileUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        // Wrap animation
-
-        const formData = new FormData();
-        formData.append("file", file); 
-
-        try {
-            const response = await fetch("http://127.0.0.1:8000/api/v1/process-audio", {
-                method: "POST",
-                body: formData
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log("Elaborazione completata:", data);
-                
-                //pipeline logs in the UI
-                
+            if (document.body.classList.contains("light-theme")) {
+                logo.src = "./static/imgs/small_white.png";
+                long_logo.src = "./static/imgs/logo_grande_Senza_scritta_nero.png";
             } else {
-                console.error("Errore nell'elaborazione del server");
+                logo.src = "./static/imgs/small_blue.png";
+                long_logo.src = "./static/imgs/logo_grande_Senza_scritta_bianco.png";
             }
-        } catch (error) {
-            console.error("Errore di rete o server offline:", error);
         }
-    }
     </script>
 
+    <script src="static/js/buttons.js"></script>
+    <script src="static/js/upload_file.js" async></script>
+
 </body>
+
 </html>
