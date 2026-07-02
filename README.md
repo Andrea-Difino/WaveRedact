@@ -25,16 +25,16 @@ From a shell in the project folder:
 
 ### With `uv` (recommended)
 
-If you already use `uv`, the setup is a bit simpler because you do not need to create and activate the virtual environment manually:
+If you already use `uv`, the setup is the simplest path: `uv sync` now installs the project itself, so the `waveredact` command becomes available after synchronization.
 
 ```bash
 uv sync
 ```
 
-After `uv sync`, `waveredact` is available inside the project environment, not as a global shell command. On Windows, run it with:
+Then run the CLI directly from the project environment:
 
 ```bash
-uv run waveredact
+waveredact
 ```
 
 If you also want the web interface:
@@ -46,8 +46,10 @@ uv sync --extra web
 And then:
 
 ```bash
-uv run waveredact-web
+waveredact-web
 ```
+
+If your shell does not pick up the commands directly, use `uv run waveredact` or activate the generated `.venv` first.
 
 ### With `venv` and `pip`
 
