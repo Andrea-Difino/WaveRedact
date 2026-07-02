@@ -45,10 +45,6 @@ class AudioCensor:
         except FileNotFoundError:
             click.secho("\n[FATAL ERROR] FFmpeg not found in the system!", fg="red", bold=True)
             click.echo("WaveRedact require FFmpeg to cut and modify audio")
-            click.echo("Per installarlo:")
-            click.echo("  - Windows: apri il terminale e digita 'winget install ffmpeg'")
-            click.echo("  - Mac: digita 'brew install ffmpeg'")
-            click.echo("  - Linux: digita 'sudo apt install ffmpeg'")
             click.secho("After installation, close and open again the terminal.\n", fg="yellow")
             sys.exit(1)
 

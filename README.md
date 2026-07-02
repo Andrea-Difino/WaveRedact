@@ -144,25 +144,23 @@ The interface lets you upload an audio file and receive the analysis of the sens
 ## Expected output
 When processing finishes, the CLI prints the path of the generated file. You will usually see a message like:
 
-```txt
+```plaintext
 ✅ File saved: .../audio/censored/file_name_censored.mp3
 ```
 
-Folder structure
-audio/: input folder for files to process.
+## Folder structure
 
-audio/censored/: output folder for redacted files.
+- `audio/`: input folder for files to process.
+- `audio/censored/`: output folder for redacted files.
+- `files/`: local models and resources.
+- `web/`: web interface and API.
 
-files/: local models and resources.
+## Common issues
+- `FileNotFoundError: [WinError 2]` or `Couldn't find ffprobe or avprobe`: You are missing `ffmpeg`. Follow the instructions in the Requirements section to install it, then completely close and reopen your terminal.
 
-web/: web interface and API.
+- **Nothing happens**: Make sure there are supported audio files inside `audio/`.
 
-Common issues
-FileNotFoundError: [WinError 2] or Couldn't find ffprobe or avprobe: You are missing ffmpeg. Follow the instructions in the Requirements section to install it, then completely close and reopen your terminal.
+- **LLM Server doesn't start**: If you use `--use-llm` and the LLM server fails to initialize (e.g., due to port conflicts or missing files), WaveRedact will safely fallback and continue without that component.
 
-Nothing happens: Make sure there are supported audio files inside audio/.
-
-LLM Server doesn't start: If you use --use-llm and the LLM server fails to initialize (e.g., due to port conflicts or missing files), WaveRedact will safely fallback and continue without that component.
-
-License
+## License
 This project is distributed under the terms of the license included in the repository.
