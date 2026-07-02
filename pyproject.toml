@@ -29,6 +29,13 @@ web = [
 waveredact = "cli.main:main"
 waveredact-web = "web.app:start_server"
 
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv]
+package = true
+
 [tool.setuptools]
 packages = ["waveredact", "cli", "web"]
 

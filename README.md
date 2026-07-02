@@ -23,6 +23,34 @@ If you want to use the GPU, the project will try to take advantage of it; if it 
 
 From a shell in the project folder:
 
+### With `uv` (recommended)
+
+If you already use `uv`, the setup is a bit simpler because you do not need to create and activate the virtual environment manually:
+
+```bash
+uv sync
+```
+
+After `uv sync`, `waveredact` is available inside the project environment, not as a global shell command. On Windows, run it with:
+
+```bash
+uv run waveredact
+```
+
+If you also want the web interface:
+
+```bash
+uv sync --extra web
+```
+
+And then:
+
+```bash
+uv run waveredact-web
+```
+
+### With `venv` and `pip`
+
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
