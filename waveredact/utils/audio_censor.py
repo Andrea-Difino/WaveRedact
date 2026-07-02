@@ -2,6 +2,8 @@ import os
 from pydub import AudioSegment
 from pydub.generators import Sine
 import logging
+import sys
+import click
 from pathlib import Path
 from enum import Enum
 
@@ -38,7 +40,13 @@ class AudioCensor:
         """
 
         logger.info(f"Loading audio for censor: {input_path}")
-        audio = AudioSegment.from_file(input_path)
+        try:
+            audio = AudioSegment.from_file(input_path)
+        except FileNotFoundError:
+            click.secho("\n[FATAL ERROR] FFmpeg not found in the system!", fg="red", bold=True)
+            click.echo("WaveRedact require FFmpeg to cut and modify audio")
+            click.secho("After installation, close and open again the terminal.\n", fg="yellow")
+            sys.exit(1)
 
         timestamps = self._get_interval_to_censor()
 
