@@ -72,7 +72,8 @@ class Orchestrator:
 
         checked_idx.update(locked_idx)
         final_words_found = [self.iw_pair[idx] for idx in sorted(checked_idx)]
-
+        
+        print(f"These are the final sensitive words found using the LLM: {final_words_found}")
         if self.interactive_mode:
             is_approved = self._human_approval(final_words_found)
             if is_approved:

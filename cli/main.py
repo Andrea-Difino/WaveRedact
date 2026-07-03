@@ -12,7 +12,7 @@ from waveredact.pipeline.orchestrator import Orchestrator
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
 from waveredact.services.llama_server import LlamaServerService
 from waveredact.services.transcribe import TranscribeService
-from waveredact.utils.audio_censor import AudioCensor
+from waveredact.utils.audio_censor import AudioCensor, AudioMaskTypes
 from waveredact.utils.audio_manager import IOAudioManager
 from waveredact.utils.chunk import Chunker
 from waveredact.utils.gpu_setup import GPUEnvironmentManager
@@ -33,14 +33,15 @@ logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
 @click.option('--level', type=click.Choice(['base', 'medium', 'total'], case_sensitive=False), default='total', help='Level of PII censor. Used only if --auto is applied')
 @click.option('--auto', is_flag=True, help='Disable interactive mode (no confirm required).')
 @click.option('--use-llm', is_flag=True, help="Execute LLM to maximize precision.")
-def main(level: str, auto: bool, use_llm: bool) -> None:
+@click.option('--mode', type=click.Choice(['beep', 'muted'], case_sensitive=False), default='muted', help='Censor mode')
+def main(level: str, auto: bool, use_llm: bool, mode: str) -> None:
 
     # VARIABLES
     MAKER_MODEL_NAME = "Qwen2.5-7B-Instruct-Q5_K_M.gguf"
     REPO_ID = "bartowski/Qwen2.5-7B-Instruct-GGUF"
     SERVER_PORT = 8080
 
-    click.secho(f"Starting WaveRedact - Auto: {auto} | LLM: {use_llm}", fg="cyan")
+    click.secho(f"Starting WaveRedact - Auto: {auto} | LLM: {use_llm} | Censor: {mode}", fg="cyan")
 
     # MODELS INITIALIZATION
     gpu_setup = GPUEnvironmentManager()
@@ -105,7 +106,11 @@ def main(level: str, auto: bool, use_llm: bool) -> None:
         full_idx = orchestrator.run_audio_chunks()
 
         censor_manager = AudioCensor(transcribe_serv.ival_pair, full_idx)
-        censor_manager.censor_file(str(audio_path))
+        if mode == 'beep':
+            censor_mode = AudioMaskTypes.BEEP
+        else:
+            censor_mode = AudioMaskTypes.SILENCE
+        censor_manager.censor_file(str(audio_path), mode = censor_mode)
 
     click.secho("Thanks for using waveredact! 🌊", fg="cyan")
 

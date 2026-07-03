@@ -2,6 +2,7 @@ import os
 import sys
 import urllib.request
 import zipfile
+import torch
 import logging
 from pathlib import Path
 
@@ -15,16 +16,15 @@ class GPUEnvironmentManager:
         self.dll_folder = str(project_root / "files" / "server")
 
     def ensure_gpu_ready(self) -> None:
-        if not sys.platform.startswith('win'):
-            return
-        
-        os.makedirs(self.dll_folder, exist_ok=True)
+        if sys.platform.startswith('win'):
+            os.makedirs(self.dll_folder, exist_ok=True)
+            dll_path = os.path.join(self.dll_folder, "cublas64_12.dll")
+            if not os.path.exists(dll_path):
+                self._download_and_extract_dlls()
+            self._inject_dlls()
 
-        dll_path = os.path.join(self.dll_folder, "cublas64_12.dll")
-        if not os.path.exists(dll_path):
-            self._download_and_extract_dlls()
-
-        self._inject_dlls()
+        device = self.get_device()
+        logger.info(f"Hardware rilevato per l'inferenza: {device.upper()}")
 
     def _download_and_extract_dlls(self) -> None:
         logger.info("Downloading NVIDIA libraries (CUDA 12) for the GPU...")
@@ -48,3 +48,17 @@ class GPUEnvironmentManager:
             logger.info("✅ [GPU Setup] DLL NVIDIA injected and ready to use.")
         except Exception as e:
             logger.warning(f"Impossible to inject DLLs : {e}")
+
+    def get_device(self) -> str:
+        """Detect best hardware available"""
+        if torch.cuda.is_available():
+            return "cuda"
+        else:
+            return "cpu"        
+
+    def get_compute_type(self, device: str) -> str:
+        """Return data format supported by the hardware."""
+        if device == "cuda":
+            return "int8_float16"
+        else:
+            return "int8"

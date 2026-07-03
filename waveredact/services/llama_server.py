@@ -6,12 +6,13 @@ import time
 import requests
 import atexit
 import logging
+import platform
+import stat
 from pathlib import Path
 
 FORMAT = '%(asctime)s %(message)s'
 logging.basicConfig(datefmt=FORMAT,level=logging.WARNING, force=True)
 logger = logging.getLogger(__name__)
-
 
 class LlamaServerService:
 
@@ -26,27 +27,48 @@ class LlamaServerService:
         self.process = None
         self.server_port = server_port
 
+        self.exe_name, self.download_url = self._get_os_config()
+
         self._init_server()
         atexit.register(self.stop_server)
+
+    def _get_os_config(self) -> tuple[str, str]:
+        """Return the name of the executable file and download URL based on the OS"""
+        system = platform.system().lower()
+        base_url = "https://github.com/ggml-org/llama.cpp/releases/download/b3100"
+        
+        if system == "windows":
+            return "llama-server.exe", f"{base_url}/llama-b3100-bin-win-vulkan-x64.zip"
+        elif system == "darwin":
+            return "llama-server", f"{base_url}/llama-b3100-bin-macos-universal.zip"
+        else:
+            return "llama-server", f"{base_url}/llama-b3100-bin-ubuntu-vulkan-x64.zip"
 
     def _find_executable(self) -> str | None:
         if os.path.exists(self.destination_folder):
             for root, _, files in os.walk(self.destination_folder):
-                if "llama-server.exe" in files:
-                    return os.path.join(root, "llama-server.exe")
+                if self.exe_name in files:
+                    return os.path.join(root, self.exe_name)
         return None
+    
+    def _make_executable(self, path: str) -> None:
+        """Add execution permission (chmod +x), a must for Mac/Linux."""
+        if platform.system().lower() != "windows":
+            st = os.stat(path)
+            os.chmod(path, st.st_mode | stat.S_IEXEC)
     
     def _init_server(self) -> None:
         self.exe_path = self._find_executable()
+        
         if self.exe_path:
+            self._make_executable(self.exe_path)
             return None
             
         logger.info("Downloading AI engine...")
         os.makedirs(self.destination_folder, exist_ok=True)
 
-        url_exe = "https://github.com/ggml-org/llama.cpp/releases/download/b9538/llama-b9538-bin-win-cuda-12.4-x64.zip"
         zip_exe_path = os.path.join(self.destination_folder, "llama_exe.zip")
-        urllib.request.urlretrieve(url_exe, zip_exe_path)
+        urllib.request.urlretrieve(self.download_url, zip_exe_path)
 
         logger.info("Extracting Llama engine...")
         with zipfile.ZipFile(zip_exe_path, 'r') as zip_ref:
@@ -57,8 +79,10 @@ class LlamaServerService:
 
         self.exe_path = self._find_executable()
         if not self.exe_path:
-            raise FileNotFoundError("Critical error: llama-server.exe not found even after extraction.")
-            
+            raise FileNotFoundError(f"Critical error: {self.exe_name} not found even after extraction.")
+
+        self._make_executable(self.exe_path)
+        
         logger.info("Llama server ready to run!")
 
     def start_server(self):

@@ -1,10 +1,17 @@
 from pathlib import Path
 from gliner2 import GLiNER2
 import os
+import json
+
 
 class GlinerFactory:
-
-    def __init__(self, model_id: str = "fastino/gliner2-privacy-filter-PII-multi", cache_dir: str = "", target_labels: list[str] | None = None, threshold: float = 0.54):
+    def __init__(
+        self,
+        model_id: str = "fastino/gliner2-privacy-filter-PII-multi",
+        cache_dir: str = "",
+        target_labels: list[str] | None = None,
+        threshold: float = 0.54,
+    ):
         self.model_id = model_id
         self.threshold = threshold
 
@@ -15,24 +22,55 @@ class GlinerFactory:
         else:
             self.cache_dir = cache_dir
 
-        self.target_labels = target_labels if target_labels else [
-            "person", "first_name", "last_name", "password",
-            "street_address", "city", "state_or_region",
-            "bank_account", "account_number", "email"
-        ]
+        self.target_labels = (
+            target_labels
+            if target_labels
+            else [
+                "person",
+                "first_name",
+                "last_name",
+                "password",
+                "street_address",
+                "city",
+                "state_or_region",
+                "bank_account",
+                "account_number",
+                "email",
+            ]
+        )
 
     def build(self) -> GLiNER2:
         if os.path.exists(self.cache_dir) and os.listdir(self.cache_dir):
-            print(f"\n📦 Finded model '{self.cache_dir}'. Offline loading...")
+            print(f"\n📦 Found model '{self.cache_dir}'. Offline loading...")
+
+            tok_config_path = Path(self.cache_dir) / "tokenizer_config.json"
+            if tok_config_path.exists():
+                try:
+                    with open(tok_config_path, "r", encoding="utf-8") as f:
+                        config = json.load(f)
+
+                    if "extra_special_tokens" in config and isinstance(
+                        config["extra_special_tokens"], list
+                    ):
+                        del config["extra_special_tokens"]
+
+                        with open(tok_config_path, "w", encoding="utf-8") as fw:
+                            json.dump(config, fw, indent=2)
+                except Exception:
+                    pass
 
             model = GLiNER2.from_pretrained(self.cache_dir, local_files_only=True)
         else:
-            print(f"\n🌐 Model not finded locally. Downloading '{self.model_id}'... (Could take some minutes)")
+            print(
+                f"\n🌐 Model not found locally. Downloading '{self.model_id}'... (Could take some minutes)"
+            )
 
             os.makedirs(self.cache_dir, exist_ok=True)
 
             model = GLiNER2.from_pretrained(self.model_id)
             model.save_pretrained(self.cache_dir)
-            print(f"\n✅ Model downloaded successfully and saved in '{self.cache_dir}'!")
+            print(
+                f"\n✅ Model downloaded successfully and saved in '{self.cache_dir}'!"
+            )
 
         return model

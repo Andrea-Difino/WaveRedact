@@ -114,9 +114,12 @@ waveredact --use-llm
 
   - `medium` adds names, email addresses, phone numbers, and documents.
 
-  - `total` extends redaction to addresses and time-related references.
+  - `total` extends redaction to addresses and time-related references. (default)
 
 - `--use-llm` enables the optional LLM component to improve detection.
+- `--mode` defines how to censor the sensitive data.
+  - `muted`replace sensitive data with silence. (default)
+  - `beep` replace sensitive data with beep sound.
 
 ### Example workflow
 
