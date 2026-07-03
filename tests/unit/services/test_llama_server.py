@@ -12,6 +12,15 @@ def mock_atexit():
     with patch(f"{MODULE_PATH}.atexit.register") as mock:
         yield mock
 
+@pytest.fixture(autouse=True)
+def mock_platform():
+    """
+    Inganna la classe facendole credere di girare su Windows.
+    Risolve il problema dei nomi dei file (.exe) e previene il crash di
+    os.stat quando _make_executable cerca di modificare percorsi finti su Linux.
+    """
+    with patch(f"{MODULE_PATH}.platform.system", return_value="Windows"):
+        yield
 
 class TestLlamaServerService:
 

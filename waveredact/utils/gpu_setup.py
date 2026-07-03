@@ -24,7 +24,7 @@ class GPUEnvironmentManager:
             self._inject_dlls()
 
         device = self.get_device()
-        logger.info(f"Hardware rilevato per l'inferenza: {device.upper()}")
+        logger.info(f"Hardware detected for inference: {device.upper()}")
 
     def _download_and_extract_dlls(self) -> None:
         logger.info("Downloading NVIDIA libraries (CUDA 12) for the GPU...")
