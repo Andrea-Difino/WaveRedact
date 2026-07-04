@@ -12,4 +12,5 @@ class RegexExtractor(BaseExtractor):
         self.regex_totale = f"({pattern_email})|({pattern_iban})|({pattern_carte})|({pattern_tel})|({pattern_cap})"
 
     def extract(self, text: str) -> List[Tuple[int, int, float]]:
+        print("[STEP 1] Using REGEX extractor")
         return [(match.start(), match.end(), 1.0) for match in re.finditer(self.regex_totale, text)]

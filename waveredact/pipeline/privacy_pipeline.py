@@ -20,7 +20,7 @@ class DataPrivacyPipeline:
 
         self.llm_extractors: List[Model] = [llm_extractor] if llm_extractor else []
 
-    def extract_sensitive_data(self, mapper: ChunkMapper, lock_threshold: float = 0.90) -> Tuple[Set[int], Set[int]]:
+    def extract_sensitive_data(self, mapper: ChunkMapper, lock_threshold: float = 0.99) -> Tuple[Set[int], Set[int]]:
         total_idx: Set[int] = set()
         locked_idx: Set[int] = set()
 

@@ -30,7 +30,22 @@ logging.getLogger("transformers").setLevel(logging.ERROR)
 logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
 
 @click.command()
-@click.option('--level', type=click.Choice(['base', 'medium', 'total'], case_sensitive=False), default='total', help='Level of PII censor. Used only if --auto is applied')
+@click.option(
+    '--level', 
+    type=click.Choice(['base', 'medium', 'total'], case_sensitive=False), 
+    default='total', 
+    help='''Level of PII censor. Used only if --auto is applied. Levels:
+
+    \b
+    1) Base level: Immediately redact sensitive information that could compromise the security of your accounts or savings. Remove passwords, digital access keys, tokens, and banking
+    or credit card details.
+    \b
+    2) Medium level: It extends Base level to ensure maximum compliance with privacy regulations. It removes any data that could directly identify you or other individuals, such as 
+    names, email addresses, phone numbers, and identification documents.
+    \b
+    3) Total level: Beyond protecting accounts and identities, it eliminates every trace of geographic and temporal context—removing addresses, cities, states, and any dates 
+    mentioned in the audio—thereby rendering the conversation completely decontextualized.'''
+)
 @click.option('--auto', is_flag=True, help='Disable interactive mode (no confirm required).')
 @click.option('--use-llm', is_flag=True, help="Execute LLM to maximize precision.")
 @click.option('--mode', type=click.Choice(['beep', 'muted'], case_sensitive=False), default='muted', help='Censor mode')

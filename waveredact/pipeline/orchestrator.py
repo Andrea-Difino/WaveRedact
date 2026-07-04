@@ -28,14 +28,19 @@ class Orchestrator:
     ) -> list[int]:
         full_idx: set[int] = set()
         full_locked_idx: set[int] = set()
+        
+        chunk_ambiguous_list: list[list[int]] = []
 
         n_chunks = len(self.mappers)
         words_found: list[str] = []
 
         for i in range(n_chunks):
-            logger.info(f"Running chunk: {i + 1}")
+            print(f"Running chunk: {i + 1}")
 
             res, locked_res = self.data_pipeline.extract_sensitive_data(self.mappers[i])
+
+            chunk_ambiguous = list(set(res) - set(locked_res))
+            chunk_ambiguous_list.append(chunk_ambiguous)
 
             words_found.extend([self.iw_pair[idx] for idx in sorted(res)])
             full_idx.update(res)
@@ -43,7 +48,6 @@ class Orchestrator:
 
         ordered_idx = sorted(full_idx)
 
-        ambiguous_idx = full_idx - full_locked_idx
         if self.interactive_mode:
             is_approved = self._human_approval(words_found)
             
@@ -51,7 +55,7 @@ class Orchestrator:
                 return ordered_idx
             else:
                 if self.data_pipeline.llm_extractors:
-                    return self.run_llm_extraction(sorted(ambiguous_idx), full_locked_idx)
+                    return self.run_llm_extraction(chunk_ambiguous_list, full_locked_idx)
                 else:
                     logger.warning("You answered 'N', but no LLM is configured to refine the search.")
                     print("💡 Hint: Restart the pipeline adding the '--use-llm' flag for better precision.")
@@ -60,34 +64,29 @@ class Orchestrator:
         else:
             if self.use_llm and self.data_pipeline.llm_extractors:
                 logger.info("Automatic mode: Executing LLM to maximize security...")
-                return self.run_llm_extraction(sorted(ambiguous_idx), full_locked_idx)
+                return self.run_llm_extraction(chunk_ambiguous_list, full_locked_idx)
             else:
                 logger.info("Fast mode: LLM bypassed.\n")
                 return ordered_idx
         
-    def run_llm_extraction(self, ambiguous_idx: list[int], locked_idx: set[int]) -> list[int]:
+    def run_llm_extraction(self, chunk_ambiguous_list: list[list[int]], locked_idx: set[int]) -> list[int]:
         checked_idx: set[int] = set()
         n_chunks = len(self.mappers)
 
         for i in range(n_chunks):
-            logger.info(f"Running chunk: {i + 1}")
+            chunk_ambiguous = chunk_ambiguous_list[i]
 
-            res = self.data_pipeline.extract_sensitive_with_llm(self.mappers[i], ambiguous_idx)
+            logger.info(f"Running LLM for chunk: {i + 1}")
+            res = self.data_pipeline.extract_sensitive_with_llm(self.mappers[i], chunk_ambiguous)
             checked_idx.update(res)
 
         checked_idx.update(locked_idx)
         final_words_found = [self.iw_pair[idx] for idx in sorted(checked_idx)]
         
-        print(f"These are the final sensitive words found using the LLM: {final_words_found}")
-        if self.interactive_mode:
-            is_approved = self._human_approval(final_words_found)
-            if is_approved:
-                return sorted(checked_idx)
-            else:
-                return sorted(locked_idx)
-        else:
-            logger.info("Automatic mode: accepting LLM final results")
-            return sorted(checked_idx)
+        print(f"\n🧠 [LLM Final Results] Sensitive words identified:\n{final_words_found}")
+        logger.info("Trusting LLM extraction. Proceeding with redaction...")
+        
+        return sorted(checked_idx)
     
     def _human_approval(self, sensitive_words: list[str]) -> bool:
         while True:

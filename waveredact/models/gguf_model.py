@@ -55,6 +55,7 @@ class GGUFModel(Model):
             print("Model already downloaded")
 
     def run_model(self, chunk: dict[int,str], ambiguous_idx: list[int] | None) -> list[int]:
+        print("[STEP 3] Using LLM")
         system_prompt = self.sys_prompt
         
         couple = ""
@@ -74,9 +75,10 @@ class GGUFModel(Model):
                 response_format={"type": "json_object"} 
             )
             
-            risposta_testo = response.choices[0].message.content
+            text_response = response.choices[0].message.content
+            print(text_response)
 
-            list_sensitive_ids: list[int] = json.loads(risposta_testo if risposta_testo else "")["final_indices"]
+            list_sensitive_ids: list[int] = json.loads(text_response if text_response else "")["final_indices"]
             return list_sensitive_ids
 
         except Exception as e:

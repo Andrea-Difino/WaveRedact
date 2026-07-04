@@ -57,7 +57,7 @@ class LevelSetter:
                 "\nSelect the level of censor you like:\n"
                 "1) Base level:  Immediately redact sensitive information that could compromise the security of your accounts or savings. Remove passwords, digital access keys, tokens, and banking or credit card details.\n"
                 "2) Medium level: It extends Base level to ensure maximum compliance with privacy regulations. It removes any data that could directly identify you or other individuals, such as names, email addresses, phone numbers, and identification documents.\n"
-                "3) Beyond protecting accounts and identities, it eliminates every trace of geographic and temporal context—removing addresses, cities, states, and any dates mentioned in the audio—thereby rendering the conversation completely decontextualized.\n"
+                "3) Total level: Beyond protecting accounts and identities, it eliminates every trace of geographic and temporal context—removing addresses, cities, states, and any dates mentioned in the audio—thereby rendering the conversation completely decontextualized.\n"
                 "Insert the number: "
                 )
             
