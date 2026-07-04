@@ -48,7 +48,7 @@ class TestOrchestrator:
             index_word_pair={0: "name", 1: "token"},
             mappers=[ChunkMapper({0: "name ", 1: "token"})],
             data_pipeline=pipeline,
-            auto_llm=False,
+            use_llm=False,
             interactive_mode=False,
         )
 
@@ -63,7 +63,7 @@ class TestOrchestrator:
             index_word_pair={0: "name", 1: "token"},
             mappers=[ChunkMapper({0: "name ", 1: "token"})],
             data_pipeline=pipeline,
-            auto_llm=True,
+            use_llm=True,
             interactive_mode=False,
         )
         monkeypatch.setattr(orchestrator, "_human_approval", lambda _words: True)
@@ -78,7 +78,7 @@ class TestOrchestrator:
             index_word_pair={0: "name", 1: "token"},
             mappers=[ChunkMapper({0: "name ", 1: "token"})],
             data_pipeline=pipeline,
-            auto_llm=False,
+            use_llm=False,
             interactive_mode=True,
         )
         monkeypatch.setattr(orchestrator, "_human_approval", lambda _words: False)

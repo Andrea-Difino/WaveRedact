@@ -70,7 +70,7 @@ def main(level: str, auto: bool, use_llm: bool, mode: str) -> None:
         return
 
     for audio_path in audios:
-        print("Processing audio", audio_path)
+        click.secho(f"Processing audio {audio_path}", fg='green')
         transcribe_serv.transcribe_audio(str(audio_path))
 
         chunk_man = Chunker()
@@ -97,7 +97,7 @@ def main(level: str, auto: bool, use_llm: bool, mode: str) -> None:
             index_word_pair=transcribe_serv.iw_pair,
             mappers=mappers,
             data_pipeline=privacy_pipeline,
-            auto_llm=use_llm and maker is not None,
+            use_llm=use_llm and maker is not None,
             interactive_mode=not auto
         )
 

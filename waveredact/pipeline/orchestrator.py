@@ -14,13 +14,13 @@ class Orchestrator:
         index_word_pair: dict[int, str], 
         mappers: list[ChunkMapper],
         data_pipeline: DataPrivacyPipeline,
-        auto_llm: bool = False,
+        use_llm: bool = False,
         interactive_mode: bool = True
     ):  
         self.iw_pair = index_word_pair
         self.mappers = mappers
         self.data_pipeline = data_pipeline
-        self.auto_llm = auto_llm
+        self.use_llm = use_llm
         self.interactive_mode = interactive_mode
 
     def run_audio_chunks(
@@ -46,14 +46,19 @@ class Orchestrator:
         ambiguous_idx = full_idx - full_locked_idx
         if self.interactive_mode:
             is_approved = self._human_approval(words_found)
-            if is_approved or not self.data_pipeline.llm_extractors:
-                if not is_approved and not self.data_pipeline.llm_extractors:
-                    logger.info("LLM bypassed because no LLM extractor is configured.")
+            
+            if is_approved:
                 return ordered_idx
             else:
-                return self.run_llm_extraction(sorted(ambiguous_idx), full_locked_idx)
+                if self.data_pipeline.llm_extractors:
+                    return self.run_llm_extraction(sorted(ambiguous_idx), full_locked_idx)
+                else:
+                    logger.warning("You answered 'N', but no LLM is configured to refine the search.")
+                    print("💡 Hint: Restart the pipeline adding the '--use-llm' flag for better precision.")
+                    print("Proceeding with the current redaction list to ensure data safety.\n")
+                    return ordered_idx
         else:
-            if self.auto_llm and self.data_pipeline.llm_extractors:
+            if self.use_llm and self.data_pipeline.llm_extractors:
                 logger.info("Automatic mode: Executing LLM to maximize security...")
                 return self.run_llm_extraction(sorted(ambiguous_idx), full_locked_idx)
             else:

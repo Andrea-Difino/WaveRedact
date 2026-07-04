@@ -1,8 +1,13 @@
 from pathlib import Path
 from gliner2 import GLiNER2
+import logging
 import os
+from contextlib import redirect_stdout
 import json
 
+logger = logging.getLogger(__name__)
+FORMAT = "%(asctime)s %(message)s"
+logging.basicConfig(datefmt=FORMAT, level=logging.WARNING, force=True)
 
 class GlinerFactory:
     def __init__(
@@ -41,7 +46,7 @@ class GlinerFactory:
 
     def build(self) -> GLiNER2:
         if os.path.exists(self.cache_dir) and os.listdir(self.cache_dir):
-            print(f"\n📦 Found model '{self.cache_dir}'. Offline loading...")
+            logger.info(f"\n📦 Found model '{self.cache_dir}'. Offline loading...")
 
             tok_config_path = Path(self.cache_dir) / "tokenizer_config.json"
             if tok_config_path.exists():
@@ -59,7 +64,8 @@ class GlinerFactory:
                 except Exception:
                     pass
 
-            model = GLiNER2.from_pretrained(self.cache_dir, local_files_only=True)
+            with open(os.devnull, 'w', encoding="utf-8") as devnull, redirect_stdout(devnull):
+                model = GLiNER2.from_pretrained(self.cache_dir, local_files_only=True)
         else:
             print(
                 f"\n🌐 Model not found locally. Downloading '{self.model_id}'... (Could take some minutes)"
@@ -67,7 +73,9 @@ class GlinerFactory:
 
             os.makedirs(self.cache_dir, exist_ok=True)
 
-            model = GLiNER2.from_pretrained(self.model_id)
+            with open(os.devnull, 'w', encoding="utf-8") as devnull, redirect_stdout(devnull):
+                model = GLiNER2.from_pretrained(self.model_id)
+
             model.save_pretrained(self.cache_dir)
             print(
                 f"\n✅ Model downloaded successfully and saved in '{self.cache_dir}'!"
