@@ -53,7 +53,7 @@ class AudioCensor:
         timestamps = sorted(timestamps, key=lambda x: x[0])
 
         pad_start = 50
-        pad_end = 100
+        pad_end = 130
 
         for start_sec, end_sec in timestamps:
             start_ms = int(start_sec * 1000)
@@ -72,7 +72,7 @@ class AudioCensor:
             else:
                 censor = AudioSegment.silent(duration=safe_duration)
                 
-            censor = censor.fade_in(10).fade_out(10)
+            censor = censor.fade_in(12).fade_out(20)
 
             audio = audio[:safe_start] + censor + audio[safe_end:]
         

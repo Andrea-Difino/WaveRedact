@@ -76,7 +76,7 @@ class Orchestrator:
         for i in range(n_chunks):
             chunk_ambiguous = chunk_ambiguous_list[i]
 
-            logger.info(f"Running LLM for chunk: {i + 1}")
+            print(f"Running LLM for chunk: {i + 1}")
             res = self.data_pipeline.extract_sensitive_with_llm(self.mappers[i], chunk_ambiguous)
             checked_idx.update(res)
 

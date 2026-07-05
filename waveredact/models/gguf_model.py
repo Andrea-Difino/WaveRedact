@@ -1,4 +1,5 @@
 import json
+import re
 from waveredact.models.model import Model
 from huggingface_hub import hf_hub_download
 import os
@@ -78,8 +79,30 @@ class GGUFModel(Model):
             text_response = response.choices[0].message.content
             print(text_response)
 
-            list_sensitive_ids: list[int] = json.loads(text_response if text_response else "")["final_indices"]
-            return list_sensitive_ids
+            if not text_response:
+                return []
+
+            json_match = re.search(r'\{.*\}', text_response, re.DOTALL)
+            
+            if json_match:
+                clean_json_string = json_match.group(0)
+                parsed_data = json.loads(clean_json_string)
+                
+                list_sensitive_ids: list[int] = []
+
+                if "word_analysis" in parsed_data:
+                    for analysis in parsed_data["word_analysis"]:
+                        if analysis.get("action") == "SENSITIVE":
+                            word_id = analysis.get("id")
+                            if word_id is not None:
+                                list_sensitive_ids.append(word_id)
+                else:
+                    list_sensitive_ids = parsed_data.get("final_indices", [])
+
+                return list_sensitive_ids
+            else:
+                logger.warning("No JSON structure found in the LLM response.")
+                return []
 
         except Exception as e:
             logger.warning(f"Error during LLM inference: {e}")
