@@ -11,10 +11,10 @@ import yaml
 load_dotenv()
 logger = logging.getLogger(__name__)
 FORMAT = '%(asctime)s %(message)s'
-logging.basicConfig(datefmt=FORMAT,level=logging.WARNING, force=True)
+logging.basicConfig(datefmt=FORMAT, level=logging.WARNING, force=True)
 
 class GGUFModel(Model):
-    def __init__(self, gguf_file_name: str, repo_id: str ,model_dir: str = "./files/gguf_models", server_port: int = 8080):
+    def __init__(self, gguf_file_name: str, repo_id: str, model_dir: str = "./files/gguf_models", server_port: int = 8080):
         self.file_gguf = gguf_file_name
         self.model_dir = os.path.abspath(model_dir)
         self.path = f"{self.model_dir}/{self.file_gguf}"
@@ -55,21 +55,61 @@ class GGUFModel(Model):
         else:
             print("Model already downloaded")
 
-    def run_model(self, chunk: dict[int,str], ambiguous_idx: list[int] | None) -> list[int]:
-        print("[STEP 3] Using LLM")
-        system_prompt = self.sys_prompt
-        
-        couple = ""
-        for pair in chunk.items():
-            couple += f"[{pair[0]}] {pair[1]}\n"
+    def _build_chunk_string(self, chunk: dict[int, str]) -> str:
+        """Converte il dizionario in una stringa formattata [ID] parola."""
+        return "".join([f"[{k}] {v}\n" for k, v in chunk.items()])
 
-        user_prompt = self.user_prompt.format(labels=self.labels, ambiguous=ambiguous_idx, idx_couples=couple)
+    def _parse_llm_response(self, text_response: str) -> dict | None:
+        if not text_response:
+            return None
+
+        json_match = re.search(r'\{.*\}', text_response, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group(0))
+            except json.JSONDecodeError as e:
+                logger.warning(f"Failed to parse cleaned JSON: {e}")
+                return None
+        return None
+
+    def _extract_ids_with_healing(self, parsed_data: dict, chunk: dict[int, str]) -> list[int]:
+        """Extract sensitive IDs and check possible hallucinations of the model"""
+        list_sensitive_ids = []
+
+        if "word_analysis" not in parsed_data:
+            logger.error("The output JSON doesn't have 'word_analysis' array. Returning empty list")
+            return []
+
+        for analysis in parsed_data["word_analysis"]:
+            if analysis.get("action") == "SENSITIVE":
+                reported_id = analysis.get("id")
+                reported_word = analysis.get("word")
+                
+                if reported_id is not None and reported_word is not None:
+                    if reported_id in chunk and reported_word in chunk[reported_id]:
+                        list_sensitive_ids.append(reported_id)
+                        
+                    else:
+                        logger.warning(f"LLM hallucinated ID {reported_id} for word '{reported_word}'. Attempting recovery...")
+                        for real_id, real_word in chunk.items():
+                            if reported_word in real_word:
+                                list_sensitive_ids.append(real_id)
+                                print("ID recovered")
+                                break
+        
+        return list_sensitive_ids
+
+    def run_model(self, chunk: dict[int, str], ambiguous_idx: list[int] | None) -> list[int]:
+        print("[STEP 3] Using LLM")
+        
+        couple_str = self._build_chunk_string(chunk)
+        user_prompt = self.user_prompt.format(labels=self.labels, ambiguous=ambiguous_idx, idx_couples=couple_str)
         
         try:
             response = self.client.chat.completions.create(
                 model="local-model",
                 messages=[
-                    {"role": "system", "content": system_prompt},
+                    {"role": "system", "content": self.sys_prompt},
                     {"role": "user", "content": f"Testo da analizzare: '{user_prompt}'"}
                 ],
                 temperature=0.0, 
@@ -77,31 +117,16 @@ class GGUFModel(Model):
             )
             
             text_response = response.choices[0].message.content
-            print(text_response)
-
-            if not text_response:
-                return []
-
-            json_match = re.search(r'\{.*\}', text_response, re.DOTALL)
+            #print(text_response)
             
-            if json_match:
-                clean_json_string = json_match.group(0)
-                parsed_data = json.loads(clean_json_string)
-                
-                list_sensitive_ids: list[int] = []
-
-                if "word_analysis" in parsed_data:
-                    for analysis in parsed_data["word_analysis"]:
-                        if analysis.get("action") == "SENSITIVE":
-                            word_id = analysis.get("id")
-                            if word_id is not None:
-                                list_sensitive_ids.append(word_id)
+            if text_response:
+                parsed_data = self._parse_llm_response(text_response)
+                if parsed_data:
+                    return self._extract_ids_with_healing(parsed_data, chunk)
                 else:
-                    list_sensitive_ids = parsed_data.get("final_indices", [])
-
-                return list_sensitive_ids
+                    logger.warning("No valid JSON structure found in the LLM response.")
+                    return []
             else:
-                logger.warning("No JSON structure found in the LLM response.")
                 return []
 
         except Exception as e:

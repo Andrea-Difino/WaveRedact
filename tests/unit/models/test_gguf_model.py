@@ -119,20 +119,40 @@ class TestGGUFModel:
         model.labels = ["email", "phone_number"]
         assert model.labels == ["email", "phone_number"]
 
-    def test_run_model_returns_final_indices(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    def test_run_model_returns_sensitive_indices(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
         module = _import_gguf_model(monkeypatch)
+
+        mocked_llm_json = json.dumps({
+            "word_analysis": [
+                {
+                    "id": 0,
+                    "word": "hello",
+                    "reason": "Generic greeting.",
+                    "action": "IGNORE"
+                },
+                {
+                    "id": 1,
+                    "word": "world",
+                    "reason": "Matches a sensitive label.",
+                    "action": "SENSITIVE"
+                }
+            ]
+        })
+        
         response = SimpleNamespace(
             choices=[
                 SimpleNamespace(
-                    message=SimpleNamespace(content='{"final_indices": [1, 3]}')
+                    message=SimpleNamespace(content=mocked_llm_json)
                 )
             ]
         )
+        
         mock_create = MagicMock(return_value=response)
         mock_client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=mock_create)))
         monkeypatch.setattr(module, "OpenAI", MagicMock(return_value=mock_client))
         monkeypatch.setattr(module, "hf_hub_download", MagicMock())
         monkeypatch.setattr(module.os.path, "exists", lambda _path: True)
+
         monkeypatch.setattr("builtins.open", mock_open(read_data=json.dumps(PROMPTS)))
 
         model = module.GGUFModel("model.gguf", "repo/name", model_dir=str(tmp_path))
@@ -140,7 +160,8 @@ class TestGGUFModel:
 
         result = model.run_model({0: "hello", 1: "world"}, [0])
 
-        assert result == [1, 3]
+        assert result == [1]
+        
         mock_create.assert_called_once()
         kwargs = mock_create.call_args.kwargs
         assert kwargs["model"] == "local-model"
