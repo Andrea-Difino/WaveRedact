@@ -1,4 +1,4 @@
-![](imgs/logo_grande_2.png)
+![](imgs/logo_presentazione.png)
 ![Static Badge](https://img.shields.io/badge/Licence-Apache%202\.0-orange)
 
 WaveRedact is a local tool for transcribing audio files and automatically redacting sensitive information in spoken content. The basic workflow is simple: put audio files in the `audio/` folder, run the CLI, and find the redacted version in `audio/censored/`.
