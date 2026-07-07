@@ -7,6 +7,7 @@ import requests
 import atexit
 import logging
 import platform
+import json
 import stat
 from pathlib import Path
 
@@ -33,16 +34,37 @@ class LlamaServerService:
         atexit.register(self.stop_server)
 
     def _get_os_config(self) -> tuple[str, str]:
-        """Return the name of the executable file and download URL based on the OS"""
-        system = platform.system().lower()
-        base_url = "https://github.com/ggml-org/llama.cpp/releases/download/b3100"
+        """Interroga le API di GitHub per ottenere l'eseguibile e l'URL dell'ultima release disponibile."""
+        api_url = "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest"
         
+        try:
+            req = urllib.request.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req) as response:
+                data = json.loads(response.read().decode('utf-8'))
+                
+            latest_tag = data.get("tag_name")
+            if not latest_tag:
+                raise ValueError("Tag della release non trovato nel JSON di GitHub.")
+                
+        except Exception as e:
+            print(f"\n[WARNING] Impossible to contact Github API ({e}). Using version b9895 as fallback.")
+            latest_tag = "b9895"
+
+        # 2. Rileviamo l'hardware
+        system = platform.system().lower()
+        machine = platform.machine().lower()
+        
+        base_url = f"https://github.com/ggml-org/llama.cpp/releases/download/{latest_tag}"
+  
         if system == "windows":
-            return "llama-server.exe", f"{base_url}/llama-b3100-bin-win-vulkan-x64.zip"
+            return "llama-server.exe", f"{base_url}/llama-{latest_tag}-bin-win-vulkan-x64.zip"
         elif system == "darwin":
-            return "llama-server", f"{base_url}/llama-b3100-bin-macos-universal.zip"
+            if machine in ["arm64", "aarch64"]:
+                return "llama-server", f"{base_url}/llama-{latest_tag}-bin-macos-arm64.zip"
+            else:
+                return "llama-server", f"{base_url}/llama-{latest_tag}-bin-macos-x64.zip"   
         else:
-            return "llama-server", f"{base_url}/llama-b3100-bin-ubuntu-vulkan-x64.zip"
+            return "llama-server", f"{base_url}/llama-{latest_tag}-bin-ubuntu-x64.zip"
 
     def _find_executable(self) -> str | None:
         if os.path.exists(self.destination_folder):
