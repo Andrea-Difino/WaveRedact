@@ -14,6 +14,7 @@ class GPUEnvironmentManager:
         project_root = Path(__file__).resolve().parent.parent.parent
 
         self.dll_folder = str(project_root / "files" / "server")
+        self.device: str = self.get_device()
 
     def ensure_gpu_ready(self) -> None:
         if sys.platform.startswith('win'):
@@ -23,7 +24,7 @@ class GPUEnvironmentManager:
                 self._download_and_extract_dlls()
             self._inject_dlls()
 
-        device = self.get_device()
+        device = self.device
         logger.info(f"Hardware detected for inference: {device.upper()}")
 
     def _download_and_extract_dlls(self) -> None:

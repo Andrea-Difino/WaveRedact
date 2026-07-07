@@ -70,7 +70,7 @@ def main(level: str, auto: bool, use_llm: bool, mode: str) -> None:
         maker = GGUFModel(MAKER_MODEL_NAME, REPO_ID, server_port=SERVER_PORT)
 
         # SERVER INITIALIZATION
-        server = LlamaServerService(MAKER_MODEL_NAME, server_port=SERVER_PORT)
+        server = LlamaServerService(MAKER_MODEL_NAME, server_port=SERVER_PORT, device=gpu_setup.device)
 
         try:
             server.start_server()

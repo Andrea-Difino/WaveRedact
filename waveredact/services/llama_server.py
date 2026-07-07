@@ -8,6 +8,7 @@ import atexit
 import logging
 import platform
 import json
+import math
 import stat
 from pathlib import Path
 
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class LlamaServerService:
 
-    def __init__(self, model_file_name: str, server_port: int = 8080):
+    def __init__(self, model_file_name: str, server_port: int = 8080, device: str = "cpu"):
         project_root = Path(__file__).resolve().parent.parent.parent
         self.destination_folder = str(project_root / "files" / "server")
         self.model_dir = str(project_root / "files" / "gguf_models")
@@ -26,7 +27,8 @@ class LlamaServerService:
         self.path = os.path.join(self.model_dir, self.file_gguf)
 
         self.process = None
-        self.server_port = server_port
+        self.server_port = server_port 
+        self.device = device
 
         self.exe_name, self.download_url = self._get_os_config()
 
@@ -56,7 +58,10 @@ class LlamaServerService:
         base_url = f"https://github.com/ggml-org/llama.cpp/releases/download/{latest_tag}"
   
         if system == "windows":
-            return "llama-server.exe", f"{base_url}/llama-{latest_tag}-bin-win-vulkan-x64.zip"
+            if self.device == "cuda":
+                return "llama-server.exe", f"{base_url}/llama-{latest_tag}-bin-win-cuda-12.4-x64.zip"
+            else:
+                return "llama-server.exe", f"{base_url}/llama-{latest_tag}-bin-win-vulkan-x64.zip"
         elif system == "darwin":
             if machine in ["arm64", "aarch64"]:
                 return "llama-server", f"{base_url}/llama-{latest_tag}-bin-macos-arm64.zip"
@@ -109,10 +114,12 @@ class LlamaServerService:
     def start_server(self):
         print("Starting Llama server...")
 
+        ngl = self._get_optimal_ngl()
+
         command = [
             self.exe_path,
             "--model", self.path,
-            "-ngl", "99",
+            "-ngl", ngl,
             "--port", f"{self.server_port}",
             "--flash-attn", "auto",
             "-c", "4096"
@@ -141,6 +148,40 @@ class LlamaServerService:
             raise RuntimeError("Server didn't start in time")
 
         logger.info("Server ready")
+
+    def _get_optimal_ngl(self) -> str:
+        """Dinamically process the number of layer to load in the GPU"""
+        if platform.system().lower() != "windows" or self.device != "cuda":
+            return "99"
+
+        try:
+            result = subprocess.check_output(
+                ["nvidia-smi", "--query-gpu=memory.free", "--format=csv,nounits,noheader"],
+                encoding="utf-8",
+                creationflags=subprocess.CREATE_NO_WINDOW 
+            )
+            free_vram_mb = int(result.strip().split('\n')[0])
+            
+            mb_per_layer = 140
+
+            buffer_mb = 800 
+            
+            safe_vram_mb = free_vram_mb - buffer_mb
+            
+            if safe_vram_mb <= 0:
+                logger.warning("VRAM almost full, model will run on CPU.")
+                return "0"
+                
+            calculated_layers = math.floor(safe_vram_mb / mb_per_layer)
+
+            optimal_ngl = min(calculated_layers, 99)
+            
+            logger.info(f"[AUTO-NGL] VRAM free: {free_vram_mb}MB. Layer calculated: {optimal_ngl}")
+            return str(optimal_ngl)
+            
+        except Exception as e:
+            logger.warning(f"[AUTO-NGL] Impossible to read nvidia-smi ({e}). Using 25 as fallback.")
+            return "25"
 
     def stop_server(self):
         if self.process:
