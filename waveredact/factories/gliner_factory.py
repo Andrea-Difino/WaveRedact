@@ -1,5 +1,6 @@
 from pathlib import Path
 from gliner2 import GLiNER2
+from huggingface_hub import snapshot_download
 import logging
 import os
 from contextlib import redirect_stdout
@@ -45,40 +46,30 @@ class GlinerFactory:
         )
 
     def build(self) -> GLiNER2:
-        if os.path.exists(self.cache_dir) and os.listdir(self.cache_dir):
+        if not (os.path.exists(self.cache_dir) and os.listdir(self.cache_dir)):
+            print(f"\n🌐 Model not found locally. Downloading '{self.model_id}'... (Could take some minutes)")
+            os.makedirs(self.cache_dir, exist_ok=True)
+            
+            snapshot_download(repo_id=self.model_id, local_dir=self.cache_dir)
+            print(f"\n✅ Model downloaded successfully and saved in '{self.cache_dir}'!")
+        else:
             logger.info(f"\n📦 Found model '{self.cache_dir}'. Offline loading...")
 
-            tok_config_path = Path(self.cache_dir) / "tokenizer_config.json"
-            if tok_config_path.exists():
-                try:
-                    with open(tok_config_path, "r", encoding="utf-8") as f:
-                        config = json.load(f)
+        tok_config_path = Path(self.cache_dir) / "tokenizer_config.json"
+        if tok_config_path.exists():
+            try:
+                with open(tok_config_path, "r", encoding="utf-8") as f:
+                    config = json.load(f)
 
-                    if "extra_special_tokens" in config and isinstance(
-                        config["extra_special_tokens"], list
-                    ):
-                        del config["extra_special_tokens"]
+                if "extra_special_tokens" in config and isinstance(config["extra_special_tokens"], list):
+                    del config["extra_special_tokens"]
 
-                        with open(tok_config_path, "w", encoding="utf-8") as fw:
-                            json.dump(config, fw, indent=2)
-                except Exception:
-                    pass
+                    with open(tok_config_path, "w", encoding="utf-8") as fw:
+                        json.dump(config, fw, indent=2)
+            except Exception as e:
+                logger.warning(f"Impossibile correggere il tokenizer config: {e}")
 
-            with open(os.devnull, 'w', encoding="utf-8") as devnull, redirect_stdout(devnull):
-                model = GLiNER2.from_pretrained(self.cache_dir, local_files_only=True)
-        else:
-            print(
-                f"\n🌐 Model not found locally. Downloading '{self.model_id}'... (Could take some minutes)"
-            )
-
-            os.makedirs(self.cache_dir, exist_ok=True)
-
-            with open(os.devnull, 'w', encoding="utf-8") as devnull, redirect_stdout(devnull):
-                model = GLiNER2.from_pretrained(self.model_id)
-
-            model.save_pretrained(self.cache_dir)
-            print(
-                f"\n✅ Model downloaded successfully and saved in '{self.cache_dir}'!"
-            )
+        with open(os.devnull, 'w', encoding="utf-8") as devnull, redirect_stdout(devnull):
+            model = GLiNER2.from_pretrained(self.cache_dir, local_files_only=True)
 
         return model
