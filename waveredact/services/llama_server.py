@@ -34,7 +34,7 @@ class LlamaServerService:
         atexit.register(self.stop_server)
 
     def _get_os_config(self) -> tuple[str, str]:
-        """Interroga le API di GitHub per ottenere l'eseguibile e l'URL dell'ultima release disponibile."""
+        """Use Github API to obtain the exe file and the URL for the last available release"""
         api_url = "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest"
         
         try:
@@ -44,13 +44,12 @@ class LlamaServerService:
                 
             latest_tag = data.get("tag_name")
             if not latest_tag:
-                raise ValueError("Tag della release non trovato nel JSON di GitHub.")
+                raise ValueError("Release tag not found")
                 
         except Exception as e:
             print(f"\n[WARNING] Impossible to contact Github API ({e}). Using version b9895 as fallback.")
             latest_tag = "b9895"
 
-        # 2. Rileviamo l'hardware
         system = platform.system().lower()
         machine = platform.machine().lower()
         

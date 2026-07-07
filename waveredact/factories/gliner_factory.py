@@ -1,5 +1,6 @@
 from pathlib import Path
 from gliner2 import GLiNER2
+import sys
 from huggingface_hub import snapshot_download
 import logging
 import os
@@ -67,7 +68,8 @@ class GlinerFactory:
                     with open(tok_config_path, "w", encoding="utf-8") as fw:
                         json.dump(config, fw, indent=2)
             except Exception as e:
-                logger.warning(f"Impossibile correggere il tokenizer config: {e}")
+                logger.warning(f"Impossible to correct the tokenizer config: {e}")
+                sys.exit(1)
 
         with open(os.devnull, 'w', encoding="utf-8") as devnull, redirect_stdout(devnull):
             model = GLiNER2.from_pretrained(self.cache_dir, local_files_only=True)
