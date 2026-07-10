@@ -94,9 +94,9 @@ class Orchestrator:
                 f"\nThese are the words found:\n{sensitive_words}\n\nAre they all (Y/N)? "
             )
 
-            if user_question.upper() == "Y":
+            if user_question.upper().strip() == "Y":
                 return True
-            elif user_question.upper() == "N":
+            elif user_question.upper().strip() == "N":
                 return False
             else:
                 print("⚠️ Invalid input. Please enter Y or N.")
