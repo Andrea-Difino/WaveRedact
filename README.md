@@ -1,7 +1,24 @@
 ![](imgs/logo_presentazione.png)
-![Static Badge](https://img.shields.io/badge/Licence-Apache%202\.0-orange)
+<div align="center">
 
-WaveRedact is a local tool for transcribing audio files and automatically redacting sensitive information in spoken content. The basic workflow is simple: put audio files in the `audio/` folder, run the CLI, and find the redacted version in `audio/censored/`.
+  <p>
+    <strong>An advanced architecture for the anonymization and protection of sensitive data (PII) in transcriptions.</strong>
+  </p>
+
+  <p>
+    WaveRedact leverages a hybrid pipeline combining compact NER models (GLiNER) with <strong>strictly local Large Language Models</strong> (via <i>llama.cpp</i>). Designed to identify, validate, and redact personal information with surgical precision and auto-correction of hallucinations, ensuring your data <strong>never</strong> leaves your machine.
+  </p>
+
+</div>
+
+<div align="center">
+  <p>
+      <img src="https://img.shields.io/badge/Licence-Apache%202.0-yellow.svg" alt="Licence Apache 2.0">
+      <img src="https://img.shields.io/badge/python-3.10%2B-blue.svg" alt="Python Version">
+      <img src="https://img.shields.io/badge/privacy-100%25_local-success.svg" alt="Privacy First">
+      <img src="https://img.shields.io/badge/powered_by-llama.cpp-orange.svg" alt="Powered by llama.cpp">
+  </p>
+</div>
 
 ## What it does
 
