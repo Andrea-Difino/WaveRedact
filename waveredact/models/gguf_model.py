@@ -9,15 +9,20 @@ import logging
 import yaml
 from pathlib import Path
 
-load_dotenv()
+project_root = Path(__file__).resolve().parent.parent.parent
+env_path = project_root / ".env"
+load_dotenv(dotenv_path=env_path)
+
 logger = logging.getLogger(__name__)
 FORMAT = '%(asctime)s %(message)s'
 logging.basicConfig(datefmt=FORMAT, level=logging.WARNING, force=True)
 
 class GGUFModel(Model):
-    def __init__(self, gguf_file_name: str, repo_id: str, model_dir: str = "./files/gguf_models", server_port: int = 8080):
+    def __init__(self, gguf_file_name: str, repo_id: str, model_dir: str | None = None, server_port: int = 8080):
+        project_root = Path(__file__).resolve().parent.parent.parent
+        self.model_dir = model_dir if model_dir else str(project_root / "files" / "gguf_models")
+        
         self.file_gguf = gguf_file_name
-        self.model_dir = os.path.abspath(model_dir)
         self.path = f"{self.model_dir}/{self.file_gguf}"
         self.repo_id = repo_id
         self.target_labels: list[str] | None = None

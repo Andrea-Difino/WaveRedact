@@ -2,6 +2,7 @@ import logging
 
 import click
 from dotenv import load_dotenv
+from pathlib import Path
 
 from waveredact.factories.gliner_factory import GlinerFactory
 from waveredact.factories.whisper_factory import WhisperFactory
@@ -18,7 +19,9 @@ from waveredact.utils.chunk import Chunker
 from waveredact.utils.gpu_setup import GPUEnvironmentManager
 from waveredact.utils.level import LevelSetter
 
-load_dotenv()
+project_root = Path(__file__).resolve().parent.parent
+env_path = project_root / ".env"
+load_dotenv(dotenv_path=env_path)
 
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(message)s"

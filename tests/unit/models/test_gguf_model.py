@@ -38,7 +38,7 @@ def _import_gguf_model(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setitem(sys.modules, "huggingface_hub", fake_hf)
 
     fake_dotenv = types.ModuleType("dotenv")
-    fake_dotenv.load_dotenv = lambda: None
+    fake_dotenv.load_dotenv = lambda *args, **kwargs: None
     monkeypatch.setitem(sys.modules, "dotenv", fake_dotenv)
 
     fake_yaml = types.ModuleType("yaml")

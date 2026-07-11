@@ -26,6 +26,7 @@ class TestGPUEnvironmentManager:
         self, mock_inject, mock_download, mock_exists, mock_makedirs
     ):
         manager = GPUEnvironmentManager()
+        manager.device = "cuda"
 
         mock_exists.return_value = True
 
@@ -45,6 +46,7 @@ class TestGPUEnvironmentManager:
         self, mock_inject, mock_download, mock_exists, mock_makedirs
     ):
         manager = GPUEnvironmentManager()
+        manager.device = "cuda"
 
         mock_exists.return_value = False
 
