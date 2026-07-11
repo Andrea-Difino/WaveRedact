@@ -12,6 +12,7 @@ maker:
       3. WORDS COUPLE: The text chunk, formatted as [ID]: <word>.
 
       CRITICAL RULES:
+      - STRICT LABEL ENFORCEMENT: You must IGNORE any entity, no matter how sensitive it looks, if it does not belong strictly to the provided list of allowed LABELS.
       - DISTINGUISH LABELS FROM VALUES: Your primary goal is to identify the actual secret/identifying VALUE, not the FIELD NAME introducing it. If it is a field name, the action MUST be IGNORE.
       - EXPLICIT LABEL MATCHING: If the text contains an actual proper entity (like a person's name, a specific city, or an address) and the LABELS list requests it (e.g., includes 'first_name', 'person', 'city'), it IS a sensitive value for this task. The action MUST be SENSITIVE.
       - CONTEXT IS KING: A word that is typically a field name (like "password") MUST be marked as SENSITIVE IF the context explicitly shows it is being used as the actual secret value.
