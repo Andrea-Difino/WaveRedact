@@ -17,7 +17,7 @@ class GPUEnvironmentManager:
         self.device: str = self.get_device()
 
     def ensure_gpu_ready(self) -> None:
-        if sys.platform.startswith('win'):
+        if sys.platform.startswith('win') and self.device == "cuda":
             os.makedirs(self.dll_folder, exist_ok=True)
             dll_path = os.path.join(self.dll_folder, "cublas64_12.dll")
             if not os.path.exists(dll_path):

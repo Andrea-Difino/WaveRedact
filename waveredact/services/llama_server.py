@@ -10,6 +10,7 @@ import platform
 import json
 import math
 import stat
+import tarfile
 from pathlib import Path
 
 FORMAT = '%(asctime)s %(message)s'
@@ -64,11 +65,11 @@ class LlamaServerService:
                 return "llama-server.exe", f"{base_url}/llama-{latest_tag}-bin-win-vulkan-x64.zip"
         elif system == "darwin":
             if machine in ["arm64", "aarch64"]:
-                return "llama-server", f"{base_url}/llama-{latest_tag}-bin-macos-arm64.zip"
+                return "llama-server", f"{base_url}/llama-{latest_tag}-bin-macos-arm64.tar.gz"
             else:
-                return "llama-server", f"{base_url}/llama-{latest_tag}-bin-macos-x64.zip"   
+                return "llama-server", f"{base_url}/llama-{latest_tag}-bin-macos-x64.tar.gz"   
         else:
-            return "llama-server", f"{base_url}/llama-{latest_tag}-bin-ubuntu-x64.zip"
+            return "llama-server", f"{base_url}/llama-{latest_tag}-bin-ubuntu-x64.tar.gz"
 
     def _find_executable(self) -> str | None:
         if os.path.exists(self.destination_folder):
@@ -93,14 +94,21 @@ class LlamaServerService:
         logger.info("Downloading AI engine...")
         os.makedirs(self.destination_folder, exist_ok=True)
 
-        zip_exe_path = os.path.join(self.destination_folder, "llama_exe.zip")
-        urllib.request.urlretrieve(self.download_url, zip_exe_path)
+        is_zip = self.download_url.endswith('.zip')
+        archive_name = "llama_exe.zip" if is_zip else "llama_exe.tar.gz"
+        archive_path = os.path.join(self.destination_folder, archive_name)
+        
+        urllib.request.urlretrieve(self.download_url, archive_path)
 
         logger.info("Extracting Llama engine...")
-        with zipfile.ZipFile(zip_exe_path, 'r') as zip_ref:
-            zip_ref.extractall(self.destination_folder)
+        if is_zip:
+            with zipfile.ZipFile(archive_path, 'r') as zip_ref:
+                zip_ref.extractall(self.destination_folder)
+        else:
+            with tarfile.open(archive_path, 'r:gz') as tar_ref:
+                tar_ref.extractall(self.destination_folder)
 
-        os.remove(zip_exe_path)
+        os.remove(archive_path)
         logger.info("Llama engine downloaded!")
 
         self.exe_path = self._find_executable()
@@ -151,31 +159,33 @@ class LlamaServerService:
 
     def _get_optimal_ngl(self) -> str:
         """Dinamically process the number of layer to load in the GPU"""
-        if platform.system().lower() != "windows" or self.device != "cuda":
+        if self.device != "cuda":
             return "99"
 
         try:
+            kwargs = {}
+            if platform.system().lower() == "windows":
+                kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+
             result = subprocess.check_output(
                 ["nvidia-smi", "--query-gpu=memory.free", "--format=csv,nounits,noheader"],
                 encoding="utf-8",
-                creationflags=subprocess.CREATE_NO_WINDOW 
+                **kwargs
             )
             free_vram_mb = int(result.strip().split('\n')[0])
-            
-            mb_per_layer = 140
 
+            mb_per_layer = 140
             buffer_mb = 800 
-            
             safe_vram_mb = free_vram_mb - buffer_mb
-            
+
             if safe_vram_mb <= 0:
                 logger.warning("VRAM almost full, model will run on CPU.")
                 return "0"
-                
+
             calculated_layers = math.floor(safe_vram_mb / mb_per_layer)
 
             optimal_ngl = min(calculated_layers, 99)
-            
+
             logger.info(f"[AUTO-NGL] VRAM free: {free_vram_mb}MB. Layer calculated: {optimal_ngl}")
             return str(optimal_ngl)
             

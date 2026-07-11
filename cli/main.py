@@ -80,9 +80,24 @@ def main(level: str, auto: bool, use_llm: bool, mode: str) -> None:
 
     audio_manager = IOAudioManager()
     audios = audio_manager.get_audio()
-    if len(audios) == 0:
+    if not audios:
         click.secho("There's no audio to process. Terminating process...", fg="yellow")
         return
+
+    levels_setter = LevelSetter(not auto, level_name=level)
+
+    gliner_factory = GlinerFactory(target_labels=levels_setter.target_labels)
+    if maker:
+        maker.labels = levels_setter.target_labels
+
+    privacy_pipeline = DataPrivacyPipeline(
+        GlinerExtractor(
+            gliner_factory.build(),
+            gliner_factory.target_labels,
+            gliner_factory.threshold,
+        ),
+        maker
+    )
 
     for audio_path in audios:
         click.secho(f"Processing audio {audio_path}", fg='green')
@@ -93,21 +108,6 @@ def main(level: str, auto: bool, use_llm: bool, mode: str) -> None:
 
         mappers = [ChunkMapper(chunk) for chunk in chunks]
         
-        levels_setter = LevelSetter(not auto, level_name=level)
-
-        gliner_factory = GlinerFactory(target_labels=levels_setter.target_labels)
-        if maker:
-            maker.labels = levels_setter.target_labels
-
-        privacy_pipeline = DataPrivacyPipeline(
-            GlinerExtractor(
-                gliner_factory.build(),
-                gliner_factory.target_labels,
-                gliner_factory.threshold,
-            ),
-            maker
-        )
-
         orchestrator = Orchestrator(
             index_word_pair=transcribe_serv.iw_pair,
             mappers=mappers,

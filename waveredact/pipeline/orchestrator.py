@@ -132,7 +132,7 @@ class Orchestrator:
         """
         while True:
             user_question = input(
-                f"\nThese are the words found:\n{sensitive_words}\n\nAre they all (Y/N)? "
+                f"\nThese are the words found:\n{sensitive_words}\n\nAre they all correct (Y/N)? "
             )
 
             if user_question.upper().strip() == "Y":

@@ -7,6 +7,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import logging
 import yaml
+from pathlib import Path
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -21,7 +22,9 @@ class GGUFModel(Model):
         self.repo_id = repo_id
         self.target_labels: list[str] | None = None
 
-        with open("prompts.yaml", "r") as f:
+        project_root = Path(__file__).resolve().parent.parent.parent
+        prompts_path = project_root / "prompts.yaml"
+        with open(prompts_path, "r") as f:
             prompts = yaml.safe_load(f)
 
         self.sys_prompt = prompts["maker"]["default"]["system_prompt"]

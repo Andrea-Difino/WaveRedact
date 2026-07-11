@@ -18,8 +18,7 @@ class WhisperFactory:
         self.gpu_manager = gpu_manager
 
     def build(self) -> WhisperModel:
-        gpu_manager = GPUEnvironmentManager()
-        gpu_manager.ensure_gpu_ready()
+        self.gpu_manager.ensure_gpu_ready()
         device = self.gpu_manager.get_device()
         return WhisperModel(
             self.model_name,
