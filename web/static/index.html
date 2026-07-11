@@ -9,7 +9,8 @@
 </head>
 
 <body>
-    <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">WaveRedact — censor sensitive data of your audio using Machine Learning</h2>
+    <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">WaveRedact — censor sensitive
+        data of your audio using Machine Learning</h2>
 
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Cambia tema">
         <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -35,86 +36,85 @@
         <div id="site-scoop">
             <h1>Protect <em>every sensitive data</em> of your audio</h1>
             <p class="subtitle">Load an audio. WaveRedact detect, isolate and remove automatically <b>PII
-                    informations</b> returning a <b>censored</b> audio.</p>
+                    informations</b> returning a <b>censored audio</b>.</p>
         </div>
     </header>
 
     <main>
+        <div id="sideInfoPanel" class="side-panel">
+            <div class="side-header">
+                <h3>Level Information</h3>
+                <button class="close-btn" onclick="toggleInfoPanel()" aria-label="Close Info">✕</button>
+            </div>
+            <div class="side-content">
+                <div id="labelsContainer">
+
+                </div>
+            </div>
+        </div>
+
         <div class="orbit-wrap" id="orbitWrap">
             <div class="ring ring-3"></div>
             <div class="ring ring-2"></div>
             <div class="ring ring-1"></div>
 
-            <div class="security-panel">
+            <div id="setupPanel"
+                style="display: flex; flex-direction: column; align-items: center; gap: 32px; width: 100%;">
+                <div class="security-panel">
 
-                <span class="section-title">Security Level</span>
+                    <span class="section-title" style="display: flex; align-items: center; gap: 8px;">
+                        Security Level
+                        <button id="infoIconBtn" class="info-circle" onclick="toggleInfoPanel()"
+                            aria-label="Level Info">i</button>
+                    </span>
 
-                <div class="segmented security-tabs">
-                    <div class="slider">
-                        <div class="wave-track">
-                            <svg class="wave" viewBox="0 0 120 20" preserveAspectRatio="none">
-                                <path d="M0 10 C15 0 30 20 45 10 S75 0 90 10 S105 20 120 10"/>
-                            </svg>
-                            <svg class="wave" viewBox="0 0 120 20" preserveAspectRatio="none">
-                                <path d="M0 10 C15 0 30 20 45 10 S75 0 90 10 S105 20 120 10"/>
-                            </svg>
+                    <div class="segmented security-tabs">
+                        <div class="slider">
+                            <div class="wave-track">
+                                <svg class="wave" viewBox="0 0 120 20" preserveAspectRatio="none">
+                                    <path d="M0 10 C15 0 30 20 45 10 S75 0 90 10 S105 20 120 10" />
+                                </svg>
+                                <svg class="wave" viewBox="0 0 120 20" preserveAspectRatio="none">
+                                    <path d="M0 10 C15 0 30 20 45 10 S75 0 90 10 S105 20 120 10" />
+                                </svg>
+                            </div>
                         </div>
+
+                        <button class="active" value="base" data-level="light" onclick="refreshLabels()">
+                            Light
+                        </button>
+
+                        <button data-level="deep" value="medium" onclick="refreshLabels()">
+                            Deep
+                        </button>
+
+                        <button data-level="tsunami" value="total" onclick="refreshLabels()">
+                            Tsunami
+                        </button>
                     </div>
-
-                    <button class="active" value="base" data-level="light">
-                        Light
-                    </button>
-
-                    <button data-level="deep" value="medium">
-                        Deep
-                    </button>
-
-                    <button data-level="tsunami" value="total">
-                        Tsunami
-                    </button>
-
-                    <!--<button data-level="custom">
-                        Custom
-                    </button>-->
                 </div>
 
-                <div class="security-info">
+                <button class="upload-btn" id="uploadBtn" onclick="startProcess()" aria-label="Carica audio">
+                    <span class="ub-label">Start the pipeline</span>
+                </button>
 
-                    <p class="preset-list active" id="light-list">
-                        Immediately redact sensitive information that could compromise the security of your accounts or savings. Remove passwords, digital access keys, tokens, and banking or credit card details.
-                    </p>
-
-                    <p class="preset-list" id="deep-list">
-                        It extends Level 1 to ensure maximum compliance with privacy regulations. It removes any data that could directly identify you or other individuals, such as names, email addresses, phone numbers, and identification documents.
-                    </p>
-
-                    <p class="preset-list" id="tsunami-list">
-                        Beyond protecting accounts and identities, it eliminates every trace of geographic and temporal context—removing addresses, cities, states, and any dates mentioned in the audio—thereby rendering the conversation completely decontextualized.
-                    </p>
-
-                    <!--<ul class="preset-list" id="custom-list">
-                        <select id="sensitive-data-list">
-                            <option value="volvo">Person</option>
-                            <option value="saab">First name</option>
-                            <option value="opel">Last name</option>
-                            <option value="audi">Email</option>
-                        </select>
-                    </ul>-->
-
+                <div class="redaction-panel">
+                    <span class="section-title">Redaction Style</span>
+                    <div class="segmented mode-tabs">
+                        <div class="slider"></div>
+                        <button class="active" value="muted">🔇 MUTED</button>
+                        <button value="beep">🔊 BEEP</button>
+                    </div>
                 </div>
             </div>
 
-            <button class="upload-btn" id="uploadBtn" onclick="startProcess()" aria-label="Carica audio">
-                <span class="ub-label">Start the pipeline</span>
-            </button>
-
-            <div class="redaction-panel">
-                <span class="section-title">Redaction Style</span>
-                <div class="segmented mode-tabs">
-                    <div class="slider"></div>
-                    <button class="active" value="muted">🔇 MUTED</button>
-                    <button value="beep">🔊 BEEP</button>
+            <div id="processingPanel">
+                <div class="pulse-ring"></div>
+                <div class="progress-bar-container">
+                    <div id="progressBar"></div>
                 </div>
+                <h3 id="processingStatus" class="status-text">Starting pipeline...</h3>
+                <div id="actionContainer"></div>
             </div>
 
 

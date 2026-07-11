@@ -27,7 +27,6 @@ class GGUFModel(Model):
         self.repo_id = repo_id
         self.target_labels: list[str] | None = None
 
-        project_root = Path(__file__).resolve().parent.parent.parent
         prompts_path = project_root / "prompts.yaml"
         with open(prompts_path, "r") as f:
             prompts = yaml.safe_load(f)

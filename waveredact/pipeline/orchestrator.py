@@ -26,13 +26,15 @@ class Orchestrator:
         mappers: list[ChunkMapper],
         data_pipeline: DataPrivacyPipeline,
         use_llm: bool = False,
-        interactive_mode: bool = True
+        interactive_mode: bool = True,
+        progress_callback = None
     ):  
         self.iw_pair = index_word_pair
         self.mappers = mappers
         self.data_pipeline = data_pipeline
         self.use_llm = use_llm
         self.interactive_mode = interactive_mode
+        self.progress_callback = progress_callback
 
     def run_audio_chunks(
         self
@@ -53,6 +55,9 @@ class Orchestrator:
 
         for i in range(n_chunks):
             print(f"Running chunk: {i + 1}")
+            if self.progress_callback:
+                percent = 40 + int((i / n_chunks) * 40)
+                self.progress_callback(f"Extracting sensitive data from chunk {i + 1}/{n_chunks}...", percent)
 
             res, locked_res = self.data_pipeline.extract_sensitive_data(self.mappers[i])
 
@@ -108,6 +113,9 @@ class Orchestrator:
             chunk_ambiguous = chunk_ambiguous_list[i]
 
             print(f"Running LLM for chunk: {i + 1}")
+            if self.progress_callback:
+                percent = 80 + int((i / n_chunks) * 10)
+                self.progress_callback(f"Running LLM analysis on chunk {i + 1}/{n_chunks}...", percent)
             res = self.data_pipeline.extract_sensitive_with_llm(self.mappers[i], chunk_ambiguous)
             checked_idx.update(res)
 
