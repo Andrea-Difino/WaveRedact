@@ -5,16 +5,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from web.services.audio_processing_service import AudioProcessingService
-from web.api.routers import frontend_router, audio_router
-
-audio_service = AudioProcessingService()
+from web.core.dependencies import get_model_manager
+from web.api.routers import frontend_router, audio_router, ws_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    audio_service.load_models()
+    model_manager = get_model_manager()
+    model_manager.load_models()
     yield
-
     print("Shutting down server and cleaning VRAM...")
 
 def create_app() -> FastAPI:
@@ -38,6 +36,7 @@ def create_app() -> FastAPI:
 
     app.include_router(frontend_router.router)
     app.include_router(audio_router.router)
+    app.include_router(ws_router.router)
 
     return app
 
