@@ -3,7 +3,6 @@ from web.services.model_manager import ModelManager
 from web.services.file_service import FileService
 from web.services.audio_processing_service import AudioProcessingService
 
-# Instantiate Singletons
 ws_manager = WebSocketManager()
 model_manager = ModelManager()
 file_service = FileService()

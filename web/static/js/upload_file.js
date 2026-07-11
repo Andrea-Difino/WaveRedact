@@ -121,7 +121,6 @@ async function handleFileUpload(event) {
 
     const clientId = Math.random().toString(36).substring(2, 15);
 
-    // Setup WebSocket
     const wsUrl = `ws://${window.location.host}/api/v1/ws/${clientId}`;
     socket = new WebSocket(wsUrl);
 

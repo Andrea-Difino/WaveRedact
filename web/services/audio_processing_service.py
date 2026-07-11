@@ -92,7 +92,6 @@ class AudioProcessingService:
         loop = asyncio.get_running_loop()
 
         try:
-            # Run the heavy synchronous processing in a separate thread
             result = await asyncio.to_thread(self._process_audio_sync, temp_file_path, level_name, censor_mode, client_id, loop)
             await self._send_ws_progress(client_id, "Process completed!", 100)
             return result
