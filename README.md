@@ -14,7 +14,7 @@
 <div align="center">
   <p>
       <img src="https://img.shields.io/badge/Licence-Apache%202.0-yellow.svg" alt="Licence Apache 2.0">
-      <img src="https://img.shields.io/badge/python-3.10%2B-blue.svg" alt="Python Version">
+      <img src="https://img.shields.io/badge/python-3.11%2B-blue.svg" alt="Python Version">
       <img src="https://img.shields.io/badge/privacy-100%25_local-success.svg" alt="Privacy First">
       <img src="https://img.shields.io/badge/powered_by-llama.cpp-orange.svg" alt="Powered by llama.cpp">
   </p>
