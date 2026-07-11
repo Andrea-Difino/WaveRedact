@@ -189,11 +189,54 @@ WaveRedact has been evaluated against a synthetic "Golden Dataset" of 120 divers
 
 | Mode | Precision | Recall | F1-Score |
 | :--- | :---: | :---: | :---: |
-| **Fast Mode** (Regex + GLiNER) | 44.04% | 39.55% | 41.68% |
-| **Max Security** (Regex + GLiNER + LLM) | 68.82% | 90.05% | 78.02% |
+| **Fast Mode** (Regex + GLiNER2) | 44.04% | 39.55% | 41.68% |
+| **Max Security** (Regex + GLiNER2 + LLM) | 68.82% | 90.05% | 78.02% |
 
 **Why the LLM makes a difference:**
-As shown in the benchmarks, while compact models (GLiNER) are incredibly fast, they can sometimes over-censor generic words (False Positives) or miss highly ambiguous context. By adding the local LLM as a final verification layer, WaveRedact actively fixes hallucinations and guarantees maximum surgical precision, ensuring you only redact what is truly sensitive.
+As shown in the benchmarks, while compact models (GLiNER2) are incredibly fast, they can sometimes over-censor generic words (False Positives) or miss highly ambiguous context. By adding the local LLM as a final verification layer, WaveRedact actively fixes hallucinations and guarantees maximum surgical precision, ensuring you only redact what is truly sensitive.
+
+## 🙏 Acknowledgments & Core Technologies
+
+WaveRedact is built upon several outstanding open-source projects. We would like to express our deepest gratitude to the creators and maintainers of these technologies:
+
+* **[GLiNER2](https://github.com/fastino-ai/GLiNER2)** by Urchade Zaratiana et al. - The foundation of our initial PII extraction stage, providing fast and versatile zero-shot Named Entity Recognition.
+* **[Faster-Whisper](https://github.com/SYSTRAN/faster-whisper)** by SYSTRAN - Powering our rapid and accurate audio transcription pipeline using CTranslate2.
+* **[llama.cpp](https://github.com/ggml-org/llama.cpp)** by Georgi Gerganov and the ggml community - Enabling lightning-fast, entirely local execution of our validation LLMs with minimal hardware requirements.
+
+If you are using WaveRedact in academic research, please consider citing these foundational works as well.
+
+
+## 🤝 Contributing
+
+Thank you for your interest in WaveRedact 💙
+
+Currently, this is a personal open-source project developed and maintained independently by a solo developer. Because I am managing all aspects of the architecture, testing, and development on my own, my bandwidth to review and merge large code contributions (Pull Requests) is currently limited.
+
+However, I am completely open to community feedback, ideas, and constructive help! Here is how you can best contribute:
+* **Bug Reports:** If you find a bug, a memory leak, or a blind spot in the PII extraction pipeline, please open an Issue with reproducible steps or logs.
+* **Ideas & Suggestions:** Have a proposal for a new feature, a performance optimization, or a better regex pattern? Open an Issue so we can discuss it!
+* **Code Contributions:** If you would like to submit code, please open an Issue *first* to discuss your implementation idea before spending your valuable time on a Pull Request. This ensures our architectural visions align and your effort isn't wasted.
+
+⭐ I deeply appreciate every star, bug report, and piece of feedback from the community!
+
+## 📝 Citation
+
+If you use WaveRedact in your research, thesis, or software pipeline, please cite this repository. 
+
+**Plain Text:**
+> Andrea-Difino, (2026). WaveRedact: An open-source local AI pipeline for audio PII redaction. GitHub. https://github.com/Andrea-Difino/WaveRedact
+
+**BibTeX:**
+```bibtex
+@software{WaveRedact_2026,
+  author = {Andrea Difino},
+  title = {WaveRedact: An open-source local AI pipeline for audio PII redaction},
+  year = {2026},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/Andrea-Difino/WaveRedact}}
+}
+```
 
 ## License
 This project is distributed under the terms of the license included in the repository.
