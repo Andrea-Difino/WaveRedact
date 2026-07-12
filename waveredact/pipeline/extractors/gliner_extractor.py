@@ -4,6 +4,14 @@ from gliner2 import GLiNER2
 
 
 class GlinerExtractor(BaseExtractor):
+    """
+    Extract sensitive entities using the GLiNER2 model.
+
+    Attributes:
+        target_labels   - List of entity labels to extract (e.g., PERSON, LOCATION)
+        threshold       - Confidence threshold for entity extraction
+        model           - GLiNER2 model instance
+    """
     def __init__(self, model: GLiNER2, target_labels: List[str], threshold: float):
         self.target_labels = target_labels
         self.threshold = threshold
@@ -20,7 +28,6 @@ class GlinerExtractor(BaseExtractor):
 
         for label, entities_list in entities_dict.items():
             for entity in entities_list:
-                #print(f"{entity['text']} => {label} ({entity['confidence']})")
                 score = float(entity.get("confidence", 0.0))
                 extracted_tuples.add((entity["start"], entity["end"], score))
 

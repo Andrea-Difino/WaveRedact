@@ -12,6 +12,15 @@ FORMAT = "%(asctime)s %(message)s"
 logging.basicConfig(datefmt=FORMAT, level=logging.WARNING, force=True)
 
 class GlinerFactory:
+    """
+    Factory class responsible for downloading and instantiating the GLiNER2 model.
+
+    Attributes:
+        model_id        - HuggingFace model ID for GLiNER
+        threshold       - Confidence threshold for entity extraction
+        cache_dir       - Directory path where the model is downloaded and cached
+        target_labels   - List of default entity labels to extract
+    """
     def __init__(
         self,
         model_id: str = "fastino/gliner2-privacy-filter-PII-multi",
@@ -47,6 +56,12 @@ class GlinerFactory:
         )
 
     def build(self) -> GLiNER2:
+        """
+        Download (if necessary), configure, and instantiate the GLiNER2 model.
+
+        Return:
+            GLiNER2 object ready for inference
+        """
         if not (os.path.exists(self.cache_dir) and os.listdir(self.cache_dir)):
             print(f"\n🌐 Model not found locally. Downloading '{self.model_id}'... (Could take some minutes)")
             os.makedirs(self.cache_dir, exist_ok=True)

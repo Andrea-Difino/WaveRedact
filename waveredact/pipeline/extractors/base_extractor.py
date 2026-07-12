@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 from typing import List, Tuple
 
 class BaseExtractor(ABC):
+    """
+    Abstract base class for all sensitive data extractors.
+    """
     @abstractmethod
     def extract(self, text: str) -> List[Tuple[int, int, float]]:
         """
@@ -9,7 +12,6 @@ class BaseExtractor(ABC):
 
         Params:
         text    - str text of the current chunk
-        old_idx - list of the previous extracted indices. Used to check if the previous step made some errors
         
         Return:
         list of coordinates and confidence score: [(start, end, score)]

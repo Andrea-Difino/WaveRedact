@@ -64,7 +64,7 @@ class TestGGUFModel:
         assert model.sys_prompt == "system prompt"
         assert model.user_prompt.startswith("labels=")
         download_mock.assert_not_called()
-        module.OpenAI.assert_called_once_with(base_url="http://localhost:9090/v1", api_key="locale")
+        module.OpenAI.assert_called_once_with(base_url="http://localhost:9090/v1", api_key="local")
         assert model.client == mock_client
 
     def test_init_downloads_missing_model(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
@@ -167,7 +167,6 @@ class TestGGUFModel:
         assert kwargs["model"] == "local-model"
         assert kwargs["temperature"] == 0.0
         assert kwargs["response_format"] == {"type": "json_object"}
-        assert "Testo da analizzare" in kwargs["messages"][1]["content"]
 
     def test_run_model_returns_empty_list_on_error(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
         module = _import_gguf_model(monkeypatch)

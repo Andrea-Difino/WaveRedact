@@ -6,6 +6,7 @@ import sys
 import click
 from pathlib import Path
 from enum import Enum
+from waveredact.utils.audio_manager import IOAudioManager
 
 logger = logging.getLogger(__name__)
 
@@ -14,16 +15,38 @@ class AudioMaskTypes(Enum):
     SILENCE = "silence"
 
 class AudioCensor:
-    def __init__(self, all_intervals: dict[int, str], idx_for_censor: list[int], rel_output_dir: str = "audio/censored"):
+    """
+    Apply censoring effects (beep or silence) to specific intervals in audio files.
+
+    Attributes:
+        output_dir      - Path to the directory where censored audio will be saved
+        all_intervals   - Dictionary mapping indices to their time intervals
+        idx_for_censor  - List of indices that need to be censored
+    """
+    def __init__(
+        self, 
+        audio_manager: IOAudioManager,
+        all_intervals: dict[int, str], 
+        idx_for_censor: list[int], 
+        rel_output_dir: str = "audio/censored"
+    ):
         project_root = Path(__file__).resolve().parent.parent.parent
         safe_output_dir = project_root / rel_output_dir
         self.output_dir = str(safe_output_dir)
         os.makedirs(self.output_dir, exist_ok=True)
 
+        self.audio_manager = audio_manager
+
         self.all_intervals = all_intervals
         self.idx_for_censor = idx_for_censor
 
     def _get_interval_to_censor(self) -> list[tuple[float, float]]:
+        """
+        Retrieve the time intervals for the indices marked for censorship.
+
+        Return:
+            List of tuples containing start and end seconds
+        """
         intervals_to_censor = []
         for idx in self.idx_for_censor:
             start_str, end_str = self.all_intervals[idx].split("-")
@@ -33,10 +56,14 @@ class AudioCensor:
 
     def censor_file(self, input_path: str, mode: AudioMaskTypes = AudioMaskTypes.SILENCE) -> str:
         """
-        Apply censor to audio.
+        Apply censor to audio by silencing or beeping the sensitive intervals.
 
         Params:
-        timestamps: list of tuples (start_seconds, end_seconds) es. [(1.2, 1.8), (5.0, 5.5)]
+            input_path  - Path to the input audio file
+            mode        - Audio mask type to use (beep or silence)
+
+        Return:
+            Path to the saved censored audio file
         """
 
         logger.info(f"Loading audio for censor: {input_path}")
@@ -75,24 +102,5 @@ class AudioCensor:
             censor = censor.fade_in(12).fade_out(20)
 
             audio = audio[:safe_start] + censor + audio[safe_end:]
-        
-        return self._handle_file(audio, input_path)
-    
-    def _handle_file(self, audio, input_path: str) -> str:
-        
-        filename = os.path.basename(input_path)
-        name_without_extension, extension = os.path.splitext(filename)
-        output_filename = f"{name_without_extension}_censored{extension}"
-        output_path = os.path.join(self.output_dir, output_filename)
-        
-        logger.info("Exporting censored file...")
 
-        format_export = extension.replace(".", "")
-
-        if format_export == "m4a":
-            format_export = "ipod"
-
-        audio.export(output_path, format=format_export)
-        
-        print(f"✅ File saved: {output_path}\n")
-        return output_path
+        return self.audio_manager.save_censored(audio, input_path, self.output_dir)

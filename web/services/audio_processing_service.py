@@ -9,6 +9,7 @@ from waveredact.pipeline.orchestrator import Orchestrator
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
 from waveredact.services.transcribe import TranscribeService
 from waveredact.utils.audio_censor import AudioCensor, AudioMaskTypes
+from waveredact.utils.audio_manager import IOAudioManager
 from waveredact.utils.chunk import Chunker
 from waveredact.utils.level import LevelSetter
 
@@ -38,6 +39,7 @@ class AudioProcessingService:
         progress_callback("Transcribing audio... (this may take a while)", 10)
 
         levels_setter = LevelSetter(interactive=False, level_name=level_name)
+        audio_manager = IOAudioManager()
         
         pipeline = DataPrivacyPipeline(
             GlinerExtractor(
@@ -69,7 +71,7 @@ class AudioProcessingService:
 
         progress_callback(f"Identified {len(sensitive_words)} sensitive words. Censoring audio...", 90)
 
-        censor_manager = AudioCensor(transcribe_service.ival_pair, full_idx)
+        censor_manager = AudioCensor(audio_manager, transcribe_service.ival_pair, full_idx)
 
         if censor_mode.lower() == "beep":
             censor_mode_enum = AudioMaskTypes.BEEP

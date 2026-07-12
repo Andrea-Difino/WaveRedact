@@ -9,7 +9,13 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 class GPUEnvironmentManager:
+    """
+    Manage the setup and configuration of the GPU environment for model inference.
 
+    Attributes:
+        dll_folder      - Path to the folder where DLLs will be stored
+        device          - The selected hardware device (e.g., cuda or cpu)
+    """
     def __init__(self) -> None:
         project_root = Path(__file__).resolve().parent.parent.parent
 
@@ -17,6 +23,9 @@ class GPUEnvironmentManager:
         self.device: str = self.get_device()
 
     def ensure_gpu_ready(self) -> None:
+        """
+        Verify the GPU environment is ready, downloading and injecting necessary DLLs if needed.
+        """
         if sys.platform.startswith('win') and self.device == "cuda":
             os.makedirs(self.dll_folder, exist_ok=True)
             dll_path = os.path.join(self.dll_folder, "cublas64_12.dll")

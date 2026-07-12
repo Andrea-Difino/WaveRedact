@@ -1,6 +1,9 @@
 from enum import Enum
 
 class Levels(Enum):
+    """
+    Enum representing different privacy levels for censoring.
+    """
     BASE = "base"
     MEDIUM = "medium"
     TOTAL = "total"
@@ -37,7 +40,13 @@ class Levels(Enum):
             return []
 
 class LevelSetter:
+    """
+    Handle the selection and configuration of the privacy level.
 
+    Attributes:
+        level           - Selected Levels enum
+        target_labels   - List of labels associated with the selected level
+    """
     def __init__(self, interactive: bool, level_name: str = ""):
         if not interactive:
             if level_name.lower() == "base":
@@ -52,6 +61,12 @@ class LevelSetter:
 
     @staticmethod
     def _ask_level() -> Levels:
+        """
+        Interactively ask the user to select a privacy level.
+
+        Return:
+            Selected Levels enum
+        """
         while True:
             user_q = input(
                 "\nSelect the level of censor you like:\n"
@@ -61,11 +76,11 @@ class LevelSetter:
                 "Insert the number: "
                 )
             
-            if user_q == "1":
+            if user_q.strip() == "1":
                 return Levels.BASE
-            elif user_q == "2":
+            elif user_q.strip() == "2":
                 return Levels.MEDIUM
-            elif user_q == "3":
+            elif user_q.strip() == "3":
                 return Levels.TOTAL
             else:
                 print("Invalid input. Please enter 1,2 or 3")

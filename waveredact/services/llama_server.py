@@ -18,6 +18,21 @@ logging.basicConfig(datefmt=FORMAT,level=logging.WARNING, force=True)
 logger = logging.getLogger(__name__)
 
 class LlamaServerService:
+    """
+    Manage the downloading and execution of the Llama model server.
+
+    Attributes:
+        destination_folder  - Path where the server executable is saved
+        model_dir           - Path where the model is saved
+        file_gguf           - Model filename
+        path                - Full path to the model file
+        process             - Subprocess instance of the server
+        server_port         - Port for the server
+        device              - Device to run the server on (e.g. cpu, cuda)
+        exe_name            - Name of the server executable
+        download_url        - URL to download the server executable
+        exe_path            - Full path to the server executable
+    """
 
     def __init__(self, model_file_name: str, server_port: int = 8080, device: str = "cpu"):
         project_root = Path(__file__).resolve().parent.parent.parent
@@ -120,6 +135,9 @@ class LlamaServerService:
         logger.info("Llama server ready to run!")
 
     def start_server(self):
+        """
+        Start the Llama model server in a separate process.
+        """
         print("Starting Llama server...")
 
         ngl = self._get_optimal_ngl()
@@ -194,6 +212,9 @@ class LlamaServerService:
             return "25"
 
     def stop_server(self):
+        """
+        Stop the Llama model server process.
+        """
         if self.process:
             logger.info("\nClosing LLM server...")
             self.process.terminate()

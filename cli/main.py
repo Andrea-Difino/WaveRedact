@@ -123,7 +123,7 @@ def main(level: str, auto: bool, use_llm: bool, mode: str) -> None:
 
         full_idx = orchestrator.run_audio_chunks()
 
-        censor_manager = AudioCensor(transcribe_serv.ival_pair, full_idx)
+        censor_manager = AudioCensor(audio_manager, transcribe_serv.ival_pair, full_idx)
         if mode == 'beep':
             censor_mode = AudioMaskTypes.BEEP
         else:

@@ -9,6 +9,13 @@ logging.basicConfig(datefmt=FORMAT, level=logging.WARNING, force=True)
 
 
 class WhisperFactory:
+    """
+    Factory class responsible for instantiating the WhisperModel.
+
+    Attributes:
+        model_name      - Name of the Whisper model to load
+        gpu_manager     - GPUEnvironmentManager instance to configure hardware acceleration
+    """
     def __init__(
         self,
         gpu_manager: GPUEnvironmentManager,
@@ -18,6 +25,12 @@ class WhisperFactory:
         self.gpu_manager = gpu_manager
 
     def build(self) -> WhisperModel:
+        """
+        Build and return a configured WhisperModel instance.
+
+        Return:
+            WhisperModel object ready for inference
+        """
         self.gpu_manager.ensure_gpu_ready()
         device = self.gpu_manager.get_device()
         return WhisperModel(

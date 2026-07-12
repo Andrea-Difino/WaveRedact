@@ -1,5 +1,6 @@
 import json
 import re
+from typing import Dict
 from waveredact.models.model import Model
 from huggingface_hub import hf_hub_download
 import os
@@ -18,6 +19,19 @@ FORMAT = '%(asctime)s %(message)s'
 logging.basicConfig(datefmt=FORMAT, level=logging.WARNING, force=True)
 
 class GGUFModel(Model):
+    """
+    Implementation of the Model interface for GGUF-based local LLMs.
+
+    Attributes:
+        model_dir       - Path to the directory where the model is stored
+        file_gguf       - Filename of the GGUF model
+        path            - Complete path to the model file
+        repo_id         - HuggingFace repository ID for the model
+        target_labels   - List of sensitive labels to extract
+        sys_prompt      - System prompt for the LLM
+        user_prompt     - User prompt template for the LLM
+        client          - OpenAI API client instance connected to the local server
+    """
     def __init__(self, gguf_file_name: str, repo_id: str, model_dir: str | None = None, server_port: int = 8080):
         project_root = Path(__file__).resolve().parent.parent.parent
         self.model_dir = model_dir if model_dir else str(project_root / "files" / "gguf_models")
@@ -33,11 +47,11 @@ class GGUFModel(Model):
 
         self.sys_prompt = prompts["maker"]["default"]["system_prompt"]
         self.user_prompt = prompts["maker"]["default"]["user_prompt"]
-        self.check_existance()
+        self._check_existance()
 
         self.client = OpenAI(
             base_url=f"http://localhost:{server_port}/v1", 
-            api_key="locale"
+            api_key="local"
         )
     
     @property
@@ -48,7 +62,7 @@ class GGUFModel(Model):
     def labels(self, labels: list[str]):
         self.target_labels = labels
 
-    def check_existance(self) -> None:
+    def _check_existance(self) -> None:
         if not os.path.exists(self.path):
             print("Model not found. Download... (it could take some minutes)...")
 
@@ -62,11 +76,13 @@ class GGUFModel(Model):
         else:
             print("Model already downloaded")
 
-    def _build_chunk_string(self, chunk: dict[int, str]) -> str:
-        """Converte il dizionario in una stringa formattata [ID] parola."""
-        return "".join([f"[{k}] {v}\n" for k, v in chunk.items()])
+    def _parse_llm_response(self, text_response: str) -> Dict | None:
+        """
+        Transform the model response in a correct JSON object
 
-    def _parse_llm_response(self, text_response: str) -> dict | None:
+        Params:
+            text_response   - response of the LLM
+        """
         if not text_response:
             return None
 
@@ -79,8 +95,14 @@ class GGUFModel(Model):
                 return None
         return None
 
-    def _extract_ids_with_healing(self, parsed_data: dict, chunk: dict[int, str]) -> list[int]:
-        """Extract sensitive IDs and check possible hallucinations of the model"""
+    def _extract_ids_with_healing(self, parsed_data: Dict, chunk: Dict[int, str]) -> list[int]:
+        """
+        Extract sensitive IDs and check possible hallucinations of the model
+        
+        Params:
+            parsed_data     - JSON object with the model output
+            chunk           - dict with the right correspondece of id-word
+        """
         list_sensitive_ids = []
 
         if "word_analysis" not in parsed_data:
@@ -106,10 +128,10 @@ class GGUFModel(Model):
         
         return list_sensitive_ids
 
-    def run_model(self, chunk: dict[int, str], ambiguous_idx: list[int] | None) -> list[int]:
+    def run_model(self, chunk: Dict[int, str], ambiguous_idx: list[int] | None) -> list[int]:
         print("[STEP 3] Using LLM")
         
-        couple_str = self._build_chunk_string(chunk)
+        couple_str = "".join([f"[{k}] {v}\n" for k, v in chunk.items()])
         user_prompt = self.user_prompt.format(labels=self.labels, ambiguous=ambiguous_idx, idx_couples=couple_str)
         
         try:
@@ -117,14 +139,13 @@ class GGUFModel(Model):
                 model="local-model",
                 messages=[
                     {"role": "system", "content": self.sys_prompt},
-                    {"role": "user", "content": f"Testo da analizzare: '{user_prompt}'"}
+                    {"role": "user", "content": user_prompt}
                 ],
                 temperature=0.0, 
                 response_format={"type": "json_object"} 
             )
             
             text_response = response.choices[0].message.content
-            #print(text_response)
             
             if text_response:
                 parsed_data = self._parse_llm_response(text_response)

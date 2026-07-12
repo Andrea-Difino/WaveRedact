@@ -1,6 +1,14 @@
 from typing import Dict, List
 
 class ChunkMapper:
+    """
+    Map chunks of text back to their original indices in the transcribed word list.
+
+    Attributes:
+        chunk           - Dictionary mapping original indices to words in the chunk
+        text            - The combined text string for the chunk
+        char_mapping    - Dictionary mapping original indices to character start and end positions
+    """
     def __init__(self, chunk: Dict[int, str]):
         self.chunk = chunk
         self.text = ""
