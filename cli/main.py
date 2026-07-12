@@ -54,7 +54,16 @@ logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
 @click.option('--auto', is_flag=True, help='Disable interactive mode (no confirm required).')
 @click.option('--use-llm', is_flag=True, help="Execute LLM to maximize precision.")
 @click.option('--mode', type=click.Choice(['beep', 'muted'], case_sensitive=False), default='muted', help='Censor mode')
-def main(level: str, auto: bool, use_llm: bool, mode: str) -> None:
+@click.option('--file', type=click.Path(exists=True, dir_okay=False), help='Specific audio file to process.')
+@click.option('--folder', type=click.Path(exists=True, file_okay=False), help='Folder containing audio files to process.')
+def main(level: str, auto: bool, use_llm: bool, mode: str, file: str, folder: str) -> None:
+
+    if not file and not folder:
+        click.secho("Error: You must provide either --file or --folder.", fg="red")
+        return
+    if file and folder:
+        click.secho("Error: You cannot provide both --file and --folder.", fg="red")
+        return
 
     MODEL_NAME = "Qwen2.5-7B-Instruct-Q5_K_M.gguf"
     REPO_ID = "bartowski/Qwen2.5-7B-Instruct-GGUF"
@@ -80,7 +89,10 @@ def main(level: str, auto: bool, use_llm: bool, mode: str) -> None:
             logger.warning("LLM server unavailable, continuing without LLM: %s", exc)
             maker = None
 
-    audio_manager = IOAudioManager()
+    if file:
+        audio_manager = IOAudioManager(input_path=file, is_file=True)
+    else:
+        audio_manager = IOAudioManager(input_path=folder, is_file=False)
     audios = audio_manager.get_audio()
     if not audios:
         click.secho("There's no audio to process. Terminating process...", fg="yellow")

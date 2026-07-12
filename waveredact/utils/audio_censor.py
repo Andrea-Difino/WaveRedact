@@ -28,12 +28,14 @@ class AudioCensor:
         audio_manager: IOAudioManager,
         all_intervals: dict[int, str], 
         idx_for_censor: list[int], 
-        rel_output_dir: str = "audio/censored"
+        rel_output_dir: str | None = None
     ):
-        project_root = Path(__file__).resolve().parent.parent.parent
-        safe_output_dir = project_root / rel_output_dir
-        self.output_dir = str(safe_output_dir)
-        os.makedirs(self.output_dir, exist_ok=True)
+        if rel_output_dir:
+            safe_output_dir = Path.cwd() / rel_output_dir
+            self.output_dir = str(safe_output_dir)
+            os.makedirs(self.output_dir, exist_ok=True)
+        else:
+            self.output_dir = None
 
         self.audio_manager = audio_manager
 
@@ -103,4 +105,10 @@ class AudioCensor:
 
             audio = audio[:safe_start] + censor + audio[safe_end:]
 
-        return self.audio_manager.save_censored(audio, input_path, self.output_dir)
+        if self.output_dir:
+            final_output_dir = self.output_dir
+        else:
+            final_output_dir = os.path.join(os.path.dirname(input_path), "censored")
+            os.makedirs(final_output_dir, exist_ok=True)
+
+        return self.audio_manager.save_censored(audio, input_path, final_output_dir)

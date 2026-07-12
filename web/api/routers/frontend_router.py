@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
-from pathlib import Path
+from waveredact.utils.path_utils import get_project_root
 
 router = APIRouter()
-STATIC_DIR = Path(__file__).resolve().parent.parent.parent / "static"
+STATIC_DIR = get_project_root() / "web" / "static"
 
 @router.get("/")
 async def serve_frontend():

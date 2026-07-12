@@ -18,14 +18,14 @@ class TestAudioManager:
         """
         Initializa manager with the tmp path
         """
-        return IOAudioManager(audio_path=str(test_audio_dir))
+        return IOAudioManager(input_path=str(test_audio_dir))
 
     def test_creates_audio_folder_if_missing(self, tmp_path):
         missing_dir = tmp_path / "missing_audio"
 
         assert not missing_dir.exists()
 
-        manager = IOAudioManager(audio_path=str(missing_dir))
+        manager = IOAudioManager(input_path=str(missing_dir))
 
         assert missing_dir.exists()
         assert manager.path == str(missing_dir)

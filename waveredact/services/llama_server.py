@@ -11,7 +11,7 @@ import json
 import math
 import stat
 import tarfile
-from pathlib import Path
+from waveredact.utils.path_utils import get_app_data_dir
 
 FORMAT = '%(asctime)s %(message)s'
 logging.basicConfig(datefmt=FORMAT,level=logging.WARNING, force=True)
@@ -35,9 +35,8 @@ class LlamaServerService:
     """
 
     def __init__(self, model_file_name: str, server_port: int = 8080, device: str = "cpu"):
-        project_root = Path(__file__).resolve().parent.parent.parent
-        self.destination_folder = str(project_root / "files" / "server")
-        self.model_dir = str(project_root / "files" / "gguf_models")
+        self.destination_folder = str(get_app_data_dir() / "files" / "server")
+        self.model_dir = str(get_app_data_dir() / "files" / "gguf_models")
         
         self.file_gguf = model_file_name
         self.path = os.path.join(self.model_dir, self.file_gguf)

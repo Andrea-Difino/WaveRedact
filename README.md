@@ -104,7 +104,7 @@ The main CLI entry point is `waveredact`.
 waveredact
 ```
 
-By default, the command reads all supported audio files in `audio/`:
+By default, you must specify the input using either the `--file` or `--folder` option. Supported audio formats are:
 
 - .mp3
 - .wav
@@ -112,18 +112,20 @@ By default, the command reads all supported audio files in `audio/`:
 - .m4a
 - .ogg
 
-The censored file is saved in `audio/censored/` with the original name plus `_censored`.
+The censored file is automatically saved in a `censored/` directory created right next to your input file/folder, with the original name plus `_censored`.
 
 ### Available options
 
 ```bash
-waveredact --auto
-waveredact --level base --auto
-waveredact --level medium --auto
-waveredact --level total --auto
-waveredact --use-llm
+waveredact --file path/to/audio.mp3 --auto
+waveredact --folder path/to/audios/ --level base --auto
+waveredact --folder path/to/audios/ --level medium --auto
+waveredact --folder path/to/audios/ --level total --auto
+waveredact --file path/to/audio.mp3 --use-llm
 ```
 
+- `--file` specifies a single audio file to process.
+- `--folder` specifies a directory containing audio files to process. (You must provide exactly one between `--file` and `--folder`).
 - `--auto` disables interactive mode and applies the "total" level as default without asking for confirmation.
 
 - `--level` defines how aggressive the redaction should be when using --auto.
@@ -144,13 +146,11 @@ waveredact --use-llm
 
 ### Example workflow
 
-1. Copy your audio into `audio/`.
+1. Run the command pointing to your audio file or folder, for example `waveredact --file my_recording.wav --auto --level total`.
 
-2. Run the command, for example `waveredact --auto --level total`.
+2. Wait for transcription and redaction.
 
-3. Wait for transcription and redaction.
-
-4. Retrieve the result from `audio/censored/`.
+3. Retrieve the result from the newly created `censored/` folder next to your original file.
 
 ## Using the web interface
 The project also includes a FastAPI server with a simple web interface.
@@ -169,15 +169,15 @@ The interface lets you upload an audio file and receive the analysis of the sens
 When processing finishes, the CLI prints the path of the generated file. You will usually see a message like:
 
 ```plaintext
-✅ File saved: .../audio/censored/file_name_censored.mp3
+✅ File saved: path/to/your/audio/censored/file_name_censored.mp3
 ```
 
 ## Folder structure
 
-- `audio/`: input folder for files to process.
-- `audio/censored/`: output folder for redacted files.
-- `files/`: local models and resources.
+- `files/`: uploads and temporary data for the web interface.
 - `web/`: web interface and API.
+
+*Note: Heavy machine learning models (GLiNER, LLMs) are downloaded automatically on first run and stored in a persistent application data folder (`~/.waveredact` on Unix or `%APPDATA%\WaveRedact` on Windows).*
 
 ## Common issues
 - `FileNotFoundError: [WinError 2]` or `Couldn't find ffprobe or avprobe`: You are missing `ffmpeg`. Follow the instructions in the Requirements section to install it, then completely close and reopen your terminal.

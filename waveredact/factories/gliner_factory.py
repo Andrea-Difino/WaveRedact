@@ -32,8 +32,8 @@ class GlinerFactory:
         self.threshold = threshold
 
         if not cache_dir:
-            project_root = Path(__file__).resolve().parent.parent.parent
-            safe_cache_dir = project_root / "files" / "gliner_models" / "gliner2"
+            from waveredact.utils.path_utils import get_app_data_dir
+            safe_cache_dir = get_app_data_dir() / "files" / "gliner_models" / "gliner2"
             self.cache_dir = str(safe_cache_dir)
         else:
             self.cache_dir = cache_dir

@@ -8,9 +8,9 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import logging
 import yaml
-from pathlib import Path
+from waveredact.utils.path_utils import get_project_root, get_app_data_dir
 
-project_root = Path(__file__).resolve().parent.parent.parent
+project_root = get_project_root()
 env_path = project_root / ".env"
 load_dotenv(dotenv_path=env_path)
 
@@ -33,8 +33,8 @@ class GGUFModel(Model):
         client          - OpenAI API client instance connected to the local server
     """
     def __init__(self, gguf_file_name: str, repo_id: str, model_dir: str | None = None, server_port: int = 8080):
-        project_root = Path(__file__).resolve().parent.parent.parent
-        self.model_dir = model_dir if model_dir else str(project_root / "files" / "gguf_models")
+        project_root = get_project_root()
+        self.model_dir = model_dir if model_dir else str(get_app_data_dir() / "files" / "gguf_models")
         
         self.file_gguf = gguf_file_name
         self.path = f"{self.model_dir}/{self.file_gguf}"
