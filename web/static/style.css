@@ -63,12 +63,18 @@ body.light-theme {
     padding: 0
 }
 
+html {
+    width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     background: var(--bg-dark);
     font-family: var(--font-jakarta);
     color: var(--text-primary);
     min-height: 100vh;
     overflow: hidden;
+    width: 100%;
     position: relative;
     transition: background 0.3s ease, color 0.3s ease;
 }
@@ -126,7 +132,8 @@ header {
     text-align: left;
     display: flex;
     flex-direction: column;
-    width: fit-content;
+    width: 100%;
+    max-width: 100vw;
     align-items: flex-start;
     margin: 0px auto 20px auto;
     padding: 24px 24px 0;
@@ -134,7 +141,8 @@ header {
 }
 
 header h1 {
-    width: 30rem;
+    width: 100%;
+    max-width: 30rem;
 }
 
 main {
@@ -152,6 +160,8 @@ main {
     left: 0;
     top: 0;
     transform: translate(-10%, 0);
+    max-width: 100vw;
+    height: auto;
 }
 
 h1 {
@@ -178,7 +188,8 @@ h1 em {
 
 .orbit-wrap {
     position: relative;
-    width: 700px;
+    width: 100%;
+    max-width: 700px;
     height: 100vh;
     margin: 0 auto;
     display: flex;
@@ -219,7 +230,8 @@ h1 em {
 .security-panel {
     position: relative;
     transform: none;
-    width: 38rem;
+    width: 100%;
+    max-width: 38rem;
 }
 
 .redaction-panel {
@@ -560,7 +572,9 @@ footer {
     letter-spacing: 0.02em;
     position: fixed;
     bottom: 0;
+    width: 100%;
     display: flex;
+    justify-content: center;
     align-items: center;
 }
 
@@ -645,4 +659,65 @@ footer a {
 #actionContainer {
     margin-top: 30px;
     display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    header {
+        padding: 16px;
+        width: 100%;
+        max-width: 100vw;
+    }
+
+    header h1 {
+        font-size: 36px;
+        max-width: 100%;
+    }
+
+    #site-scoop {
+        margin-top: 60px;
+    }
+
+    .subtitle {
+        font-size: 16px;
+        max-width: 100%;
+    }
+
+    .orbit-wrap {
+        padding: 0 16px;
+    }
+    
+    .redaction-panel {
+        width: 100%;
+        max-width: 38rem;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .mode-tabs {
+        width: 100%;
+    }
+
+    .segmented button {
+        font-size: 13px;
+        padding: 8px 4px;
+    }
+
+    .side-panel {
+        width: calc(100vw - 32px);
+        right: -100vw;
+    }
+
+    .side-panel.open {
+        right: 16px;
+    }
+
+    .progress-bar-container {
+        width: 90%;
+        max-width: 350px;
+    }
+
+    .ring {
+        display: none;
+    }
 }
