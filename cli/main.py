@@ -47,21 +47,21 @@ logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
     names, email addresses, phone numbers, and identification documents.
     \b
     3) Total level: Beyond protecting accounts and identities, it eliminates every trace of geographic and temporal context—removing addresses, cities, states, and any dates 
-    mentioned in the audio—thereby rendering the conversation completely decontextualized.'''
+    mentioned in the audio—thereby rendering the conversation completely decontextualized.
+    \b
+    '''
 )
 @click.option('--auto', is_flag=True, help='Disable interactive mode (no confirm required).')
 @click.option('--use-llm', is_flag=True, help="Execute LLM to maximize precision.")
 @click.option('--mode', type=click.Choice(['beep', 'muted'], case_sensitive=False), default='muted', help='Censor mode')
 def main(level: str, auto: bool, use_llm: bool, mode: str) -> None:
 
-    # VARIABLES
-    MAKER_MODEL_NAME = "Qwen2.5-7B-Instruct-Q5_K_M.gguf"
+    MODEL_NAME = "Qwen2.5-7B-Instruct-Q5_K_M.gguf"
     REPO_ID = "bartowski/Qwen2.5-7B-Instruct-GGUF"
     SERVER_PORT = 8080
 
     click.secho(f"Starting WaveRedact - Auto: {auto} | LLM: {use_llm} | Censor: {mode}", fg="cyan")
 
-    # MODELS INITIALIZATION
     gpu_setup = GPUEnvironmentManager()
     whisper_factory = WhisperFactory(gpu_setup)
     whisper_model = whisper_factory.build()
@@ -70,10 +70,9 @@ def main(level: str, auto: bool, use_llm: bool, mode: str) -> None:
     maker = None
 
     if use_llm:
-        maker = GGUFModel(MAKER_MODEL_NAME, REPO_ID, server_port=SERVER_PORT)
+        maker = GGUFModel(MODEL_NAME, REPO_ID, server_port=SERVER_PORT)
 
-        # SERVER INITIALIZATION
-        server = LlamaServerService(MAKER_MODEL_NAME, server_port=SERVER_PORT, device=gpu_setup.device)
+        server = LlamaServerService(MODEL_NAME, server_port=SERVER_PORT, device=gpu_setup.device)
 
         try:
             server.start_server()
