@@ -297,7 +297,7 @@ h1 em {
     top: 24px;
     width: 380px;
     height: calc(100vh - 48px);
-    background: rgba(15, 19, 34, 0.65);
+    background: var(--btn-bg);
     backdrop-filter: blur(20px);
     border: 1px solid var(--btn-border);
     border-radius: 24px;
@@ -318,7 +318,7 @@ h1 em {
     align-items: center;
     justify-content: space-between;
     padding: 24px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--result-border);
 }
 
 .side-header h3 {
@@ -329,8 +329,8 @@ h1 em {
 }
 
 .close-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--tag-bg);
+    border: 1px solid var(--result-border);
     color: var(--text-secondary);
     font-size: 14px;
     cursor: pointer;
@@ -344,7 +344,7 @@ h1 em {
 }
 
 .close-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--tag-border);
     color: var(--text-primary);
 }
 
@@ -388,14 +388,14 @@ h1 em {
 }
 
 .label-badge.highlight {
-    background: rgba(43, 108, 176, 0.2);
-    border-color: rgba(43, 108, 176, 0.4);
-    color: var(--ml-cyan);
+    background: var(--tag-bg);
+    border-color: var(--tag-border);
+    color: var(--tag-text);
 }
 
 .label-badge.muted {
     background: transparent;
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--result-border);
     color: var(--text-secondary);
 }
 
