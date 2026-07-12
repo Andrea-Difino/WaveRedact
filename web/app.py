@@ -3,8 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pathlib import Path
-
+from waveredact.utils.path_utils import get_project_root
 from web.core.dependencies import get_model_manager
 from web.api.routers import frontend_router, audio_router, ws_router
 
@@ -16,7 +15,7 @@ async def lifespan(app: FastAPI):
     print("Shutting down server and cleaning VRAM...")
 
 def create_app() -> FastAPI:
-    project_root = Path(__file__).resolve().parent.parent
+    project_root = get_project_root()
     static_dir = project_root / "web" / "static"
 
     app = FastAPI(

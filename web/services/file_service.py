@@ -1,13 +1,14 @@
 import shutil
 from pathlib import Path
 from fastapi import UploadFile
+from waveredact.utils.path_utils import get_project_root
 
 class FileService:
     def __init__(self):
-        project_root = Path(__file__).resolve().parent.parent.parent
+        project_root = get_project_root()
         self.upload_dir = project_root / "files" / "uploads"
         self.upload_dir.mkdir(parents=True, exist_ok=True)
-        self.censored_dir = project_root / "audio" / "censored"
+        self.censored_dir = self.upload_dir / "censored"
         self.censored_dir.mkdir(parents=True, exist_ok=True)
 
     def save_upload(self, upload_file: UploadFile) -> Path:

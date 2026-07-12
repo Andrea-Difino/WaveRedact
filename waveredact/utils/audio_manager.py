@@ -1,7 +1,6 @@
 from pathlib import Path
 import os
 import logging
-
 logger = logging.getLogger(__name__)
 
 class IOAudioManager:
@@ -14,21 +13,34 @@ class IOAudioManager:
     """
     SUPPORTED_EXTENSIONS = {'.mp3', '.wav', '.flac', '.m4a', '.ogg'}
 
-    def __init__(self, audio_path: str = "audio"):
-        project_root = Path(__file__).resolve().parent.parent.parent
-        safe_audio_dir = project_root / audio_path
-        safe_audio_dir.mkdir(parents=True, exist_ok=True)
-        self.path = str(safe_audio_dir)
+    def __init__(self, input_path: str = "audio", is_file: bool = False):
+        path_obj = Path(input_path)
+        if not path_obj.is_absolute():
+            path_obj = Path.cwd() / input_path
+            
+        self.is_file = is_file
+        self.path = str(path_obj)
+        
+        if not self.is_file:
+            path_obj.mkdir(parents=True, exist_ok=True)
 
     def get_audio(self) -> list[Path]:
         """
-        Retrieve a list of supported audio files from the audio directory.
+        Retrieve a list of supported audio files from the audio directory,
+        or a single file if initialized with a file path.
 
         Return:
             List of Path objects for the found audio files
         """
         audio_files = []
-        for file_path in Path(self.path).glob("*"):
+        path_obj = Path(self.path)
+        
+        if self.is_file:
+            files_to_check = [path_obj] if path_obj.exists() else []
+        else:
+            files_to_check = path_obj.glob("*") if path_obj.exists() else []
+            
+        for file_path in files_to_check:
 
             if not file_path.is_file():
                 continue

@@ -4,7 +4,7 @@ import urllib.request
 import zipfile
 import torch
 import logging
-from pathlib import Path
+from waveredact.utils.path_utils import get_app_data_dir
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +17,7 @@ class GPUEnvironmentManager:
         device          - The selected hardware device (e.g., cuda or cpu)
     """
     def __init__(self) -> None:
-        project_root = Path(__file__).resolve().parent.parent.parent
-
-        self.dll_folder = str(project_root / "files" / "server")
+        self.dll_folder = str(get_app_data_dir() / "files" / "server")
         self.device: str = self.get_device()
 
     def ensure_gpu_ready(self) -> None:
