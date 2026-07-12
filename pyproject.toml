@@ -12,6 +12,7 @@ dependencies = [
     "huggingface-hub>=0.24.0,<1.0",
     "openai>=2.41.0",
     "pandas>=3.0.3",
+    "pyaudioop>=0.2.1 ; python_version >= '3.13'",
     "pydub>=0.25.1",
     "python-dotenv>=1.2.2",
     "requests>=2.34.2",
