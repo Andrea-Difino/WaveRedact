@@ -129,10 +129,13 @@ waveredact --use-llm
 - `--level` defines how aggressive the redaction should be when using --auto.
 
   - `base` removes secrets and payment data.
+    - **Labels:** `password`, `api_key`, `secret`, `access_token`, `recovery_code`, `iban`, `bank_account`, `account_number`, `routing_number`, `payment_card`, `card_number`, `card_expiry`, `card_cvv`
 
   - `medium` adds names, email addresses, phone numbers, and documents.
+    - **Labels:** (All from base) + `person`, `full_name`, `first_name`, `middle_name`, `last_name`, `username`, `email`, `phone_number`, `ip_address`, `account_id`, `sensitive_account_id`, `government_id`, `national_id_number`, `passport_number`, `drivers_license_number`, `tax_id`, `tax_number`, `date_of_birth`
 
   - `total` extends redaction to addresses and time-related references. (default)
+    - **Labels:** (All from medium) + `address`, `street_address`, `city`, `state_or_region`, `postal_code`, `country`, `sensitive_date`, `document_date`, `expiration_date`, `transaction_date`, `license_number`
 
 - `--use-llm` enables the optional LLM component to improve detection.
 - `--mode` defines how to censor the sensitive data.
