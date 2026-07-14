@@ -117,9 +117,9 @@ The censored file is automatically saved in a `censored/` directory created righ
 
 ```bash
 waveredact --file path/to/audio.mp3 --auto
-waveredact --folder path/to/audios/ --level base --auto
-waveredact --folder path/to/audios/ --level medium --auto
-waveredact --folder path/to/audios/ --level total --auto
+waveredact --folder path/to/audios/ --level base
+waveredact --folder path/to/audios/ --level medium
+waveredact --folder path/to/audios/ --level total
 waveredact --file path/to/audio.mp3 --use-llm
 ```
 
