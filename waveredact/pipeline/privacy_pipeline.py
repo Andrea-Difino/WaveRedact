@@ -18,13 +18,10 @@ class DataPrivacyPipeline:
 
     def __init__(
         self,
-        gliner_extractor: GlinerExtractor,
+        simple_extractors: List[BaseExtractor],
         llm_extractor: Model | None = None,
     ):
-        self.simple_extractors: List[BaseExtractor] = [
-            RegexExtractor(),
-            gliner_extractor,
-        ]
+        self.simple_extractors: List[BaseExtractor] = simple_extractors
 
         self.llm_extractors: List[Model] = [llm_extractor] if llm_extractor else []
 

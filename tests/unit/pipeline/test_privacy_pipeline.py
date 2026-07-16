@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from waveredact.pipeline.mapper import ChunkMapper
+from waveredact.pipeline.extractors.regex_extractor import RegexExtractor
 
 
 class FakeGlinerExtractor:
@@ -36,7 +37,7 @@ class TestPrivacyPipeline:
                 return [(0, 4, 0.5)]
 
         pipeline = module.DataPrivacyPipeline(
-            gliner_extractor=FakeSimpleExtractor(),
+            simple_extractors=[RegexExtractor(), FakeSimpleExtractor()],
             llm_extractor=None,
         )
 
@@ -53,7 +54,7 @@ class TestPrivacyPipeline:
         llm_model.run_model.return_value = [0, 2]
 
         pipeline = module.DataPrivacyPipeline(
-            gliner_extractor=MagicMock(),
+            simple_extractors=[MagicMock()],
             llm_extractor=llm_model,
         )
 
@@ -66,7 +67,7 @@ class TestPrivacyPipeline:
     def test_extract_sensitive_with_llm_returns_empty_without_llm(self, monkeypatch: pytest.MonkeyPatch):
         module = _import_privacy_pipeline(monkeypatch)
 
-        pipeline = module.DataPrivacyPipeline(gliner_extractor=MagicMock(), llm_extractor=None)
+        pipeline = module.DataPrivacyPipeline(simple_extractors=[MagicMock()], llm_extractor=None)
 
         mapper = ChunkMapper({0: "alpha", 1: "beta"})
         result = pipeline.extract_sensitive_with_llm(mapper, [1])
