@@ -37,7 +37,7 @@ class TestOrchestrator:
                 return [(0, 4, 0.5), (5, 9, 0.95)]
 
         return privacy_module.DataPrivacyPipeline(
-            gliner_extractor=FakeExtractor(),
+            simple_extractors=[FakeExtractor()],
             llm_extractor=llm_extractor,
         )
 
@@ -70,7 +70,6 @@ class TestOrchestrator:
             use_llm=True,
             interactive_mode=False,
         )
-        monkeypatch.setattr(orchestrator, "_human_approval", lambda _words: True)
 
         assert orchestrator.run_audio_chunks() == [0]
 
@@ -85,7 +84,7 @@ class TestOrchestrator:
             data_pipeline=pipeline,
             use_llm=False,
             interactive_mode=True,
+            approval_callback=lambda _words: False,
         )
-        monkeypatch.setattr(orchestrator, "_human_approval", lambda _words: False)
 
         assert orchestrator.run_audio_chunks() == [0, 1]

@@ -1,7 +1,7 @@
 from waveredact.pipeline.mapper import ChunkMapper
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
 import logging
-from typing import Dict, Set
+from typing import Dict, Set, Callable
 
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(message)s"
@@ -28,7 +28,8 @@ class Orchestrator:
         data_pipeline: DataPrivacyPipeline,
         use_llm: bool = False,
         interactive_mode: bool = True,
-        progress_callback=None,
+        progress_callback: Callable[[str, int], None] | None = None,
+        approval_callback: Callable[[list[str]], bool] | None = None,
     ):
         self.iw_pair = index_word_pair
         self.mappers = mappers
@@ -36,6 +37,7 @@ class Orchestrator:
         self.use_llm = use_llm
         self.interactive_mode = interactive_mode
         self.progress_callback = progress_callback
+        self.approval_callback = approval_callback
 
     def run_audio_chunks(self) -> list[int]:
         """
@@ -73,7 +75,10 @@ class Orchestrator:
         ordered_idx = sorted(full_idx)
 
         if self.interactive_mode:
-            is_approved = self._human_approval(words_found)
+            if self.approval_callback:
+                is_approved = self.approval_callback(words_found)
+            else:
+                is_approved = True
 
             if is_approved:
                 return ordered_idx
@@ -141,25 +146,4 @@ class Orchestrator:
 
         return sorted(checked_idx)
 
-    def _human_approval(self, sensitive_words: list[str]) -> bool:
-        """
-        Function used for human approval in the interactive_mode
 
-        Params:
-            sensitive_words - list of the sensitive words found until now
-
-        Return:
-            True if the user is satisfied and want to end the programm or continue to the next audio
-            False if he is not satisfied and wants to use the LLM
-        """
-        while True:
-            user_question = input(
-                f"\nThese are the words found:\n{sensitive_words}\n\nAre they all correct (Y/N)? "
-            )
-
-            if user_question.upper().strip() == "Y":
-                return True
-            elif user_question.upper().strip() == "N":
-                return False
-            else:
-                print("⚠️ Invalid input. Please enter Y or N.")

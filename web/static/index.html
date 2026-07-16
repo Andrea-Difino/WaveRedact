@@ -98,12 +98,23 @@
                     <span class="ub-label">Start the pipeline</span>
                 </button>
 
-                <div class="redaction-panel">
-                    <span class="section-title">Redaction Style</span>
-                    <div class="segmented mode-tabs">
-                        <div class="slider"></div>
-                        <button class="active" value="muted">🔇 MUTED</button>
-                        <button value="beep">🔊 BEEP</button>
+                <div class="settings-row" style="display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; width: 100%;">
+                    <div class="redaction-panel">
+                        <span class="section-title">Redaction Style</span>
+                        <div class="segmented mode-tabs">
+                            <div class="slider"></div>
+                            <button class="active" value="muted">🔇 MUTED</button>
+                            <button value="beep">🔊 BEEP</button>
+                        </div>
+                    </div>
+
+                    <div class="redaction-panel">
+                        <span class="section-title">AI Engine</span>
+                        <div class="segmented llm-tabs">
+                            <div class="slider"></div>
+                            <button class="active" value="false">⚡ FAST</button>
+                            <button value="true">🧠 LLM</button>
+                        </div>
                     </div>
                 </div>
             </div>

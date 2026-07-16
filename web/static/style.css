@@ -273,6 +273,11 @@ h1 em {
     width: 25%;
     z-index: 2;
     transition: .25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
 }
 
 .segmented button.active {
@@ -411,8 +416,9 @@ h1 em {
     color: var(--text-secondary);
 }
 
-.mode-tabs {
-    width: 220px;
+.mode-tabs,
+.llm-tabs {
+    width: 260px;
     align-self: center;
 }
 
@@ -461,7 +467,8 @@ h1 em {
     }
 }
 
-.mode-tabs .slider {
+.mode-tabs .slider,
+.llm-tabs .slider {
     width: calc(50% - 4px);
 }
 
@@ -686,15 +693,16 @@ footer a {
     .orbit-wrap {
         padding: 0 16px;
     }
-    
+
     .redaction-panel {
         width: 100%;
         max-width: 38rem;
         display: flex;
         flex-direction: column;
     }
-    
-    .mode-tabs {
+
+    .mode-tabs,
+    .llm-tabs {
         width: 100%;
     }
 

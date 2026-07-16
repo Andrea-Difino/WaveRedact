@@ -14,18 +14,16 @@ securityButtons.forEach((btn, index) => {
 
         btn.classList.add("active");
 
-        slider.style.transform =
-            `translateX(${index * 100}%)`;
+        slider.style.transform = `translateX(${index * 100}%)`;
 
         lists.forEach(l =>
             l.classList.remove("active")
         );
 
-        document
-            .getElementById(
-                btn.dataset.level + "-list"
-            )
-            .classList.add("active");
+        let targetList = document.getElementById(btn.dataset.level + "-list");
+        if (targetList) {
+            targetList.classList.add("active");
+        }
 
     });
 
@@ -59,10 +57,23 @@ let revealed = false;
 buttons.forEach(btn => {
     btn.addEventListener('click', () => {
 
-        if (!revealed) {
+        if (!revealed && securityInfo) {
             securityInfo.classList.add('visible');
             revealed = true;
         }
 
     });
 });
+
+const llmButtons = document.querySelectorAll(".llm-tabs button");
+const llmSlider = document.querySelector(".llm-tabs .slider");
+
+if (llmButtons.length > 0 && llmSlider) {
+    llmButtons.forEach((btn, index) => {
+        btn.addEventListener("click", () => {
+            llmButtons.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            llmSlider.style.transform = `translateX(${index * 100}%)`;
+        });
+    });
+}

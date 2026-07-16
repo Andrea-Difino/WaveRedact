@@ -143,6 +143,10 @@ async function handleFileUpload(event) {
     formData.append("level", getActiveSecurityLevel());
     formData.append("censor_mode", getActiveCensorMode());
     formData.append("client_id", clientId);
+    const llmBtn = document.querySelector('.llm-tabs button.active');
+    if (llmBtn) {
+        formData.append("use_llm", llmBtn.value === 'true');
+    }
 
     try {
         const response = await fetch("/api/v1/audio/process", {
