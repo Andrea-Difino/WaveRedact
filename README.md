@@ -29,7 +29,7 @@
 
 ## Requirements
 
-- Python 3.11 or later.
+- Python 3.11, 3.12, or 3.13.
 - At least 6.69GB of free disk space for the bundled local models included in the repository.
 - Extra disk space for your audio files and for the first Whisper model download if it is not already cached locally.
 - **`ffmpeg` installed and available in your system's `PATH`.** This is strictly required by the underlying audio processing engine to decode and slice the media files.

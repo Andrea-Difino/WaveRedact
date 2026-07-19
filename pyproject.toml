@@ -3,7 +3,7 @@ name = "WaveRedact"
 version = "0.5.0"
 description = "A local data privacy pipeline."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 dependencies = [
     "click>=8.4.1",
     "faster-whisper>=1.2.1",
