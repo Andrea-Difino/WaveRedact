@@ -12,7 +12,6 @@ def get_project_root() -> Path:
     if getattr(sys, 'frozen', False):
         return Path(sys._MEIPASS)
     else:
-        # Assuming this file is at waveredact/utils/path_utils.py
         return Path(__file__).resolve().parent.parent.parent
 
 def get_app_data_dir() -> Path:
