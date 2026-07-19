@@ -11,6 +11,7 @@ import json
 import math
 import stat
 import tarfile
+import multiprocessing
 from waveredact.utils.path_utils import get_app_data_dir
 
 FORMAT = '%(asctime)s %(message)s'
@@ -141,10 +142,18 @@ class LlamaServerService:
 
         ngl = self._get_optimal_ngl()
 
+        threads = "4"
+        
+        if platform.system().lower() == "darwin" and platform.machine().lower() in ["arm64", "aarch64"]:
+            threads = "4" 
+        else:
+            threads = str(max(1, multiprocessing.cpu_count() // 2))
+
         command = [
             self.exe_path,
             "--model", self.path,
             "-ngl", ngl,
+            "-t", threads,
             "--port", f"{self.server_port}",
             "--flash-attn", "auto",
             "-c", "4096"
@@ -176,8 +185,23 @@ class LlamaServerService:
 
     def _get_optimal_ngl(self) -> str:
         """Dinamically process the number of layer to load in the GPU"""
+        system = platform.system().lower()
+
+        if system == "darwin":
+            try:
+                mem_bytes = int(subprocess.check_output(["sysctl", "-n", "hw.memsize"]).strip())
+                ram_gb = mem_bytes / (1024**3)
+                
+                if ram_gb <= 8:
+                    logger.warning("[AUTO-NGL] Mac 8GB detected. Limiting layers")
+                    return "15"
+                else:
+                    return "99" 
+            except Exception:
+                return "15" 
+
         if self.device != "cuda":
-            return "99"
+            return "0"
 
         try:
             kwargs = {}
