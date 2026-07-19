@@ -42,7 +42,6 @@ function refreshLabels() {
 
         let html = '';
 
-        // Base group
         const isBaseHighlight = level === 'base';
         html += `<div class="label-group">
             <h5>${isBaseHighlight ? 'Base Level Labels' : '✓ Base Level (Included)'}</h5>
@@ -51,7 +50,6 @@ function refreshLabels() {
             </div>
         </div>`;
 
-        // Medium group
         if (level === 'medium' || level === 'total') {
             const isMediumHighlight = level === 'medium';
             html += `<div class="label-group">
@@ -62,7 +60,6 @@ function refreshLabels() {
             </div>`;
         }
 
-        // Total group
         if (level === 'total') {
             html += `<div class="label-group">
                 <h5>+ Tsunami Level Additions</h5>

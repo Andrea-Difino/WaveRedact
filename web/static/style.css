@@ -668,7 +668,6 @@ footer a {
     display: none;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     header {
         padding: 16px;
