@@ -30,8 +30,6 @@
 ## Requirements
 
 - Python 3.11 or 3.12.
-- At least 6.69GB of free disk space for the bundled local models included in the repository.
-- Extra disk space for your audio files and for the first Whisper model download if it is not already cached locally.
 - **`ffmpeg` installed and available in your system's `PATH`.** This is strictly required by the underlying audio processing engine to decode and slice the media files.
   - **Windows:** Open PowerShell or Command Prompt as Administrator and run:
     ```bash
@@ -47,7 +45,32 @@
     sudo apt update && sudo apt install ffmpeg
     ```
 
-If you want to use the GPU, the project will try to take advantage of it; if it is not available, the CLI can continue in CPU mode.
+### Hardware Requirements & Models Architecture
+
+WaveRedact relies on three main AI components. Below is the breakdown of the models and the hardware requirements needed to run the pipeline smoothly without overheating or crashing your system.
+
+| Component | Model Used | Approximate Size | Hardware Execution |
+| :--- | :--- | :---: | :--- |
+| **Transcription** | `faster-whisper` (default: `large-v3-turbo`) | ~1.5 GB | CPU or GPU (CUDA/MPS) |
+| **PII Extraction** | `fastino/gliner2-privacy-filter-PII-multi` | ~1.2 GB | CPU or GPU |
+| **Validation LLM** (Optional) | `Qwen2.5-7B-Instruct-Q5_K_M.gguf` | ~5.0 GB | CPU or GPU (via `llama.cpp` auto-offload) |
+
+**Total Storage Required:** At least **~6.69 GB** of free disk space for the default models + extra space for your audio processing.
+
+#### Minimum System Specifications (Fast Mode)
+To run the standard pipeline safely without the optional LLM:
+- **RAM:** 8 GB minimum
+- **CPU:** Modern multi-core processor (Intel i5 / Ryzen 5 or equivalent)
+- **VRAM (Optional):** 2 GB+ (for faster Whisper/GLiNER execution)
+
+#### Recommended System Specifications (Max Security with LLM)
+Running the entire pipeline including the 7B LLM requires more memory. The built-in `llama.cpp` server will automatically distribute the workload between your GPU and RAM based on available VRAM.
+- **RAM:** 16 GB minimum (32 GB recommended if CPU-only)
+- **CPU:** Modern multi-core processor (Intel i5 / Ryzen 5 or equivalent)
+- **VRAM:** 6-8 GB+ (Nvidia RTX 3050/3060+ or Mac M-series with 16GB+ Unified Memory) to avoid heavy RAM swapping and system slowdowns.
+*Note for Mac Users:* If an 8GB Mac is detected, WaveRedact automatically limits the LLM GPU layers to prevent system crashes.
+
+If you want to use the GPU, the project will try to take advantage of it automatically; if it is not available, the CLI can continue in CPU mode.
 
 ## Installation
 
