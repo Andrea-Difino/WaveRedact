@@ -4,12 +4,11 @@ from PyInstaller.utils.hooks import collect_all
 datas_gliner, binaries_gliner, hiddenimports_gliner = collect_all('gliner2')
 
 custom_datas = [
-    ('prompts.yaml', '.'),
-    ('.env', '.')
+    ('prompts.yaml', '.')
 ]
 
 a = Analysis(
-    ['cli\\main.py'],
+    ['cli/main.py'],
     pathex=[],
     binaries=binaries_gliner,
     datas=custom_datas + datas_gliner,
