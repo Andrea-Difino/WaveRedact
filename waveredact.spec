@@ -1,9 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
-from PyInstaller.utils.hooks import collect_dynamic_libs
 
 datas_gliner, binaries_gliner, hiddenimports_gliner = collect_all('gliner2')
-torch_binaries = collect_dynamic_libs('torch')
 
 custom_datas = [
     ('prompts.yaml', '.')
@@ -12,7 +10,7 @@ custom_datas = [
 a = Analysis(
     ['cli/main.py'],
     pathex=[],
-    binaries=binaries_gliner + torch_binaries,
+    binaries=binaries_gliner,
     datas=custom_datas + datas_gliner,
     hiddenimports=hiddenimports_gliner, 
     hookspath=[],
