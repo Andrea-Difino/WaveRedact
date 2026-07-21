@@ -45,7 +45,7 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           cd dist
-          zip -r -s 1500m ../waveredact-${{ github.ref_name }}-${{ runner.os | lower }}.zip waveredact/
+          zip -r -s 1500m ../waveredact-${{ github.ref_name }}-${{ runner.os }}.zip waveredact/
 
       - name: Creating Release and Upload Volumes
         uses: softprops/action-gh-release@v2
