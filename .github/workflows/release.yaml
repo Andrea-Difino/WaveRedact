@@ -1,0 +1,55 @@
+name: Build and Release WaveRedact
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false 
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+      - name: Checkout of the code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # Cambia con la tua versione
+
+      - name: Downloading dependecies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Compiling with PyInstaller
+        run: pyinstaller waveredact.spec
+
+      - name: Zip and divide in Volumes (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cd dist
+          7z a -v1500m ..\waveredact-${{ github.ref_name }}-windows.zip waveredact\
+
+      - name: Zip and divide in Volumes (macOS e Linux)
+        if: runner.os != 'Windows'
+        run: |
+          cd dist
+          zip -r -s 1500m ../waveredact-${{ github.ref_name }}-${{ runner.os | lower }}.zip waveredact/
+
+      - name: Creating Release and Upload Volumes
+        uses: softprops/action-gh-release@v2
+        with:
+          files: waveredact-${{ github.ref_name }}-*.*
+          draft: true
+          generate_release_notes: true
