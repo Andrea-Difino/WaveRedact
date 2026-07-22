@@ -1,5 +1,4 @@
 import logging
-import time
 import click
 from dotenv import load_dotenv
 from pathlib import Path
@@ -68,8 +67,6 @@ def main(level: str, auto: bool, use_llm: bool, mode: str, file: str, folder: st
         click.secho("Error: You cannot provide both --file and --folder.", fg="red")
         return
 
-    start = time.time()
-
     config = AppConfig(
         level=level,
         auto=auto,
@@ -81,11 +78,6 @@ def main(level: str, auto: bool, use_llm: bool, mode: str, file: str, folder: st
 
     app = WaveRedactApplication(config=config, approval_callback=ask_user_approval)
     app.run()
-
-    end = time.time()
-
-    total = end - start
-    print("Execution time:", total)
 
     click.secho("Thanks for using waveredact! 🌊", fg="cyan")
 
