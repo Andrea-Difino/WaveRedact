@@ -1,5 +1,4 @@
 import logging
-
 import click
 from dotenv import load_dotenv
 from pathlib import Path

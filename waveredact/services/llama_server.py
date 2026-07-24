@@ -156,7 +156,9 @@ class LlamaServerService:
             "-t", threads,
             "--port", f"{self.server_port}",
             "--flash-attn", "auto",
-            "-c", "4096"
+            "-c", "4096",
+            "--cache-type-k", "q8_0",
+            "--cache-type-v", "q8_0"
         ]
 
         self.process = subprocess.Popen(
