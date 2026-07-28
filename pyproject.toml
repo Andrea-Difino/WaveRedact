@@ -34,7 +34,7 @@ waveredact = "cli.main:main"
 waveredact-web = "web.app:start_server"
 
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=83.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.uv]
