@@ -29,7 +29,7 @@
 
 ## Requirements
 
-- Python 3.11 or 3.12.
+- Python 3.11.
 - **`ffmpeg` installed and available in your system's `PATH`.** This is strictly required by the underlying audio processing engine to decode and slice the media files.
   - **Windows:** Open PowerShell or Command Prompt as Administrator and run:
     ```bash
