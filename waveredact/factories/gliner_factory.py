@@ -23,9 +23,9 @@ class GlinerFactory:
     """
     def __init__(
         self,
+        target_labels: list[str],
         model_id: str = "fastino/gliner2-privacy-filter-PII-multi",
         cache_dir: str = "",
-        target_labels: list[str] | None = None,
         threshold: float = 0.54,
     ):
         self.model_id = model_id
@@ -38,22 +38,7 @@ class GlinerFactory:
         else:
             self.cache_dir = cache_dir
 
-        self.target_labels = (
-            target_labels
-            if target_labels
-            else [
-                "person",
-                "first_name",
-                "last_name",
-                "password",
-                "street_address",
-                "city",
-                "state_or_region",
-                "bank_account",
-                "account_number",
-                "email",
-            ]
-        )
+        self.target_labels = target_labels
 
     def build(self) -> GLiNER2:
         """

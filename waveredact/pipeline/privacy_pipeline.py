@@ -1,8 +1,6 @@
 from typing import List, Set, Tuple
 
 from .extractors.base_extractor import BaseExtractor
-from .extractors.gliner_extractor import GlinerExtractor
-from .extractors.regex_extractor import RegexExtractor
 from .mapper import ChunkMapper
 from waveredact.models.model import Model
 

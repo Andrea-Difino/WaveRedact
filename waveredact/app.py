@@ -2,6 +2,8 @@ import logging
 import click
 from dataclasses import dataclass
 from typing import Callable, Optional, List
+from faster_whisper import WhisperModel
+from gliner2 import GLiNER2
 
 from waveredact.factories.gliner_factory import GlinerFactory
 from waveredact.factories.whisper_factory import WhisperFactory
@@ -42,9 +44,9 @@ class WaveRedactApplication:
         config: AppConfig, 
         approval_callback: Callable[[list[str]], bool] | None = None,
         progress_callback: Callable[[str, int], None] | None = None,
-        whisper_model=None,
-        gliner_model=None,
-        gpu_setup=None
+        whisper_model: WhisperModel | None = None,
+        gliner_model: GLiNER2 | None = None,
+        gpu_setup = None
     ):
         self.config = config
         self.approval_callback = approval_callback
@@ -71,17 +73,17 @@ class WaveRedactApplication:
             whisper_model = self.whisper_model
 
         transcribe_serv = TranscribeService(whisper_model)
-        maker = None
+        model = None
         server = None
 
         if self.config.use_llm:
-            maker = GGUFModel(self.MODEL_NAME, self.REPO_ID, server_port=self.SERVER_PORT)
+            model = GGUFModel(self.MODEL_NAME, self.REPO_ID, server_port=self.SERVER_PORT)
             server = LlamaServerService(self.MODEL_NAME, server_port=self.SERVER_PORT, device=gpu_setup.device)
             try:
                 server.start_server()
             except Exception as exc:
                 logger.warning("LLM server unavailable, continuing without LLM: %s", exc)
-                maker = None
+                model = None
                 server = None
 
         if self.config.file:
@@ -105,10 +107,10 @@ class WaveRedactApplication:
                 gliner_threshold = gliner_factory.threshold
             else:
                 gliner_model = self.gliner_model
-                gliner_threshold = 0.90
+                gliner_threshold = gliner_model.threshold
                 
-            if maker:
-                maker.labels = levels_setter.target_labels
+            if model:
+                model.labels = levels_setter.target_labels
 
             gliner_extractor = GlinerExtractor(
                 gliner_model,
@@ -120,7 +122,7 @@ class WaveRedactApplication:
             
             privacy_pipeline = DataPrivacyPipeline(
                 simple_extractors=[regex_extractor, gliner_extractor],
-                llm_extractor=maker
+                llm_extractor=model
             )
 
             results = []
@@ -132,6 +134,7 @@ class WaveRedactApplication:
                     click.secho(f"Processing audio {audio_path}", fg='green')
                     
                 transcribe_serv.transcribe_audio(str(audio_path))
+                print("Complete sentence:", transcribe_serv.full_text.strip(), "\n")
 
                 chunk_man = Chunker()
                 chunks = chunk_man.chunk_text(transcribe_serv.iw_pair)
@@ -142,13 +145,11 @@ class WaveRedactApplication:
                     index_word_pair=transcribe_serv.iw_pair,
                     mappers=mappers,
                     data_pipeline=privacy_pipeline,
-                    use_llm=self.config.use_llm and maker is not None,
+                    use_llm=self.config.use_llm and model is not None,
                     interactive_mode=not self.config.auto,
                     progress_callback=self.progress_callback,
                     approval_callback=self.approval_callback
                 )
-
-                print("Complete sentence:", transcribe_serv.full_text.strip(), "\n")
 
                 full_idx = orchestrator.run_audio_chunks()
                 sensitive_words = [transcribe_serv.iw_pair[idx] for idx in sorted(full_idx)]
