@@ -1,4 +1,5 @@
 import logging
+from .factory import Factory
 from faster_whisper import WhisperModel
 from waveredact.utils.gpu_setup import GPUEnvironmentManager
 
@@ -8,7 +9,7 @@ FORMAT = "%(asctime)s %(message)s"
 logging.basicConfig(datefmt=FORMAT, level=logging.WARNING, force=True)
 
 
-class WhisperFactory:
+class WhisperFactory(Factory):
     """
     Factory class responsible for instantiating the WhisperModel.
 

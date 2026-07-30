@@ -1,9 +1,10 @@
+import os
+import sys
+from .factory import Factory
 from pathlib import Path
 from gliner2 import GLiNER2
-import sys
 from huggingface_hub import snapshot_download
 import logging
-import os
 from contextlib import redirect_stdout
 import json
 
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(message)s"
 logging.basicConfig(datefmt=FORMAT, level=logging.WARNING, force=True)
 
-class GlinerFactory:
+class GlinerFactory(Factory):
     """
     Factory class responsible for downloading and instantiating the GLiNER2 model.
 
