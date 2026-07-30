@@ -15,7 +15,6 @@ class GlinerExtractor(BaseExtractor):
     def __init__(self, model: GLiNER2, target_labels: List[str], threshold: float):
         self.target_labels = target_labels
         self.threshold = threshold
-
         self.model = model
 
     def extract(self, text: str) -> List[Tuple[int, int, float]]:
