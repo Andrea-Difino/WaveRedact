@@ -1,6 +1,6 @@
 import os
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, mock_open
 import requests
 from waveredact.services.llama_server import LlamaServerService
 
@@ -30,20 +30,23 @@ class TestLlamaServerService:
         mock_exists.return_value = True
         mock_walk.return_value = [("/fake/path", [], ["llama-server.exe", "altro.txt"])]
 
-        with patch(f"{MODULE_PATH}.urllib.request.urlretrieve") as mock_urlretrieve:
+        with patch(f"{MODULE_PATH}.requests.get") as mock_get:
+            mock_get.return_value.json.return_value = {"tag_name": "v1.0"}
             service = LlamaServerService("fake_model.gguf")
 
-        mock_urlretrieve.assert_not_called()
+        # Verifichiamo che get() sia stato chiamato solo 1 volta (per le API) e non 2 (per il download)
+        assert mock_get.call_count == 1
         assert service.exe_path == os.path.join("/fake/path", "llama-server.exe")
 
     @patch(f"{MODULE_PATH}.os.path.exists")
     @patch(f"{MODULE_PATH}.os.walk")
-    @patch(f"{MODULE_PATH}.urllib.request.urlretrieve")
+    @patch(f"{MODULE_PATH}.requests.get")
+    @patch("builtins.open", new_callable=mock_open)
     @patch(f"{MODULE_PATH}.zipfile.ZipFile")
     @patch(f"{MODULE_PATH}.os.remove")
     @patch(f"{MODULE_PATH}.os.makedirs")
     def test_init_downloads_and_extracts_if_missing(
-        self, mock_makedirs, mock_remove, mock_zip, mock_urlretrieve, mock_walk, mock_exists, mock_atexit
+        self, mock_makedirs, mock_remove, mock_zip, mock_file_open, mock_get, mock_walk, mock_exists, mock_atexit
     ):
         mock_exists.return_value = True
         mock_walk.side_effect = [
@@ -51,28 +54,42 @@ class TestLlamaServerService:
             [("/fake/path", [], ["llama-server.exe"])]
         ]
 
+        # Simuliamo una risposta valida sia per il JSON delle API sia per i chunk del file in download
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"tag_name": "v1.0"}
+        mock_response.iter_content.return_value = [b"chunk_dati"]
+        mock_get.return_value = mock_response
+
         service = LlamaServerService("fake_model.gguf")
 
         mock_makedirs.assert_called_once_with(service.destination_folder, exist_ok=True)
-        mock_urlretrieve.assert_called_once()
+        # Chiamato 2 volte: una per l'API (_get_os_config) e una per il download (_init_server)
+        assert mock_get.call_count == 2 
+        mock_file_open.assert_called_once_with(os.path.join(service.destination_folder, "llama_exe.zip"), 'wb')
         mock_zip.assert_called_once()
         mock_remove.assert_called_once()
         assert service.exe_path == os.path.join("/fake/path", "llama-server.exe")
 
     @patch(f"{MODULE_PATH}.os.path.exists")
     @patch(f"{MODULE_PATH}.os.walk")
-    @patch(f"{MODULE_PATH}.urllib.request.urlretrieve")
+    @patch(f"{MODULE_PATH}.requests.get")
+    @patch("builtins.open", new_callable=mock_open)
     @patch(f"{MODULE_PATH}.zipfile.ZipFile")
     @patch(f"{MODULE_PATH}.os.remove")
     @patch(f"{MODULE_PATH}.os.makedirs")
     def test_init_raises_error_if_extraction_fails(
-        self, mock_makedirs, mock_remove, mock_zip, mock_urlretrieve, mock_walk, mock_exists, mock_atexit
+        self, mock_makedirs, mock_remove, mock_zip, mock_file_open, mock_get, mock_walk, mock_exists, mock_atexit
     ):
         mock_exists.return_value = True
         mock_walk.side_effect = [
             [("/fake/path", [], [])],
             [("/fake/path", [], [])]
         ]
+        
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"tag_name": "v1.0"}
+        mock_response.iter_content.return_value = [b"chunk_dati"]
+        mock_get.return_value = mock_response
 
         with pytest.raises(FileNotFoundError, match="Critical error: llama-server.exe not found"):
             LlamaServerService("fake_model.gguf")
@@ -82,7 +99,6 @@ class TestLlamaServerService:
     @patch(f"{MODULE_PATH}.os.walk")
     def test_find_executable_success(self, mock_walk, mock_exists, mock_init, mock_atexit):
         mock_exists.return_value = True
-
         mock_walk.return_value = [("/fake/destination", [], ["llama-server.exe", "altro_file.txt"])]
         
         service = LlamaServerService("fake_model.gguf")
@@ -94,19 +110,24 @@ class TestLlamaServerService:
     @patch(f"{MODULE_PATH}.subprocess.Popen")
     @patch(f"{MODULE_PATH}.requests.get")
     def test_start_server_success(self, mock_get, mock_popen, mock_find_exe, mock_atexit):
+        # Prepariamo la sequenza esatta di risposte che requests.get dovrà restituire
+        mock_api = MagicMock()
+        mock_api.json.return_value = {"tag_name": "v1.0"}
+        
+        mock_health_ok = MagicMock()
+        mock_health_ok.status_code = 200
+        
+        # Sequenza: 1. API Init, 2. Server ancora spento (ConnectionError), 3. Server pronto (200)
+        mock_get.side_effect = [mock_api, requests.exceptions.ConnectionError, mock_health_ok]
+        
         service = LlamaServerService("fake_model.gguf")
         
         mock_process = MagicMock()
         mock_popen.return_value = mock_process
 
-        mock_response_ok = MagicMock()
-        mock_response_ok.status_code = 200
-        mock_get.side_effect = [requests.exceptions.ConnectionError, mock_response_ok]
-
         service.start_server()
 
         mock_popen.assert_called_once()
-
         assert mock_get.call_count == 3
         assert service.process == mock_process
 
@@ -115,10 +136,12 @@ class TestLlamaServerService:
     @patch(f"{MODULE_PATH}.requests.get")
     @patch(f"{MODULE_PATH}.time.sleep") 
     def test_start_server_timeout(self, mock_sleep, mock_get, mock_popen, mock_find_exe, mock_atexit):
-        service = LlamaServerService("fake_model.gguf")
         mock_popen.return_value = MagicMock()
 
+        # Generiamo fallimenti continui (1 per l'API in init che andrà in fallback, 30 per il timeout)
         mock_get.side_effect = requests.exceptions.ConnectionError
+
+        service = LlamaServerService("fake_model.gguf")
 
         with pytest.raises(RuntimeError, match="Server didn't start in time"):
             service.start_server()

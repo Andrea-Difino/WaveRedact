@@ -1,4 +1,3 @@
-import urllib.request
 import zipfile
 import os
 import subprocess
@@ -7,7 +6,6 @@ import requests
 import atexit
 import logging
 import platform
-import json
 import math
 import stat
 import tarfile
@@ -113,7 +111,12 @@ class LlamaServerService:
         archive_name = "llama_exe.zip" if is_zip else "llama_exe.tar.gz"
         archive_path = os.path.join(self.destination_folder, archive_name)
         
-        urllib.request.urlretrieve(self.download_url, archive_path)
+        response = requests.get(self.download_url, stream=True)
+        response.raise_for_status()
+
+        with open(archive_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
 
         logger.info("Extracting Llama engine...")
         if is_zip:
