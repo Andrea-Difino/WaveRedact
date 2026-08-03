@@ -204,6 +204,12 @@ When processing finishes, the CLI prints the path of the generated file. You wil
 ## Common issues
 - `FileNotFoundError: [WinError 2]` or `Couldn't find ffprobe or avprobe`: You are missing `ffmpeg`. Follow the instructions in the Requirements section to install it, then completely close and reopen your terminal.
 
+- **macOS "Cannot be opened" error:** If you downloaded the pre-compiled release and macOS blocks it for security reasons (Gatekeeper), you have to:
+  - Open your terminal and remove the Apple quarantine attribute by running:
+     ```bash
+     xattr -cr /path/to/your/waveredact
+     ```
+
 - **Nothing happens**: Make sure there are supported audio files inside `audio/`.
 
 - **LLM Server doesn't start**: If you use `--use-llm` and the LLM server fails to initialize (e.g., due to port conflicts or missing files), WaveRedact will safely fallback and continue without that component.

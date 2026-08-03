@@ -41,11 +41,17 @@ jobs:
           cd dist
           7z a -v1500m ..\waveredact-${{ github.ref_name }}-windows.zip waveredact\
 
-      - name: Zip and divide in Volumes (macOS e Linux)
-        if: runner.os != 'Windows'
+      - name: Zip and divide in Volumes (Linux)
+        if: runner.os == 'Linux'
         run: |
           cd dist
-          zip -r -s 1500m ../waveredact-${{ github.ref_name }}-${{ runner.os }}.zip waveredact/
+          zip -r -s 1500m ../waveredact-${{ github.ref_name }}-linux.zip waveredact/
+
+      - name: Zip as single Volume (macOS)
+        if: runner.os != 'macOS'
+        run: |
+          cd dist
+          zip -r ../waveredact-${{ github.ref_name }}-macOS.zip waveredact/
 
       - name: Creating Release and Upload Volumes
         uses: softprops/action-gh-release@v2
