@@ -107,7 +107,7 @@ class TestLlamaServerService:
 
         mock_popen.assert_called_once()
 
-        assert mock_get.call_count == 2
+        assert mock_get.call_count == 3
         assert service.process == mock_process
 
     @patch(f"{MODULE_PATH}.LlamaServerService._find_executable", return_value="/fake/exe")
@@ -123,7 +123,7 @@ class TestLlamaServerService:
         with pytest.raises(RuntimeError, match="Server didn't start in time"):
             service.start_server()
 
-        assert mock_get.call_count == 30
+        assert mock_get.call_count == 31
         assert mock_sleep.call_count == 30
 
     @patch(f"{MODULE_PATH}.LlamaServerService._find_executable", return_value="/fake/exe")
