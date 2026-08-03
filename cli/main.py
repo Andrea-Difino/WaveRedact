@@ -2,7 +2,7 @@ import logging
 import click
 from dotenv import load_dotenv
 from pathlib import Path
-
+import multiprocessing
 from waveredact.app import WaveRedactApplication, AppConfig
 
 project_root = Path(__file__).resolve().parent.parent
@@ -11,7 +11,7 @@ load_dotenv(dotenv_path=env_path)
 
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(message)s"
-logging.basicConfig(datefmt=FORMAT, level=logging.WARNING, force=True)
+logging.basicConfig(datefmt=FORMAT, level=logging.ERROR, force=True)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("gliner").setLevel(logging.WARNING)
 logging.getLogger("gliner.model").setLevel(logging.WARNING)
@@ -83,4 +83,5 @@ def main(level: str, auto: bool, use_llm: bool, mode: str, file: str, folder: st
 
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     main()

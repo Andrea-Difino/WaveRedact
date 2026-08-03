@@ -172,7 +172,7 @@ class LlamaServerService:
 
         print("Waiting for server...")
         server_ready = False
-        for _ in range(30):
+        for _ in range(60):
             try:
                 logger.info(f"Try number {_ + 1}")
                 res = requests.get(f"http://localhost:{self.server_port}/health")
