@@ -56,14 +56,14 @@ class LlamaServerService:
         api_url = "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest"
         
         try:
-            req = urllib.request.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(req) as response:
-                data = json.loads(response.read().decode('utf-8'))
+            req = requests.get(api_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
+            req.raise_for_status()
+            data = req.json()
                 
             latest_tag = data.get("tag_name")
             if not latest_tag:
                 raise ValueError("Release tag not found")
-                
+            
         except Exception as e:
             print(f"\n[WARNING] Impossible to contact Github API ({e}). Using version b9895 as fallback.")
             latest_tag = "b9895"
