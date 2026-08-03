@@ -146,8 +146,8 @@ class TestLlamaServerService:
         with pytest.raises(RuntimeError, match="Server didn't start in time"):
             service.start_server()
 
-        assert mock_get.call_count == 31
-        assert mock_sleep.call_count == 30
+        assert mock_get.call_count == 61
+        assert mock_sleep.call_count == 60
 
     @patch(f"{MODULE_PATH}.LlamaServerService._find_executable", return_value="/fake/exe")
     def test_stop_server(self, mock_find_exe, mock_atexit):

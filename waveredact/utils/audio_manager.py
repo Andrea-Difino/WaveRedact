@@ -80,7 +80,18 @@ class IOAudioManager:
         if format_export == "m4a":
             format_export = "ipod"
 
-        audio.export(output_path, format=format_export)
+        try:
+            audio.export(output_path, format=format_export)
+        except Exception as e:
+            if format_export == "ogg":
+                logger.warning(f"Missing codec libvorbis. Using libopus")
+                audio.export(output_path, format="ogg", codec="libopus")
+            else:
+                logger.error(f"Exportation error ({e}). Using .wav")
+                base_name = os.path.splitext(output_path)[0]
+                fallback_path = f"{base_name}.wav"
+                audio.export(fallback_path, format="wav")
+                output_path = fallback_path
         
         print(f"✅ File saved: {output_path}\n")
         return output_path
