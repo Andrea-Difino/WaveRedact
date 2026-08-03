@@ -48,7 +48,7 @@ jobs:
           zip -r -s 1500m ../waveredact-${{ github.ref_name }}-linux.zip waveredact/
 
       - name: Zip as single Volume (macOS)
-        if: runner.os != 'macOS'
+        if: runner.os == 'macOS'
         run: |
           cd dist
           zip -r ../waveredact-${{ github.ref_name }}-macOS.zip waveredact/
