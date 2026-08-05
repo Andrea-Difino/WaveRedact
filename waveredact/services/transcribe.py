@@ -7,8 +7,6 @@ class TranscribeService:
 
     Attributes:
         model           - WhisperModel instance
-        iw_pair         - Dictionary mapping indices to words
-        ival_pair       - Dictionary mapping indices to intervals
         full_text       - Full transcribed text string
     """
 
@@ -22,6 +20,10 @@ class TranscribeService:
 
         Params:
             audio_path  - Path to the audio file
+
+        Returns:
+            iw_pair         - Dictionary mapping indices to words
+            ival_pair       - Dictionary mapping indices to intervals
         """
 
         segments, _ = self.model.transcribe(audio_path, beam_size=5, word_timestamps=True)
