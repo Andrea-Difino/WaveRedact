@@ -2,9 +2,7 @@ import importlib
 import sys
 import types
 from unittest.mock import MagicMock
-
 import pytest
-
 
 sys.modules.pop("faster_whisper", None)
 fake_faster_whisper = types.ModuleType("faster_whisper")
@@ -54,7 +52,7 @@ class TestTranscribeService:
         mock_model.transcribe.return_value = ([segment1, segment2], MagicMock())
 
         service = TranscribeService(mock_model)
-        service.transcribe_audio("fake_audio.wav")
+        iw_pair, ival_pair = service.transcribe_audio("fake_audio.wav")
 
         mock_model.transcribe.assert_called_once_with(
             "fake_audio.wav",
@@ -64,13 +62,13 @@ class TestTranscribeService:
 
         assert service.full_text == " Hello world test"
 
-        assert service.iw_pair == {
+        assert iw_pair == {
             0: " Hello",
             1: " world",
             2: " test"
         }
         
-        assert service.ival_pair == {
+        assert ival_pair == {
             0: "0.0-1.5",
             1: "1.5-2.5",
             2: "3.0-4.0"
@@ -83,11 +81,11 @@ class TestTranscribeService:
         mock_model.transcribe.return_value = ([], MagicMock())
         
         service = TranscribeService(mock_model)
-        service.transcribe_audio("empty_audio.wav")
+        iw_pair, ival_pair = service.transcribe_audio("empty_audio.wav")
         
         assert service.full_text == ""
-        assert service.iw_pair == {}
-        assert service.ival_pair == {}
+        assert iw_pair == {}
+        assert ival_pair == {}
 
     def test_transcribe_audio_segment_without_words(self):
         """Testa il behavior if whisper return a result with segment but whithout word attribute"""
@@ -97,8 +95,8 @@ class TestTranscribeService:
         mock_model.transcribe.return_value = ([segment_no_words], MagicMock())
         
         service = TranscribeService(mock_model)
-        service.transcribe_audio("weird_audio.wav")
+        iw_pair, ival_pair = service.transcribe_audio("weird_audio.wav")
         
         assert service.full_text == ""
-        assert service.iw_pair == {}
-        assert service.ival_pair == {}
+        assert iw_pair == {}
+        assert ival_pair == {}

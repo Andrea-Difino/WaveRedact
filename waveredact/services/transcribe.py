@@ -1,4 +1,5 @@
 from faster_whisper import WhisperModel
+from typing import Tuple
 
 class TranscribeService:
     """
@@ -13,11 +14,9 @@ class TranscribeService:
 
     def __init__(self, model: WhisperModel):
         self.model = model
-        self.iw_pair: dict[int, str]
-        self.ival_pair: dict[int, str]
         self.full_text: str
 
-    def transcribe_audio(self, audio_path: str):
+    def transcribe_audio(self, audio_path: str) -> Tuple[dict[int, str], dict[int, str]]:
         """
         Transcribe the given audio file and populate full text, word pairs, and interval pairs.
 
@@ -36,8 +35,7 @@ class TranscribeService:
                     intervals_list.append(f"{word.start}-{word.end}")
 
         self.full_text = "".join(words_list)
-        self.iw_pair = self._compute_idx_pair(words_list)
-        self.ival_pair = self._compute_idx_pair(intervals_list)
+        return (self._compute_idx_pair(words_list), self._compute_idx_pair(intervals_list))
     
     def _compute_idx_pair(self, data: list[str]) -> dict[int, str]:
         """

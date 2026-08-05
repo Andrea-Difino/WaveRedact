@@ -1,10 +1,11 @@
 import logging
 import click
 from dataclasses import dataclass
-from typing import Callable, Optional, List
+from typing import Callable, Optional, List, Tuple
+from pathlib import Path
 from faster_whisper import WhisperModel
 from gliner2 import GLiNER2
-
+from waveredact.utils.memory_manager import MemoryManager
 from waveredact.factories.gliner_factory import GlinerFactory
 from waveredact.factories.whisper_factory import WhisperFactory
 from waveredact.models.gguf_model import GGUFModel
@@ -73,19 +74,6 @@ class WaveRedactApplication:
             whisper_model = self.whisper_model
 
         transcribe_serv = TranscribeService(whisper_model)
-        model = None
-        server = None
-
-        if self.config.use_llm:
-            model = GGUFModel(self.MODEL_NAME, self.REPO_ID, server_port=self.SERVER_PORT)
-            
-            try:
-                server = LlamaServerService(self.MODEL_NAME, server_port=self.SERVER_PORT, device=gpu_setup.device)
-                server.start_server()
-            except Exception as exc:
-                logger.warning("LLM server unavailable, continuing without LLM: %s", exc)
-                model = None
-                server = None
 
         if self.config.file:
             audio_manager = IOAudioManager(input_path=self.config.file, is_file=True)
@@ -95,13 +83,42 @@ class WaveRedactApplication:
         audios = audio_manager.get_audio()
         if not audios:
             print("There's no audio to process. Terminating process...")
-            if server:
-                server.stop_server()
             return []
 
         try:
-            levels_setter = LevelSetter(not self.config.auto, level_name=self.config.level)
+            index_intervals: List[Tuple[Path, dict[int, str], dict[int, str]]] = []
+            memory_manager = MemoryManager()
+
+            for audio_path in audios:
+                if self.progress_callback:
+                    self.progress_callback(f"Processing audio {audio_path.name}", 10)
+                else:
+                    click.secho(f"Processing audio {audio_path}", fg='green')
+                    
+                iw_pair, ival_pair = transcribe_serv.transcribe_audio(str(audio_path))
+                print("Complete sentence:", transcribe_serv.full_text.strip(), "\n")
+                index_intervals.append((audio_path, iw_pair, ival_pair))
+
+            del whisper_model
+            del transcribe_serv
+            memory_manager.clean_memory()
+
+            model = None
+            server = None
             
+            if self.config.use_llm:
+                model = GGUFModel(self.MODEL_NAME, self.REPO_ID, server_port=self.SERVER_PORT)
+                        
+            try:
+                server = LlamaServerService(self.MODEL_NAME, server_port=self.SERVER_PORT, device=gpu_setup.device)
+                server.start_server()
+            except Exception as exc:
+                logger.warning("LLM server unavailable, continuing without LLM: %s", exc)
+                model = None
+                server = None
+
+            levels_setter = LevelSetter(not self.config.auto, level_name=self.config.level)
+                        
             if self.gliner_model is None:
                 gliner_factory = GlinerFactory(target_labels=levels_setter.target_labels)
                 gliner_model = gliner_factory.build()
@@ -109,7 +126,7 @@ class WaveRedactApplication:
             else:
                 gliner_model = self.gliner_model
                 gliner_threshold = 0.54
-                
+
             if model:
                 model.labels = levels_setter.target_labels
 
@@ -118,32 +135,24 @@ class WaveRedactApplication:
                 levels_setter.target_labels,
                 gliner_threshold,
             )
-            
+                        
             regex_extractor = RegexExtractor()
-            
+                        
             privacy_pipeline = DataPrivacyPipeline(
                 simple_extractors=[regex_extractor, gliner_extractor],
                 llm_extractor=model
             )
-
+            
             results = []
 
-            for audio_path in audios:
-                if self.progress_callback:
-                    self.progress_callback(f"Processing audio {audio_path.name}", 10)
-                else:
-                    click.secho(f"Processing audio {audio_path}", fg='green')
-                    
-                transcribe_serv.transcribe_audio(str(audio_path))
-                print("Complete sentence:", transcribe_serv.full_text.strip(), "\n")
-
+            for audio_path, index_word, index_interval in index_intervals:
                 chunk_man = Chunker()
-                chunks = chunk_man.chunk_text(transcribe_serv.iw_pair)
+                chunks = chunk_man.chunk_text(index_word)
 
                 mappers = [ChunkMapper(chunk) for chunk in chunks]
                 
                 orchestrator = Orchestrator(
-                    index_word_pair=transcribe_serv.iw_pair,
+                    index_word_pair=index_word,
                     mappers=mappers,
                     data_pipeline=privacy_pipeline,
                     use_llm=self.config.use_llm and model is not None,
@@ -153,9 +162,9 @@ class WaveRedactApplication:
                 )
 
                 full_idx = orchestrator.run_audio_chunks()
-                sensitive_words = [transcribe_serv.iw_pair[idx] for idx in sorted(full_idx)]
+                sensitive_words = [index_word[idx] for idx in sorted(full_idx)]
 
-                censor_manager = AudioCensor(audio_manager, transcribe_serv.ival_pair, full_idx)
+                censor_manager = AudioCensor(audio_manager, index_interval, full_idx)
                 if self.config.mode == 'beep':
                     censor_mode = AudioMaskTypes.BEEP
                 else:
