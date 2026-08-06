@@ -207,7 +207,7 @@ When processing finishes, the CLI prints the path of the generated file. You wil
 - **macOS "Cannot be opened" error:** If you downloaded the pre-compiled release and macOS blocks it for security reasons (Gatekeeper), you have to:
   - Open your terminal and remove the Apple quarantine attribute by running:
      ```bash
-     xattr -cr /path/to/your/waveredact_folder
+     xattr -cr /path/to/your/waveredact_folder/
      ```
 
 - **Nothing happens**: Make sure there are supported audio files inside `audio/`.
