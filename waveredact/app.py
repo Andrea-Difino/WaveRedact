@@ -109,13 +109,13 @@ class WaveRedactApplication:
             if self.config.use_llm:
                 model = GGUFModel(self.MODEL_NAME, self.REPO_ID, server_port=self.SERVER_PORT)
                         
-            try:
-                server = LlamaServerService(self.MODEL_NAME, server_port=self.SERVER_PORT, device=gpu_setup.device)
-                server.start_server()
-            except Exception as exc:
-                logger.warning("LLM server unavailable, continuing without LLM: %s", exc)
-                model = None
-                server = None
+                try:
+                    server = LlamaServerService(self.MODEL_NAME, server_port=self.SERVER_PORT, device=gpu_setup.device)
+                    server.start_server()
+                except Exception as exc:
+                    logger.warning("LLM server unavailable, continuing without LLM: %s", exc)
+                    model = None
+                    server = None
 
             levels_setter = LevelSetter(not self.config.auto, level_name=self.config.level)
                         

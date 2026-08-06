@@ -160,8 +160,8 @@ class LlamaServerService:
             "--port", f"{self.server_port}",
             "--flash-attn", "auto",
             "-c", "4096",
-            "--cache-type-k", "q8_0",
-            "--cache-type-v", "q8_0"
+            "--cache-type-k", "q4_0",
+            "--cache-type-v", "q4_0"
         ]
 
         self.process = subprocess.Popen(
@@ -172,7 +172,7 @@ class LlamaServerService:
 
         print("Waiting for server...")
         server_ready = False
-        for _ in range(60):
+        for _ in range(100):
             try:
                 logger.info(f"Try number {_ + 1}")
                 res = requests.get(f"http://localhost:{self.server_port}/health")

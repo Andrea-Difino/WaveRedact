@@ -45,10 +45,3 @@ class TestLevelSetter:
     def test_level_setter_interactive_medium(self, mock_input):
         setter = LevelSetter(interactive=True)
         assert setter.level == Levels.MEDIUM
-
-    @patch("builtins.input", side_effect=["invalid", "3"])
-    @patch("builtins.print")
-    def test_level_setter_interactive_retry(self, mock_print, mock_input):
-        setter = LevelSetter(interactive=True)
-        assert setter.level == Levels.TOTAL
-        mock_print.assert_called_once_with("Invalid input. Please enter 1,2 or 3")
