@@ -57,6 +57,7 @@ class LevelSetter:
                 self.level = Levels.TOTAL
         else:
             self.level: Levels = LevelSetter._ask_level()
+            print("")
         self.target_labels: list[str] = self.level.labels
 
     @staticmethod
