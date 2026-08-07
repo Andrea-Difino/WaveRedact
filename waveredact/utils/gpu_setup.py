@@ -1,9 +1,11 @@
+import logging
 import os
 import sys
 import urllib.request
 import zipfile
+
 import torch
-import logging
+
 from waveredact.utils.path_utils import get_app_data_dir
 
 logger = logging.getLogger(__name__)

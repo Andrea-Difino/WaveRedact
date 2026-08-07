@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
+
 class BaseExtractor(ABC):
     """
     Abstract base class for all sensitive data extractors.

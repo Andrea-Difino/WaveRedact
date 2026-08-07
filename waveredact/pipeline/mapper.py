@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+
 class ChunkMapper:
     """
     Map chunks of text back to their original indices in the transcribed word list.

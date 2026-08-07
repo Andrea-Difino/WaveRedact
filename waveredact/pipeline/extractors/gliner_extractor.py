@@ -1,6 +1,8 @@
-from .base_extractor import BaseExtractor
 from typing import List, Tuple
+
 from gliner2 import GLiNER2
+
+from .base_extractor import BaseExtractor
 
 
 class GlinerExtractor(BaseExtractor):

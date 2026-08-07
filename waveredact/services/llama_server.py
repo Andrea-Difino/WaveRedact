@@ -1,15 +1,17 @@
-import zipfile
-import os
-import subprocess
-import time
-import requests
 import atexit
 import logging
-import platform
 import math
-import stat
-import tarfile
 import multiprocessing
+import os
+import platform
+import stat
+import subprocess
+import tarfile
+import time
+import zipfile
+
+import requests
+
 from waveredact.utils.path_utils import get_app_data_dir
 
 FORMAT = '%(asctime)s %(message)s'

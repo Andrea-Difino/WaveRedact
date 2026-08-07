@@ -1,14 +1,16 @@
 import json
+import logging
+import os
 import re
 from typing import Dict
-from waveredact.models.model import Model
-from huggingface_hub import hf_hub_download
-import os
-from openai import OpenAI
-from dotenv import load_dotenv
-import logging
+
 import yaml
-from waveredact.utils.path_utils import get_project_root, get_app_data_dir
+from dotenv import load_dotenv
+from huggingface_hub import hf_hub_download
+from openai import OpenAI
+
+from waveredact.models.model import Model
+from waveredact.utils.path_utils import get_app_data_dir, get_project_root
 
 project_root = get_project_root()
 env_path = project_root / ".env"

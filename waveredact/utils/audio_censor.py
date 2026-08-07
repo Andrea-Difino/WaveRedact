@@ -1,11 +1,13 @@
+import logging
 import os
+import sys
+from enum import Enum
+from pathlib import Path
+
+import click
 from pydub import AudioSegment
 from pydub.generators import Sine
-import logging
-import sys
-import click
-from pathlib import Path
-from enum import Enum
+
 from waveredact.utils.audio_manager import IOAudioManager
 
 logger = logging.getLogger(__name__)

@@ -1,12 +1,14 @@
+import json
+import logging
 import os
 import sys
-from .factory import Factory
+from contextlib import redirect_stdout
 from pathlib import Path
+
 from gliner2 import GLiNER2
 from huggingface_hub import snapshot_download
-import logging
-from contextlib import redirect_stdout
-import json
+
+from .factory import Factory
 
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(message)s"

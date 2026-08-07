@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Levels(Enum):
     """
     Enum representing different privacy levels for censoring.

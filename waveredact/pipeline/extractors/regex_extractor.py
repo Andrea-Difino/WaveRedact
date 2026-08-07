@@ -1,6 +1,8 @@
 import re
-from .base_extractor import BaseExtractor
 from typing import List, Tuple
+
+from .base_extractor import BaseExtractor
+
 
 class RegexExtractor(BaseExtractor):
     """

@@ -1,7 +1,8 @@
+import logging
+from typing import Callable, Dict, Set
+
 from waveredact.pipeline.mapper import ChunkMapper
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
-import logging
-from typing import Dict, Set, Callable
 
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(message)s"

@@ -1,11 +1,13 @@
 import logging
-import click
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Optional, List, Tuple
 from pathlib import Path
+from typing import List, Optional, Tuple
+
+import click
 from faster_whisper import WhisperModel
 from gliner2 import GLiNER2
-from waveredact.utils.memory_manager import MemoryManager
+
 from waveredact.factories.gliner_factory import GlinerFactory
 from waveredact.factories.whisper_factory import WhisperFactory
 from waveredact.models.gguf_model import GGUFModel
@@ -21,6 +23,7 @@ from waveredact.utils.audio_manager import IOAudioManager
 from waveredact.utils.chunk import Chunker
 from waveredact.utils.gpu_setup import GPUEnvironmentManager
 from waveredact.utils.level import LevelSetter
+from waveredact.utils.memory_manager import MemoryManager
 
 logger = logging.getLogger(__name__)
 

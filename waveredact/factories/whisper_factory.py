@@ -1,8 +1,10 @@
 import logging
-from .factory import Factory
+
 from faster_whisper import WhisperModel
+
 from waveredact.utils.gpu_setup import GPUEnvironmentManager
 
+from .factory import Factory
 
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(message)s"

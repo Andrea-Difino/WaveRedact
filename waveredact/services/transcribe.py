@@ -1,5 +1,7 @@
-from faster_whisper import WhisperModel
 from typing import Tuple
+
+from faster_whisper import WhisperModel
+
 
 class TranscribeService:
     """

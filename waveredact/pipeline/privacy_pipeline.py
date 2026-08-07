@@ -1,8 +1,9 @@
 from typing import List, Set, Tuple
 
+from waveredact.models.model import Model
+
 from .extractors.base_extractor import BaseExtractor
 from .mapper import ChunkMapper
-from waveredact.models.model import Model
 
 
 class DataPrivacyPipeline:

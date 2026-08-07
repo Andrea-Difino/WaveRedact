@@ -1,9 +1,11 @@
 import logging
+import multiprocessing
+from pathlib import Path
+
 import click
 from dotenv import load_dotenv
-from pathlib import Path
-import multiprocessing
-from waveredact.app import WaveRedactApplication, AppConfig
+
+from waveredact.app import AppConfig, WaveRedactApplication
 
 project_root = Path(__file__).resolve().parent.parent
 env_path = project_root / ".env"
