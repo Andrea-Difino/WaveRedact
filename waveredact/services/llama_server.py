@@ -140,10 +140,19 @@ class LlamaServerService:
         
         console.print("[success]✅ Llama server ready to run![/success]")
 
+    def _is_port_in_use(self, port: int) -> bool:
+        import socket
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            return s.connect_ex(('localhost', port)) == 0
+
     def start_server(self):
         """
         Start the Llama model server in a separate process.
         """
+        if self._is_port_in_use(self.server_port):
+            console.print(f"[error]❌ Port {self.server_port} is already in use. Cannot start LLM server.[/error]")
+            raise RuntimeError(f"Port {self.server_port} is already in use")
+
         console.print("[info]Starting Llama server...[/info]")
 
         ngl = self._get_optimal_ngl()
