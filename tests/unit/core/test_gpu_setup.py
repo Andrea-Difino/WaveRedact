@@ -1,9 +1,9 @@
 import os
 import pytest
 from unittest.mock import patch, MagicMock
-from waveredact.utils.gpu_setup import GPUEnvironmentManager
+from waveredact.core.gpu_setup import GPUEnvironmentManager
 
-MODULE_PATH = "waveredact.utils.gpu_setup"
+MODULE_PATH = "waveredact.core.gpu_setup"
 
 
 class TestGPUEnvironmentManager:
@@ -82,8 +82,8 @@ class TestGPUEnvironmentManager:
             assert os.environ["PATH"] == "C:\\fake\\dll\\path;C:\\Original\\Path"
 
     @patch(f"{MODULE_PATH}.os.add_dll_directory", create=True)
-    @patch(f"{MODULE_PATH}.logger.warning")
-    def test_inject_dlls_handles_exception(self, mock_logger, mock_add_dll):
+    @patch(f"{MODULE_PATH}.console.print")
+    def test_inject_dlls_handles_exception(self, mock_console, mock_add_dll):
         manager = GPUEnvironmentManager()
         
         mock_add_dll.side_effect = Exception("Access denied")
@@ -93,4 +93,4 @@ class TestGPUEnvironmentManager:
         except Exception:
             pytest.fail("Exception not handled correctly in _inject_dlls!")
 
-        mock_logger.assert_called_once()
+        mock_console.assert_called_once()

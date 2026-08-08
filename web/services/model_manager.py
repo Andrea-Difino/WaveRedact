@@ -3,7 +3,7 @@ from faster_whisper import WhisperModel
 from gliner2 import GLiNER2
 from waveredact.factories.gliner_factory import GlinerFactory
 from waveredact.factories.whisper_factory import WhisperFactory
-from waveredact.utils.gpu_setup import GPUEnvironmentManager
+from waveredact.core.gpu_setup import GPUEnvironmentManager
 
 
 logger = logging.getLogger(__name__)

@@ -1,5 +1,5 @@
 import pytest
-from waveredact.utils.audio_manager import IOAudioManager
+from waveredact.audio.audio_manager import IOAudioManager
 from pydub.generators import Sine
 
 class TestAudioManager:

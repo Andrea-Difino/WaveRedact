@@ -5,10 +5,11 @@ from enum import Enum
 from pathlib import Path
 
 import click
+from waveredact.utils.console import console
 from pydub import AudioSegment
 from pydub.generators import Sine
 
-from waveredact.utils.audio_manager import IOAudioManager
+from waveredact.audio.audio_manager import IOAudioManager
 
 logger = logging.getLogger(__name__)
 
@@ -70,13 +71,16 @@ class AudioCensor:
             Path to the saved censored audio file
         """
 
-        logger.info(f"Loading audio for censor: {input_path}")
+        console.print(f"[info]Loading audio for censor: {input_path}[/info]")
         try:
             audio = AudioSegment.from_file(input_path)
         except FileNotFoundError:
-            click.secho("\n[FATAL ERROR] FFmpeg not found in the system!", fg="red", bold=True)
-            click.echo("WaveRedact require FFmpeg to cut and modify audio")
-            click.secho("After installation, close and open again the terminal.\n", fg="yellow")
+            from rich.panel import Panel
+            error_msg = "[bold red]FATAL ERROR: FFmpeg not found in the system![/bold red]\n\n"
+            error_msg += "WaveRedact requires FFmpeg to cut and modify audio.\n"
+            error_msg += "[yellow]After installation, close and open again the terminal.[/yellow]"
+            
+            console.print(Panel(error_msg, title="Dependencies Error", border_style="red"))
             sys.exit(1)
 
         timestamps = self._get_interval_to_censor()

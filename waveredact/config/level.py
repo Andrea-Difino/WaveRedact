@@ -1,4 +1,6 @@
 from enum import Enum
+import questionary
+from waveredact.utils.console import console
 
 
 class Levels(Enum):
@@ -58,7 +60,7 @@ class LevelSetter:
                 self.level = Levels.TOTAL
         else:
             self.level: Levels = LevelSetter._ask_level()
-            print("")
+            console.print("")
         self.target_labels: list[str] = self.level.labels
 
     @staticmethod
@@ -69,21 +71,16 @@ class LevelSetter:
         Return:
             Selected Levels enum
         """
-        while True:
-            user_q = input(
-                "\nSelect the level of censor you like:\n"
-                "1) Base level:  Immediately redact sensitive information that could compromise the security of your accounts or savings. Remove passwords, digital access keys, tokens, and banking or credit card details.\n"
-                "2) Medium level: It extends Base level to ensure maximum compliance with privacy regulations. It removes any data that could directly identify you or other individuals, such as names, email addresses, phone numbers, and identification documents.\n"
-                "3) Total level: Beyond protecting accounts and identities, it eliminates every trace of geographic and temporal context—removing addresses, cities, states, and any dates mentioned in the audio—thereby rendering the conversation completely decontextualized.\n"
-                "Insert the number: "
-                )
-            
-            if user_q.strip() == "1":
-                return Levels.BASE
-            elif user_q.strip() == "2":
-                return Levels.MEDIUM
-            elif user_q.strip() == "3":
-                return Levels.TOTAL
-            else:
-                print("Invalid input. Please enter 1,2 or 3")
+        choices = [
+            questionary.Choice("1) Base level: Redact passwords, banking info, etc.", value=Levels.BASE),
+            questionary.Choice("2) Medium level: Base + names, emails, phones, IDs", value=Levels.MEDIUM),
+            questionary.Choice("3) Total level: Medium + addresses, dates (full decontextualization)", value=Levels.TOTAL),
+        ]
+        
+        answer = questionary.select(
+            "Select the level of censor you like:",
+            choices=choices
+        ).ask()
+        
+        return answer
 

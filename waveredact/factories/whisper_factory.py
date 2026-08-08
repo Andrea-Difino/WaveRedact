@@ -2,7 +2,7 @@ import logging
 
 from faster_whisper import WhisperModel
 
-from waveredact.utils.gpu_setup import GPUEnvironmentManager
+from waveredact.core.gpu_setup import GPUEnvironmentManager
 
 from .factory import Factory
 

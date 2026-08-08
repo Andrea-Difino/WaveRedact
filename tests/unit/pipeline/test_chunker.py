@@ -1,5 +1,5 @@
 import pytest
-from waveredact.utils.chunk import Chunker
+from waveredact.pipeline.chunk import Chunker
 
 
 class TestChunker:

@@ -13,6 +13,7 @@ import zipfile
 import requests
 
 from waveredact.utils.path_utils import get_app_data_dir
+from waveredact.utils.console import console
 
 FORMAT = '%(asctime)s %(message)s'
 logging.basicConfig(datefmt=FORMAT,level=logging.WARNING, force=True)
@@ -65,7 +66,7 @@ class LlamaServerService:
                 raise ValueError("Release tag not found")
             
         except Exception as e:
-            print(f"\n[WARNING] Impossible to contact Github API ({e}). Using version b9895 as fallback.")
+            console.print(f"[warning]⚠️ Failed to contact Github API ({e}). Using version b9895 as fallback.[/warning]")
             latest_tag = "b9895"
 
         system = platform.system().lower()
@@ -106,7 +107,7 @@ class LlamaServerService:
             self._make_executable(self.exe_path)
             return None
             
-        logger.info("Downloading AI engine...")
+        console.print("[info]Downloading AI engine...[/info]")
         os.makedirs(self.destination_folder, exist_ok=True)
 
         is_zip = self.download_url.endswith('.zip')
@@ -120,7 +121,7 @@ class LlamaServerService:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
 
-        logger.info("Extracting Llama engine...")
+        console.print("[info]Extracting Llama engine...[/info]")
         if is_zip:
             with zipfile.ZipFile(archive_path, 'r') as zip_ref:
                 zip_ref.extractall(self.destination_folder)
@@ -129,7 +130,7 @@ class LlamaServerService:
                 tar_ref.extractall(self.destination_folder)
 
         os.remove(archive_path)
-        logger.info("Llama engine downloaded!")
+        console.print("[success]✅ Llama engine downloaded![/success]")
 
         self.exe_path = self._find_executable()
         if not self.exe_path:
@@ -137,13 +138,13 @@ class LlamaServerService:
 
         self._make_executable(self.exe_path)
         
-        logger.info("Llama server ready to run!")
+        console.print("[success]✅ Llama server ready to run![/success]")
 
     def start_server(self):
         """
         Start the Llama model server in a separate process.
         """
-        print("Starting Llama server...")
+        console.print("[info]Starting Llama server...[/info]")
 
         ngl = self._get_optimal_ngl()
 
@@ -172,23 +173,22 @@ class LlamaServerService:
             stderr=subprocess.DEVNULL
         )
 
-        print("Waiting for server...")
         server_ready = False
-        for _ in range(100):
-            try:
-                logger.info(f"Try number {_ + 1}")
-                res = requests.get(f"http://localhost:{self.server_port}/health")
-                if res.status_code == 200:
-                    server_ready = True
-                    break
-            except requests.exceptions.ConnectionError:
-                time.sleep(1)
+        with console.status("Waiting for Llama server to be ready...", spinner="dots"):
+            for _ in range(100):
+                try:
+                    res = requests.get(f"http://localhost:{self.server_port}/health")
+                    if res.status_code == 200:
+                        server_ready = True
+                        break
+                except requests.exceptions.ConnectionError:
+                    time.sleep(1)
         
         if not server_ready:
-            logger.error("Server didn't start in time")
+            console.print("[error]❌ Server didn't start in time[/error]")
             raise RuntimeError("Server didn't start in time")
 
-        logger.info("Server ready")
+        console.print("[success]✅ Server ready[/success]")
 
     def _get_optimal_ngl(self) -> str:
         """Dinamically process the number of layer to load in the GPU"""
@@ -246,8 +246,8 @@ class LlamaServerService:
         Stop the Llama model server process.
         """
         if self.process:
-            logger.info("\nClosing LLM server...")
+            console.print("[info]Closing LLM server...[/info]")
             self.process.terminate()
             self.process.wait()
             self.process = None
-            logger.info("Server closed.")
+            console.print("[success]✅ Server closed.[/success]")
