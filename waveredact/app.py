@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-import click
+from waveredact.utils.console import console
 from faster_whisper import WhisperModel
 from gliner2 import GLiNER2
 
@@ -18,12 +18,12 @@ from waveredact.pipeline.orchestrator import Orchestrator
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
 from waveredact.services.llama_server import LlamaServerService
 from waveredact.services.transcribe import TranscribeService
-from waveredact.utils.audio_censor import AudioCensor, AudioMaskTypes
-from waveredact.utils.audio_manager import IOAudioManager
-from waveredact.utils.chunk import Chunker
-from waveredact.utils.gpu_setup import GPUEnvironmentManager
-from waveredact.utils.level import LevelSetter
-from waveredact.utils.memory_manager import MemoryManager
+from waveredact.audio.audio_censor import AudioCensor, AudioMaskTypes
+from waveredact.audio.audio_manager import IOAudioManager
+from waveredact.pipeline.chunk import Chunker
+from waveredact.core.gpu_setup import GPUEnvironmentManager
+from waveredact.config.level import LevelSetter
+from waveredact.core.memory_manager import MemoryManager
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ class WaveRedactApplication:
             
         audios = audio_manager.get_audio()
         if not audios:
-            print("There's no audio to process. Terminating process...")
+            console.print("[warning]⚠️ There's no audio to process. Terminating process...[/warning]")
             return []
 
         try:
@@ -96,10 +96,10 @@ class WaveRedactApplication:
                 if self.progress_callback:
                     self.progress_callback(f"Processing audio {audio_path.name}", 10)
                 else:
-                    click.secho(f"Processing audio {audio_path}", fg='green')
+                    console.print(f"[success]✅ Processing audio {audio_path}[/success]")
                     
                 iw_pair, ival_pair = transcribe_serv.transcribe_audio(str(audio_path))
-                print("Complete sentence:", transcribe_serv.full_text.strip(), "\n")
+                console.print(f"Complete sentence: [info]{transcribe_serv.full_text.strip()}[/info]\n")
                 index_intervals.append((audio_path, iw_pair, ival_pair))
 
             del whisper_model

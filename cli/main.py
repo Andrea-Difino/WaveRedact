@@ -6,6 +6,8 @@ import click
 from dotenv import load_dotenv
 
 from waveredact.app import AppConfig, WaveRedactApplication
+from waveredact.utils.console import console
+import questionary
 
 project_root = Path(__file__).resolve().parent.parent
 env_path = project_root / ".env"
@@ -23,18 +25,13 @@ logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
 def ask_user_approval(sensitive_words: list[str]) -> bool:
     """
     Callback function used for human approval in interactive_mode.
-    """
-    while True:
-        user_question = input(
-            f"\nThese are the words found:\n{sensitive_words}\n\nAre they all correct (Y/N)? "
-        )
-
-        if user_question.upper().strip() == "Y":
-            return True
-        elif user_question.upper().strip() == "N":
-            return False
-        else:
-            print("⚠️ Invalid input. Please enter Y or N.")
+    """ 
+    console.print("\n[warning]These are the sensitive words found:[/warning]")
+    print(sensitive_words)
+    return questionary.confirm(
+        "Are they all correct?",
+        default=True
+    ).ask()
 
 @click.command()
 @click.option(
@@ -63,10 +60,10 @@ def ask_user_approval(sensitive_words: list[str]) -> bool:
 def main(level: str, auto: bool, use_llm: bool, mode: str, file: str, folder: str) -> None:
 
     if not file and not folder:
-        click.secho("Error: You must provide either --file or --folder.", fg="red")
+        console.print("[error]Error: You must provide either --file or --folder.[/error]")
         return
     if file and folder:
-        click.secho("Error: You cannot provide both --file and --folder.", fg="red")
+        console.print("[error]Error: You cannot provide both --file and --folder.[/error]")
         return
 
     config = AppConfig(
@@ -81,7 +78,7 @@ def main(level: str, auto: bool, use_llm: bool, mode: str, file: str, folder: st
     app = WaveRedactApplication(config=config, approval_callback=ask_user_approval)
     app.run()
 
-    click.secho("Thanks for using waveredact! 🌊", fg="cyan")
+    console.print("[info]Thanks for using waveredact! 🌊[/info]")
 
 
 if __name__ == "__main__":

@@ -2,6 +2,9 @@ import logging
 import os
 from pathlib import Path
 
+from waveredact.utils.console import console
+import logging
+
 logger = logging.getLogger(__name__)
 
 class IOAudioManager:
@@ -49,7 +52,7 @@ class IOAudioManager:
             extension = file_path.suffix.lower()
             
             if extension not in self.SUPPORTED_EXTENSIONS:
-                print(f"File ignored (Format not supported): {file_path.name}")
+                console.print(f"[warning]⚠️ File ignored (Format not supported): {file_path.name}[/warning]")
                 continue
             
             audio_files.append(file_path)
@@ -74,7 +77,7 @@ class IOAudioManager:
         output_filename = f"{name_without_extension}_censored{extension}"
         output_path = os.path.join(output_dir, output_filename)
         
-        logger.info("Exporting censored file...")
+        console.print("[info]Exporting censored file...[/info]")
 
         format_export = extension.replace(".", "")
 
@@ -85,14 +88,14 @@ class IOAudioManager:
             audio.export(output_path, format=format_export)
         except Exception as e:
             if format_export == "ogg":
-                logger.warning(f"Missing codec libvorbis. Using libopus")
+                console.print("[warning]⚠️ Missing codec libvorbis. Using libopus[/warning]")
                 audio.export(output_path, format="ogg", codec="libopus")
             else:
-                logger.error(f"Exportation error ({e}). Using .wav")
+                console.print(f"[error]❌ Exportation error ({e}). Using .wav[/error]")
                 base_name = os.path.splitext(output_path)[0]
                 fallback_path = f"{base_name}.wav"
                 audio.export(fallback_path, format="wav")
                 output_path = fallback_path
         
-        print(f"✅ File saved: {output_path}\n")
+        console.print(f"[success]✅ File saved: {output_path}[/success]\n")
         return output_path

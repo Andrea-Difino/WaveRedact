@@ -1,7 +1,7 @@
 import builtins
 from unittest.mock import patch
 
-from waveredact.utils.level import Levels, LevelSetter
+from waveredact.config.level import Levels, LevelSetter
 
 class TestLevels:
     def test_levels_labels_hierarchy(self):
@@ -36,12 +36,14 @@ class TestLevelSetter:
         setter = LevelSetter(interactive=False, level_name="unknown")
         assert setter.level == Levels.TOTAL
 
-    @patch("builtins.input", side_effect=["1"])
-    def test_level_setter_interactive_base(self, mock_input):
+    @patch("waveredact.config.level.questionary.select")
+    def test_level_setter_interactive_base(self, mock_select):
+        mock_select.return_value.ask.return_value = Levels.BASE
         setter = LevelSetter(interactive=True)
         assert setter.level == Levels.BASE
 
-    @patch("builtins.input", side_effect=["2"])
-    def test_level_setter_interactive_medium(self, mock_input):
+    @patch("waveredact.config.level.questionary.select")
+    def test_level_setter_interactive_medium(self, mock_select):
+        mock_select.return_value.ask.return_value = Levels.MEDIUM
         setter = LevelSetter(interactive=True)
         assert setter.level == Levels.MEDIUM

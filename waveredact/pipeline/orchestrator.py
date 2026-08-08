@@ -3,6 +3,8 @@ from typing import Callable, Dict, Set
 
 from waveredact.pipeline.mapper import ChunkMapper
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
+from waveredact.utils.console import console
+import rich.progress
 
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(message)s"
@@ -55,8 +57,7 @@ class Orchestrator:
         n_chunks = len(self.mappers)
         words_found: list[str] = []
 
-        for i in range(n_chunks):
-            print(f"Running chunk: {i + 1}")
+        for i in rich.progress.track(range(n_chunks), description="Extracting sensitive data...", console=console):
             if self.progress_callback:
                 percent = 40 + int((i / n_chunks) * 40)
                 self.progress_callback(
@@ -89,22 +90,16 @@ class Orchestrator:
                         chunk_ambiguous_list, full_locked_idx
                     )
                 else:
-                    logger.warning(
-                        "You answered 'N', but no LLM is configured to refine the search."
-                    )
-                    print(
-                        "💡 Hint: Restart the pipeline adding the '--use-llm' flag for better precision."
-                    )
-                    print(
-                        "Proceeding with the current redaction list to ensure data safety.\n"
-                    )
+                    console.print("[warning]⚠️-You answered 'N', but no LLM is configured to refine the search.[/warning]")
+                    console.print("[info]💡 Hint: Restart the pipeline adding the '--use-llm' flag for better precision.[/info]")
+                    console.print("[warning]Proceeding with the current redaction list to ensure data safety.\n[/warning]")
                     return ordered_idx
         else:
             if self.use_llm and self.data_pipeline.llm_extractors:
-                logger.info("Automatic mode: Executing LLM to maximize security...")
+                console.print("[info]Automatic mode: Executing LLM to maximize security...[/info]")
                 return self.run_llm_extraction(chunk_ambiguous_list, full_locked_idx)
             else:
-                logger.info("Fast mode: LLM bypassed.\n")
+                console.print("[info]Fast mode: LLM bypassed.\n[/info]")
                 return ordered_idx
 
     def run_llm_extraction(
@@ -123,10 +118,9 @@ class Orchestrator:
         checked_idx: Set[int] = set()
         n_chunks = len(self.mappers)
 
-        for i in range(n_chunks):
+        for i in rich.progress.track(range(n_chunks), description="Running LLM analysis...", console=console):
             chunk_ambiguous = chunk_ambiguous_list[i]
 
-            print(f"Running LLM for chunk: {i + 1}")
             if self.progress_callback:
                 percent = 80 + int((i / n_chunks) * 10)
                 self.progress_callback(
@@ -140,10 +134,11 @@ class Orchestrator:
         checked_idx.update(locked_idx)
         final_words_found = [self.iw_pair[idx] for idx in sorted(checked_idx)]
 
-        print(
-            f"\n🧠 [LLM Final Results] Sensitive words identified:\n{final_words_found}"
+        console.print(
+            "\n🧠 [info][LLM Final Results] Sensitive words identified:[/info]"
         )
-        logger.info("Trusting LLM extraction. Proceeding with redaction...")
+        print(final_words_found)
+        console.print("[success]✅ Trusting LLM extraction. Proceeding with redaction...[/success]")
 
         return sorted(checked_idx)
 

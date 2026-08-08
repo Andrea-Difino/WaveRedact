@@ -7,6 +7,7 @@ import zipfile
 import torch
 
 from waveredact.utils.path_utils import get_app_data_dir
+from waveredact.utils.console import console
 
 logger = logging.getLogger(__name__)
 
@@ -34,30 +35,29 @@ class GPUEnvironmentManager:
             self._inject_dlls()
 
         device = self.device
-        logger.info(f"Hardware detected for inference: {device.upper()}")
+        console.print(f"[info]Hardware detected for inference: {device.upper()}[/info]")
 
     def _download_and_extract_dlls(self) -> None:
-        logger.info("Downloading NVIDIA libraries (CUDA 12) for the GPU...")
+        with console.status("Downloading NVIDIA libraries (CUDA 12) for the GPU...", spinner="dots") as status:
+            url_dll = "https://github.com/ggml-org/llama.cpp/releases/download/b9538/cudart-llama-bin-win-cuda-12.4-x64.zip"
+            zip_dll_path = os.path.join(self.dll_folder, "cuda_dlls.zip")
 
-        url_dll = "https://github.com/ggml-org/llama.cpp/releases/download/b9538/cudart-llama-bin-win-cuda-12.4-x64.zip"
-        zip_dll_path = os.path.join(self.dll_folder, "cuda_dlls.zip")
+            urllib.request.urlretrieve(url_dll, zip_dll_path)
 
-        urllib.request.urlretrieve(url_dll, zip_dll_path)
+            status.update("Extracting libraries...")
+            with zipfile.ZipFile(zip_dll_path, 'r') as zip_ref:
+                zip_ref.extractall(self.dll_folder)
 
-        logger.info("Extracting libraries...")
-        with zipfile.ZipFile(zip_dll_path, 'r') as zip_ref:
-            zip_ref.extractall(self.dll_folder)
-
-        os.remove(zip_dll_path)
-        logger.info("NVIDIA libraries downloaded!")
+            os.remove(zip_dll_path)
+            console.print("[success]✅ NVIDIA libraries downloaded![/success]")
 
     def _inject_dlls(self) -> None:
         try:
             os.add_dll_directory(self.dll_folder)
             os.environ["PATH"] = f"{self.dll_folder};{os.environ.get('PATH', '')}"
-            logger.info("✅ [GPU Setup] DLL NVIDIA injected and ready to use.")
+            console.print("[success]✅ [GPU Setup] DLL NVIDIA injected and ready to use.[/success]")
         except Exception as e:
-            logger.warning(f"Impossible to inject DLLs : {e}")
+            console.print(f"[warning]⚠️ Failed to inject DLLs: {e}[/warning]")
 
     def get_device(self) -> str:
         """Detect best hardware available"""

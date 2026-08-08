@@ -4,8 +4,8 @@ import pytest
 from pydub import AudioSegment
 from pydub.generators import Sine
 
-from waveredact.utils.audio_censor import AudioCensor, AudioMaskTypes
-from waveredact.utils.audio_manager import IOAudioManager
+from waveredact.audio.audio_censor import AudioCensor, AudioMaskTypes
+from waveredact.audio.audio_manager import IOAudioManager
 
 class TestAudioCensor:
 
