@@ -35,7 +35,7 @@ class GPUEnvironmentManager:
             self._inject_dlls()
 
         device = self.device
-        console.print(f"[info]Hardware detected for inference: {device.upper()}[/info]")
+        print(f"Hardware detected for inference: {device.upper()}\n")
 
     def _download_and_extract_dlls(self) -> None:
         with console.status("Downloading NVIDIA libraries (CUDA 12) for the GPU...", spinner="dots") as status:
@@ -55,7 +55,7 @@ class GPUEnvironmentManager:
         try:
             os.add_dll_directory(self.dll_folder)
             os.environ["PATH"] = f"{self.dll_folder};{os.environ.get('PATH', '')}"
-            console.print("[success]✅ [GPU Setup] DLL NVIDIA injected and ready to use.[/success]")
+            logger.info("[success]✅ [GPU Setup] DLL NVIDIA injected and ready to use.[/success]")
         except Exception as e:
             console.print(f"[warning]⚠️ Failed to inject DLLs: {e}[/warning]")
 
