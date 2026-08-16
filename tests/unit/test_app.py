@@ -12,7 +12,8 @@ class TestWaveRedactApplication:
             use_llm=False,
             mode="beep",
             file="test.mp3",
-            folder=None
+            folder=None,
+            custom_labels=None
         )
         assert config.level == "base"
         assert config.auto is True
@@ -20,6 +21,7 @@ class TestWaveRedactApplication:
         assert config.mode == "beep"
         assert config.file == "test.mp3"
         assert config.folder is None
+        assert config.custom_labels is None
 
     def test_app_initialization(self):
         config = AppConfig(
@@ -28,7 +30,8 @@ class TestWaveRedactApplication:
             use_llm=False,
             mode="beep",
             file="test.mp3",
-            folder=None
+            folder=None,
+            custom_labels=None
         )
         callback = MagicMock()
         app = WaveRedactApplication(config=config, approval_callback=callback)
@@ -50,7 +53,8 @@ class TestWaveRedactApplication:
             use_llm=False,
             mode="beep",
             file="test.mp3",
-            folder=None
+            folder=None,
+            custom_labels=None
         )
 
         mock_io_instance = mock_io.return_value
@@ -85,7 +89,8 @@ class TestWaveRedactApplication:
             use_llm=False,
             mode="beep",
             file="test.mp3",
-            folder=None
+            folder=None,
+            custom_labels=None
         )
 
         mock_io_instance = mock_io.return_value
@@ -137,7 +142,8 @@ class TestWaveRedactApplication:
             use_llm=True,
             mode="silence",
             file="test.mp3",
-            folder=None
+            folder=None,
+            custom_labels=None
         )
 
         mock_io_instance = mock_io.return_value

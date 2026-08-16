@@ -57,7 +57,8 @@ def ask_user_approval(sensitive_words: list[str]) -> bool:
 @click.option('--mode', type=click.Choice(['beep', 'muted'], case_sensitive=False), default='muted', help='Censor mode')
 @click.option('--file', type=click.Path(exists=True, dir_okay=False), help='Specific audio file to process.')
 @click.option('--folder', type=click.Path(exists=True, file_okay=False), help='Folder containing audio files to process.')
-def main(level: str, auto: bool, use_llm: bool, mode: str, file: str, folder: str) -> None:
+@click.option('--custom-labels', type=click.Path(exists=True, dir_okay=False), help='Specific custom labels file for censor')
+def main(level: str, auto: bool, use_llm: bool, mode: str, file: str, folder: str, custom_labels: str) -> None:
 
     if not file and not folder:
         console.print("[error]Error: You must provide either --file or --folder.[/error]")
@@ -72,7 +73,8 @@ def main(level: str, auto: bool, use_llm: bool, mode: str, file: str, folder: st
         use_llm=use_llm,
         mode=mode,
         file=file,
-        folder=folder
+        folder=folder,
+        custom_labels=custom_labels
     )
 
     app = WaveRedactApplication(config=config, approval_callback=ask_user_approval)

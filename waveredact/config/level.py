@@ -1,4 +1,7 @@
 from enum import Enum
+from pathlib import Path
+import json
+import sys
 import questionary
 from waveredact.utils.console import console
 
@@ -50,7 +53,12 @@ class LevelSetter:
         level           - Selected Levels enum
         target_labels   - List of labels associated with the selected level
     """
-    def __init__(self, interactive: bool, level_name: str = ""):
+    def __init__(self, interactive: bool, level_name: str = "", custom_label_file: str | None = None):
+        if custom_label_file:
+            self.level = Levels.TOTAL
+            self.target_labels = self.parse_labels(custom_label_file, self.level.labels)
+            return
+        
         if not interactive:
             if level_name.lower() == "base":
                 self.level = Levels.BASE
@@ -59,9 +67,10 @@ class LevelSetter:
             else:
                 self.level = Levels.TOTAL
         else:
-            self.level: Levels = LevelSetter._ask_level()
+            self.level = self._ask_level()
             console.print("")
-        self.target_labels: list[str] = self.level.labels
+            
+        self.target_labels = self.level.labels
 
     @staticmethod
     def _ask_level() -> Levels:
@@ -83,4 +92,35 @@ class LevelSetter:
         ).ask()
         
         return answer
+
+    @staticmethod
+    def parse_labels(json_path: str, all_labels: list[str]) -> list[str]:
+
+        path_obj = Path(json_path).resolve()
+
+        if not path_obj.exists():
+            raise FileNotFoundError(f"Custom label file not found at: {path_obj}")
+
+        try:
+            with open(path_obj, 'r') as file:
+                labels = json.load(file)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"The file {json_path} is not a valid JSON. Error: {e}")
+
+        if not isinstance(labels, list):
+            raise TypeError("The custom JSON file must contain a list of strings (e.g., [\"email\", \"password\"]).")
+
+        if not all(isinstance(item, str) for item in labels):
+            raise ValueError("Invalid format: All elements inside the JSON list must be strings.")
+
+        custom_labels = set(labels)
+        full_labels = set(all_labels)
+
+        unsupported_labels = custom_labels.difference(full_labels)
+
+        if len(unsupported_labels) > 0:
+            raise ValueError(f"These labels are not supported by the model: {list(unsupported_labels)}")
+        
+        return labels
+
 
