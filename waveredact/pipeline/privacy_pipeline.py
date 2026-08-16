@@ -1,5 +1,3 @@
-from typing import List, Set, Tuple
-
 from waveredact.models.model import Model
 
 from .extractors.base_extractor import BaseExtractor
@@ -17,16 +15,16 @@ class DataPrivacyPipeline:
 
     def __init__(
         self,
-        simple_extractors: List[BaseExtractor],
+        simple_extractors: list[BaseExtractor],
         llm_extractor: Model | None = None,
     ):
-        self.simple_extractors: List[BaseExtractor] = simple_extractors
+        self.simple_extractors: list[BaseExtractor] = simple_extractors
 
-        self.llm_extractors: List[Model] = [llm_extractor] if llm_extractor else []
+        self.llm_extractors: list[Model] = [llm_extractor] if llm_extractor else []
 
     def extract_sensitive_data(
         self, mapper: ChunkMapper, lock_threshold: float = 0.99
-    ) -> Tuple[Set[int], Set[int]]:
+    ) -> tuple[set[int], set[int]]:
         """
         Call sequentially extractors inside simple_extractor and lock the idx of the sensitive data with a confidence higher than 0.99
 
@@ -35,10 +33,10 @@ class DataPrivacyPipeline:
             lock_threshold  - Threshold used to lock idx that must be redacted
 
         Returns:
-            Tuple with two sets. The first set has all the possible sensitive idx and the second only the locked ones
+            tuple with two sets. The first set has all the possible sensitive idx and the second only the locked ones
         """
-        total_idx: Set[int] = set()
-        locked_idx: Set[int] = set()
+        total_idx: set[int] = set()
+        locked_idx: set[int] = set()
 
         for extractor in self.simple_extractors:
             coords = extractor.extract(mapper.text)
@@ -53,21 +51,21 @@ class DataPrivacyPipeline:
         return total_idx, locked_idx
 
     def extract_sensitive_with_llm(
-        self, mapper: ChunkMapper, ambiguous_idx: List[int]
-    ) -> Set[int]:
+        self, mapper: ChunkMapper, ambiguous_idx: list[int]
+    ) -> set[int]:
         """
         Use LLM extractors to find sensitive data in the ambiguous indices.
 
         Params:
             mapper          - ChunkMapper containing chunk information
-            ambiguous_idx   - List of indices that are ambiguous
+            ambiguous_idx   - list of indices that are ambiguous
 
         Return:
-            Set of integers representing the final sensitive indices
+            set of integers representing the final sensitive indices
         """
         
 
-        total_idx: Set[int] = set()
+        total_idx: set[int] = set()
 
         for extractor in self.llm_extractors:
             idx = extractor.run_model(mapper.chunk, ambiguous_idx)

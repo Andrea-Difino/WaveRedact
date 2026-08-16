@@ -3,11 +3,11 @@ import multiprocessing
 from pathlib import Path
 
 import click
+import questionary
 from dotenv import load_dotenv
 
 from waveredact.app import AppConfig, WaveRedactApplication
 from waveredact.utils.console import console
-import questionary
 
 project_root = Path(__file__).resolve().parent.parent
 env_path = project_root / ".env"

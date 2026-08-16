@@ -1,8 +1,9 @@
+import json
 from enum import Enum
 from pathlib import Path
-import json
-import sys
+
 import questionary
+
 from waveredact.utils.console import console
 
 

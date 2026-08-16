@@ -1,4 +1,3 @@
-from typing import Dict, List
 
 
 class ChunkMapper:
@@ -10,7 +9,7 @@ class ChunkMapper:
         text            - The combined text string for the chunk
         char_mapping    - Dictionary mapping original indices to character start and end positions
     """
-    def __init__(self, chunk: Dict[int, str]):
+    def __init__(self, chunk: dict[int, str]):
         self.chunk = chunk
         self.text = ""
         self.char_mapping = {}
@@ -25,7 +24,7 @@ class ChunkMapper:
             self.char_mapping[original_idx] = (start_char, end_char)
             curr_char = end_char
 
-    def get_original_idxs(self, char_start: int, char_end: int) -> List[int]:
+    def get_original_idxs(self, char_start: int, char_end: int) -> list[int]:
         """Convert  char position in the true Whsiper IDs"""
         found_idxs = []
         for idx, (w_start, w_end) in self.char_mapping.items():

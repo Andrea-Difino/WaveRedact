@@ -165,6 +165,7 @@ waveredact --file path/to/audio.mp3 --use-llm
 - `--mode` defines how to censor the sensitive data.
   - `muted`replace sensitive data with silence. (default)
   - `beep` replace sensitive data with beep sound.
+- `--custom-labels` specifies a JSON file that contains a list of allowed custom labels
 
 ### Example workflow
 

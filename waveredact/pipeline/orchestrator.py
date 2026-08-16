@@ -1,10 +1,11 @@
 import logging
-from typing import Callable, Dict, Set
+from collections.abc import Callable
+
+import rich.progress
 
 from waveredact.pipeline.mapper import ChunkMapper
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
 from waveredact.utils.console import console
-import rich.progress
 
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s %(message)s"
@@ -26,7 +27,7 @@ class Orchestrator:
     def __init__(
         self,
         *,
-        index_word_pair: Dict[int, str],
+        index_word_pair: dict[int, str],
         mappers: list[ChunkMapper],
         data_pipeline: DataPrivacyPipeline,
         use_llm: bool = False,
@@ -49,8 +50,8 @@ class Orchestrator:
         Return:
             list of integers corresponding to the words to censor
         """
-        full_idx: Set[int] = set()
-        full_locked_idx: Set[int] = set()
+        full_idx: set[int] = set()
+        full_locked_idx: set[int] = set()
 
         chunk_ambiguous_list: list[list[int]] = []
 
@@ -103,7 +104,7 @@ class Orchestrator:
                 return ordered_idx
 
     def run_llm_extraction(
-        self, chunk_ambiguous_list: list[list[int]], locked_idx: Set[int]
+        self, chunk_ambiguous_list: list[list[int]], locked_idx: set[int]
     ) -> list[int]:
         """
         Use LLM to check the answers given by the GLiNER model and find missed sensitive words
@@ -115,7 +116,7 @@ class Orchestrator:
         Return:
             list of the final sensitive indices
         """
-        checked_idx: Set[int] = set()
+        checked_idx: set[int] = set()
         n_chunks = len(self.mappers)
 
         for i in rich.progress.track(range(n_chunks), description="Running LLM analysis...", console=console):
