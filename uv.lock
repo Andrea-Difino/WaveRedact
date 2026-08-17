@@ -1360,7 +1360,7 @@ wheels = [
 
 [[package]]
 name = "waveredact"
-version = "0.8.2"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "click" },

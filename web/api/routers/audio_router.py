@@ -16,10 +16,11 @@ async def process_audio(
     censor_mode: str = Form("muted"), 
     use_llm: bool = Form(False),
     client_id: Optional[str] = Form(None),
+    custom_labels: Optional[str] = Form(None),
     service: AudioProcessingService = Depends(get_audio_service)
 ):
     try:
-        result = await service.process_upload(file, level, censor_mode, use_llm, client_id)
+        result = await service.process_upload(file, level, censor_mode, use_llm, client_id, custom_labels)
         return result
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
