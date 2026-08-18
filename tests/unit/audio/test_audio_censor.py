@@ -1,11 +1,13 @@
-import os
 import math
+import os
+
 import pytest
 from pydub import AudioSegment
 from pydub.generators import Sine
 
 from waveredact.audio.audio_censor import AudioCensor, AudioMaskTypes
 from waveredact.audio.audio_manager import IOAudioManager
+
 
 class TestAudioCensor:
 

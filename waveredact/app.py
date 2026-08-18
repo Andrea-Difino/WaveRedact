@@ -2,15 +2,19 @@ import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional, Tuple
 
-from waveredact.utils.console import console
 from faster_whisper import WhisperModel
 from gliner2 import GLiNER2
 
+from waveredact.audio.audio_censor import AudioCensor, AudioMaskTypes
+from waveredact.audio.audio_manager import IOAudioManager
+from waveredact.config.level import LevelSetter
+from waveredact.core.gpu_setup import GPUEnvironmentManager
+from waveredact.core.memory_manager import MemoryManager
 from waveredact.factories.gliner_factory import GlinerFactory
 from waveredact.factories.whisper_factory import WhisperFactory
 from waveredact.models.gguf_model import GGUFModel
+from waveredact.pipeline.chunk import Chunker
 from waveredact.pipeline.extractors.gliner_extractor import GlinerExtractor
 from waveredact.pipeline.extractors.regex_extractor import RegexExtractor
 from waveredact.pipeline.mapper import ChunkMapper
@@ -18,12 +22,7 @@ from waveredact.pipeline.orchestrator import Orchestrator
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
 from waveredact.services.llama_server import LlamaServerService
 from waveredact.services.transcribe import TranscribeService
-from waveredact.audio.audio_censor import AudioCensor, AudioMaskTypes
-from waveredact.audio.audio_manager import IOAudioManager
-from waveredact.pipeline.chunk import Chunker
-from waveredact.core.gpu_setup import GPUEnvironmentManager
-from waveredact.config.level import LevelSetter
-from waveredact.core.memory_manager import MemoryManager
+from waveredact.utils.console import console
 
 logger = logging.getLogger(__name__)
 
@@ -33,14 +32,15 @@ class AppConfig:
     auto: bool
     use_llm: bool
     mode: str
-    file: Optional[str]
-    folder: Optional[str]
+    file: str | None
+    folder: str | None
+    custom_labels: str | None
 
 @dataclass
 class RedactResult:
     filename: str
     censored_path: str
-    sensitive_words: List[str]
+    sensitive_words: list[str]
 
 class WaveRedactApplication:
     def __init__(
@@ -64,7 +64,7 @@ class WaveRedactApplication:
         self.REPO_ID = "bartowski/Qwen2.5-7B-Instruct-GGUF"
         self.SERVER_PORT = 8080
 
-    def run(self) -> List[RedactResult]:
+    def run(self) -> list[RedactResult]:
         if self.gpu_setup is None:
             gpu_setup = GPUEnvironmentManager()
         else:
@@ -81,15 +81,18 @@ class WaveRedactApplication:
         if self.config.file:
             audio_manager = IOAudioManager(input_path=self.config.file, is_file=True)
         else:
-            audio_manager = IOAudioManager(input_path=self.config.folder, is_file=False)
+            audio_manager = IOAudioManager(input_path=self.config.folder, is_file=False) # type: ignore
             
         audios = audio_manager.get_audio()
         if not audios:
             console.print("[warning]⚠️ There's no audio to process. Terminating process...[/warning]")
             return []
+        
+        model = None
+        server = None
 
         try:
-            index_intervals: List[Tuple[Path, dict[int, str], dict[int, str]]] = []
+            index_intervals: list[tuple[Path, dict[int, str], dict[int, str]]] = []
             memory_manager = MemoryManager()
 
             for audio_path in audios:
@@ -105,9 +108,6 @@ class WaveRedactApplication:
             del whisper_model
             del transcribe_serv
             memory_manager.clean_memory()
-
-            model = None
-            server = None
             
             if self.config.use_llm:
                 model = GGUFModel(self.MODEL_NAME, self.REPO_ID, server_port=self.SERVER_PORT)
@@ -120,7 +120,7 @@ class WaveRedactApplication:
                     model = None
                     server = None
 
-            levels_setter = LevelSetter(not self.config.auto, level_name=self.config.level)
+            levels_setter = LevelSetter(not self.config.auto, level_name=self.config.level, custom_label_file=self.config.custom_labels)
                         
             if self.gliner_model is None:
                 gliner_factory = GlinerFactory(target_labels=levels_setter.target_labels)
@@ -185,6 +185,12 @@ class WaveRedactApplication:
                 ))
                 
             return results
+        except (FileNotFoundError, ValueError) as e:
+            console.print(f"[bold red]❌ Configuration Error:[/bold red] {e}")
+            return []
+        except Exception as e:
+            console.print(f"[bold red]❌ An unexpected error occurred:[/bold red] {e}")
+            return []
         finally:
             if server:
                 server.stop_server()

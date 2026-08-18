@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 
 from waveredact.utils.console import console
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +14,11 @@ class IOAudioManager:
         SUPPORTED_EXTENSIONS - Set of supported audio file formats
         path                 - Absolute path to the audio directory
     """
-    SUPPORTED_EXTENSIONS = {'.mp3', '.wav', '.flac', '.m4a', '.ogg'}
+    
 
     def __init__(self, input_path: str = "audio", is_file: bool = False):
+        self.SUPPORTED_EXTENSIONS = {'.mp3', '.wav', '.flac', '.m4a', '.ogg'}
+
         path_obj = Path(input_path)
         if not path_obj.is_absolute():
             path_obj = Path.cwd() / input_path

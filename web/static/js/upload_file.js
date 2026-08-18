@@ -14,6 +14,34 @@ function getActiveCensorMode() {
     return activeModeButton?.value || 'muted';
 }
 
+let customLabelsSelected = new Set();
+
+function initCustomLabels() {
+    const container = document.getElementById('customLabelsList');
+    if (!container) return;
+    if (container.children.length > 0) return; // Already initialized
+
+    const allLabels = [...levelLabels.base, ...levelLabels.medium, ...levelLabels.total];
+    allLabels.forEach(label => {
+        const span = document.createElement('span');
+        span.className = 'label-badge muted';
+        span.style.cursor = 'pointer';
+        span.innerText = label;
+        span.onclick = () => {
+            if (customLabelsSelected.has(label)) {
+                customLabelsSelected.delete(label);
+                span.classList.remove('highlight');
+                span.classList.add('muted');
+            } else {
+                customLabelsSelected.add(label);
+                span.classList.remove('muted');
+                span.classList.add('highlight');
+            }
+        };
+        container.appendChild(span);
+    });
+}
+
 const levelLabels = {
     base: [
         "password", "api_key", "secret", "access_token", "recovery_code",
@@ -38,7 +66,28 @@ function refreshLabels() {
     setTimeout(() => {
         const level = getActiveSecurityLevel();
         const container = document.getElementById('labelsContainer');
+        const customPanel = document.getElementById('customLabelsPanel');
+        
+        if (customPanel) {
+            if (level === 'custom') {
+                customPanel.style.display = 'block';
+                initCustomLabels();
+            } else {
+                customPanel.style.display = 'none';
+            }
+        }
+
         if (!container) return;
+
+        if (level === 'custom') {
+            container.innerHTML = `<div class="label-group">
+                <h5>Custom Labels</h5>
+                <div class="labels-content">
+                    <span class="label-badge muted">See main panel for selection.</span>
+                </div>
+            </div>`;
+            return;
+        }
 
         let html = '';
 
@@ -143,6 +192,16 @@ async function handleFileUpload(event) {
     const llmBtn = document.querySelector('.llm-tabs button.active');
     if (llmBtn) {
         formData.append("use_llm", llmBtn.value === 'true');
+    }
+    if (getActiveSecurityLevel() === 'custom') {
+        const labelsArray = Array.from(customLabelsSelected);
+        if (labelsArray.length === 0) {
+            alert("Please select at least one custom label.");
+            if (socket) socket.close();
+            hideProcessingPanel();
+            return;
+        }
+        formData.append("custom_labels", JSON.stringify(labelsArray));
     }
 
     try {

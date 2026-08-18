@@ -92,6 +92,17 @@
                         <button data-level="tsunami" value="total" onclick="refreshLabels()">
                             Tsunami
                         </button>
+
+                        <button data-level="custom" value="custom" onclick="refreshLabels()">
+                            Custom
+                        </button>
+                    </div>
+                </div>
+
+                <div id="customLabelsPanel" style="display: none; width: 100%; max-width: 38rem; background: var(--btn-bg); border: 1px solid var(--btn-border); border-radius: 16px; padding: 20px; backdrop-filter: blur(15px); margin-top: -16px;">
+                    <span class="section-title">Select Custom Labels</span>
+                    <div id="customLabelsList" class="labels-content" style="justify-content: center; margin-top: 12px; gap: 8px;">
+                        <!-- Filled by JS -->
                     </div>
                 </div>
 
