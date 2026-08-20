@@ -79,6 +79,8 @@ omit = [
 dev = [
     "pytest>=9.1.0",
     "pytest-cov>=7.1.0",
+    "datasets>=3.3.0",
+    "Faker>=33.3.0"
 ]
 
 [[tool.uv.index]]
