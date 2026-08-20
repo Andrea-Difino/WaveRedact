@@ -139,7 +139,7 @@ class WaveRedactApplication:
                 gliner_threshold,
             )
                         
-            regex_extractor = RegexExtractor()
+            regex_extractor = RegexExtractor(levels_setter.target_labels)
                         
             privacy_pipeline = DataPrivacyPipeline(
                 simple_extractors=[regex_extractor, gliner_extractor],

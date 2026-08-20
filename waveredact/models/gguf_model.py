@@ -125,7 +125,7 @@ class GGUFModel(Model):
                         for real_id, real_word in chunk.items():
                             if reported_word in real_word:
                                 list_sensitive_ids.append(real_id)
-                                print("ID recovered")
+                                logger.warning("ID recovered")
                                 break
         
         return list_sensitive_ids
@@ -133,9 +133,9 @@ class GGUFModel(Model):
     def run_model(self, chunk: Dict[int, str], ambiguous_idx: list[int] | None) -> list[int]:
         print("[STEP 3] Using LLM")
         
-        couple_str = "".join([f"[{k}] {v}\n" for k, v in chunk.items()])
+        couple_str = "".join([f"[{k}] {v.replace(chr(10), ' ').replace(chr(13), '')}\n" for k, v in chunk.items()])
         user_prompt = self.user_prompt.format(labels=self.labels, ambiguous=ambiguous_idx, idx_couples=couple_str)
-        
+
         try:
             response = self.client.chat.completions.create(
                 model="local-model",
@@ -143,8 +143,7 @@ class GGUFModel(Model):
                     {"role": "system", "content": self.sys_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                temperature=0.0, 
-                response_format={"type": "json_object"} 
+                temperature=0.0
             )
             
             text_response = response.choices[0].message.content

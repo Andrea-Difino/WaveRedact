@@ -27,9 +27,9 @@ class GlinerExtractor(BaseExtractor):
 
         extracted_tuples = set()
 
-        for label, entities_list in entities_dict.items():
+        for entities_list in entities_dict.values():
             for entity in entities_list:
                 score = float(entity.get("confidence", 0.0))
                 extracted_tuples.add((entity["start"], entity["end"], score))
 
-        return sorted(list(extracted_tuples), key=lambda x: x[0])
+        return sorted(extracted_tuples, key=lambda x: x[0])

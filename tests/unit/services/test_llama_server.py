@@ -109,7 +109,8 @@ class TestLlamaServerService:
     @patch(f"{MODULE_PATH}.LlamaServerService._find_executable", return_value="/fake/exe")
     @patch(f"{MODULE_PATH}.subprocess.Popen")
     @patch(f"{MODULE_PATH}.requests.get")
-    def test_start_server_success(self, mock_get, mock_popen, mock_find_exe, mock_atexit):
+    @patch(f"{MODULE_PATH}.LlamaServerService._is_port_in_use", return_value=False)
+    def test_start_server_success(self, mock_is_port_in_use, mock_get, mock_popen, mock_find_exe, mock_atexit):
         # Prepariamo la sequenza esatta di risposte che requests.get dovrà restituire
         mock_api = MagicMock()
         mock_api.json.return_value = {"tag_name": "v1.0"}
@@ -134,8 +135,9 @@ class TestLlamaServerService:
     @patch(f"{MODULE_PATH}.LlamaServerService._find_executable", return_value="/fake/exe")
     @patch(f"{MODULE_PATH}.subprocess.Popen")
     @patch(f"{MODULE_PATH}.requests.get")
-    @patch(f"{MODULE_PATH}.time.sleep") 
-    def test_start_server_timeout(self, mock_sleep, mock_get, mock_popen, mock_find_exe, mock_atexit):
+    @patch(f"{MODULE_PATH}.time.sleep")
+    @patch(f"{MODULE_PATH}.LlamaServerService._is_port_in_use", return_value=False)
+    def test_start_server_timeout(self, mock_is_port_in_use, mock_sleep, mock_get, mock_popen, mock_find_exe, mock_atexit):
         mock_popen.return_value = MagicMock()
 
         # Generiamo fallimenti continui (1 per l'API in init che andrà in fallback, 30 per il timeout)

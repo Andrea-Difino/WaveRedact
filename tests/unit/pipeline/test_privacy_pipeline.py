@@ -37,7 +37,7 @@ class TestPrivacyPipeline:
                 return [(0, 4, 0.5)]
 
         pipeline = module.DataPrivacyPipeline(
-            simple_extractors=[RegexExtractor(), FakeSimpleExtractor()],
+            simple_extractors=[RegexExtractor(["email", "iban", "postal_code"]), FakeSimpleExtractor()],
             llm_extractor=None,
         )
 
