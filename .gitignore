@@ -187,9 +187,6 @@ files/*
 test_result.csv
 
 
-tests/evaluate_pipeline.py
-tests/evaluate_baseline.py
-tests/gliner_test/*
 tests/benchmark_data/*
-tests/maker_model_test/*
+tests/advanced_censor_test/*
 test_imgs/

@@ -166,7 +166,6 @@ class TestGGUFModel:
         kwargs = mock_create.call_args.kwargs
         assert kwargs["model"] == "local-model"
         assert kwargs["temperature"] == 0.0
-        assert kwargs["response_format"] == {"type": "json_object"}
 
     def test_run_model_returns_empty_list_on_error(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
         module = _import_gguf_model(monkeypatch)

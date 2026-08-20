@@ -71,7 +71,7 @@ class AudioCensor:
             Path to the saved censored audio file
         """
 
-        console.print(f"[info]Loading audio for censor: {input_path}[/info]")
+        console.print(f"🎵 [info]Loading audio for censor: {input_path}[/info]")
         try:
             audio = AudioSegment.from_file(input_path)
         except FileNotFoundError:

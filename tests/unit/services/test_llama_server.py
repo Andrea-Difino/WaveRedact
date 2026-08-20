@@ -34,7 +34,6 @@ class TestLlamaServerService:
             mock_get.return_value.json.return_value = {"tag_name": "v1.0"}
             service = LlamaServerService("fake_model.gguf")
 
-        # Verifichiamo che get() sia stato chiamato solo 1 volta (per le API) e non 2 (per il download)
         assert mock_get.call_count == 1
         assert service.exe_path == os.path.join("/fake/path", "llama-server.exe")
 
@@ -54,7 +53,6 @@ class TestLlamaServerService:
             [("/fake/path", [], ["llama-server.exe"])]
         ]
 
-        # Simuliamo una risposta valida sia per il JSON delle API sia per i chunk del file in download
         mock_response = MagicMock()
         mock_response.json.return_value = {"tag_name": "v1.0"}
         mock_response.iter_content.return_value = [b"chunk_dati"]
@@ -63,7 +61,7 @@ class TestLlamaServerService:
         service = LlamaServerService("fake_model.gguf")
 
         mock_makedirs.assert_called_once_with(service.destination_folder, exist_ok=True)
-        # Chiamato 2 volte: una per l'API (_get_os_config) e una per il download (_init_server)
+
         assert mock_get.call_count == 2 
         mock_file_open.assert_called_once_with(os.path.join(service.destination_folder, "llama_exe.zip"), 'wb')
         mock_zip.assert_called_once()
@@ -109,15 +107,14 @@ class TestLlamaServerService:
     @patch(f"{MODULE_PATH}.LlamaServerService._find_executable", return_value="/fake/exe")
     @patch(f"{MODULE_PATH}.subprocess.Popen")
     @patch(f"{MODULE_PATH}.requests.get")
-    def test_start_server_success(self, mock_get, mock_popen, mock_find_exe, mock_atexit):
-        # Prepariamo la sequenza esatta di risposte che requests.get dovrà restituire
+    @patch(f"{MODULE_PATH}.LlamaServerService._is_port_in_use", return_value=False)
+    def test_start_server_success(self, mock_is_port_in_use, mock_get, mock_popen, mock_find_exe, mock_atexit):
         mock_api = MagicMock()
         mock_api.json.return_value = {"tag_name": "v1.0"}
         
         mock_health_ok = MagicMock()
         mock_health_ok.status_code = 200
         
-        # Sequenza: 1. API Init, 2. Server ancora spento (ConnectionError), 3. Server pronto (200)
         mock_get.side_effect = [mock_api, requests.exceptions.ConnectionError, mock_health_ok]
         
         service = LlamaServerService("fake_model.gguf")
@@ -134,11 +131,11 @@ class TestLlamaServerService:
     @patch(f"{MODULE_PATH}.LlamaServerService._find_executable", return_value="/fake/exe")
     @patch(f"{MODULE_PATH}.subprocess.Popen")
     @patch(f"{MODULE_PATH}.requests.get")
-    @patch(f"{MODULE_PATH}.time.sleep") 
-    def test_start_server_timeout(self, mock_sleep, mock_get, mock_popen, mock_find_exe, mock_atexit):
+    @patch(f"{MODULE_PATH}.time.sleep")
+    @patch(f"{MODULE_PATH}.LlamaServerService._is_port_in_use", return_value=False)
+    def test_start_server_timeout(self, mock_is_port_in_use, mock_sleep, mock_get, mock_popen, mock_find_exe, mock_atexit):
         mock_popen.return_value = MagicMock()
 
-        # Generiamo fallimenti continui (1 per l'API in init che andrà in fallback, 30 per il timeout)
         mock_get.side_effect = requests.exceptions.ConnectionError
 
         service = LlamaServerService("fake_model.gguf")

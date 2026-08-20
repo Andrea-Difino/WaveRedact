@@ -139,7 +139,6 @@ class Orchestrator:
             "\n🧠 [info][LLM Final Results] Sensitive words identified:[/info]"
         )
         print(final_words_found)
-        console.print("[success]✅ Trusting LLM extraction. Proceeding with redaction...[/success]")
 
         return sorted(checked_idx)
 
