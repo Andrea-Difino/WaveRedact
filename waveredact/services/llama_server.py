@@ -54,16 +54,23 @@ class LlamaServerService:
 
     def _get_os_config(self) -> tuple[str, str]:
         """Use Github API to obtain the exe file and the URL for the last available release"""
-        api_url = "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest"
+        api_url = "https://api.github.com/repos/ggml-org/llama.cpp/releases"
         
         try:
             req = requests.get(api_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
             req.raise_for_status()
             data = req.json()
-                
-            latest_tag = data.get("tag_name")
+            
+            latest_tag = None
+            if isinstance(data, list):
+                for release in data:
+                    tag = release.get("tag_name", "")
+                    if tag.startswith("b"):
+                        latest_tag = tag
+                        break
+                        
             if not latest_tag:
-                raise ValueError("Release tag not found")
+                raise ValueError("Valid 'b' release tag not found")
             
         except Exception as e:
             console.print(f"[warning]⚠️ Failed to contact Github API ({e}). Using version b9895 as fallback.[/warning]")
@@ -182,7 +189,7 @@ class LlamaServerService:
             stderr=subprocess.DEVNULL
         )
 
-        server_ready = False
+        server_ready = False 
         with console.status("Waiting for Llama server to be ready...", spinner="dots"):
             for _ in range(100):
                 try:
@@ -191,7 +198,8 @@ class LlamaServerService:
                         server_ready = True
                         break
                 except requests.exceptions.ConnectionError:
-                    time.sleep(1)
+                    pass
+                time.sleep(1)
         
         if not server_ready:
             console.print("[error]❌ Server didn't start in time[/error]")
