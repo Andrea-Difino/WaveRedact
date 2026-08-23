@@ -29,7 +29,7 @@ class GlinerFactory(Factory):
         target_labels: list[str],
         model_id: str = "fastino/gliner2-privacy-filter-PII-multi",
         cache_dir: str = "",
-        threshold: float = 0.54,
+        threshold: float = 0.50,
     ):
         self.model_id = model_id
         self.threshold = threshold

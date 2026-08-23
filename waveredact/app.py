@@ -128,7 +128,7 @@ class WaveRedactApplication:
                 gliner_threshold = gliner_factory.threshold
             else:
                 gliner_model = self.gliner_model
-                gliner_threshold = 0.54
+                gliner_threshold = 0.50
 
             if model:
                 model.labels = levels_setter.target_labels
