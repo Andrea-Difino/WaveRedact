@@ -94,8 +94,27 @@ class GGUFModel(Model):
                 return json.loads(json_match.group(0))
             except json.JSONDecodeError as e:
                 logger.warning(f"Failed to parse cleaned JSON: {e}")
+
+                fallback_data = {"word_analysis": []}
+                
+                blocks = re.findall(r'\{[^{}]*\}', json_match.group(0))
+                for block in blocks:
+                    id_match = re.search(r'"id"\s*:\s*(\d+)', block)
+                    word_match = re.search(r'"word"\s*:\s*"([^"]+)"', block)
+                    action_match = re.search(r'"action"\s*:\s*"([^"]+)"', block)
+                    
+                    if id_match and word_match and action_match:
+                        fallback_data["word_analysis"].append({
+                            "id": int(id_match.group(1)),
+                            "word": word_match.group(1),
+                            "action": action_match.group(1).upper()
+                        })
+                
+                if fallback_data["word_analysis"]:
+                    logger.warning(f"Recovered {len(fallback_data['word_analysis'])} items using Regex Fallback!")
+                    return fallback_data
+                    
                 return None
-        return None
 
     def _extract_ids_with_healing(self, parsed_data: Dict, chunk: Dict[int, str]) -> list[int]:
         """
@@ -131,8 +150,6 @@ class GGUFModel(Model):
         return list_sensitive_ids
 
     def run_model(self, chunk: Dict[int, str], ambiguous_idx: list[int] | None) -> list[int]:
-        print("[STEP 3] Using LLM")
-        
         couple_str = "".join([f"[{k}] {v.replace(chr(10), ' ').replace(chr(13), '')}\n" for k, v in chunk.items()])
         user_prompt = self.user_prompt.format(labels=self.labels, ambiguous=ambiguous_idx, idx_couples=couple_str)
 
