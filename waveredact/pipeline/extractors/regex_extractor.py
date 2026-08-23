@@ -33,5 +33,4 @@ class RegexExtractor(BaseExtractor):
             self.total_regex = r'(?!x)x'
             
     def extract(self, text: str) -> List[Tuple[int, int, float]]:
-        print("\n[STEP 1] Using REGEX extractor")
         return [(match.start(), match.end(), 1.0) for match in re.finditer(self.total_regex, text)]
