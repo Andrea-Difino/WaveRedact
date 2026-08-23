@@ -23,7 +23,7 @@ class DataPrivacyPipeline:
         self.llm_extractors: list[Model] = [llm_extractor] if llm_extractor else []
 
     def extract_sensitive_data(
-        self, mapper: ChunkMapper, lock_threshold: float = 0.95
+        self, mapper: ChunkMapper, lock_threshold: float = 0.75
     ) -> tuple[set[int], set[int]]:
         """
         Call sequentially extractors inside simple_extractor and lock the idx of the sensitive data with a confidence higher than 0.95
