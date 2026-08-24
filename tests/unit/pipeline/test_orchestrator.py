@@ -58,7 +58,7 @@ class TestOrchestrator:
         privacy_module, orchestrator_module = _import_orchestrator(monkeypatch)
         llm_model = MagicMock()
 
-        llm_model.run_model.return_value = [0]
+        llm_model.run_model.return_value = [0, 1]
         
         test_chunk = {0: "name", 1: "token"}
         
@@ -71,9 +71,9 @@ class TestOrchestrator:
             interactive_mode=False,
         )
 
-        assert orchestrator.run_audio_chunks() == [0]
+        assert orchestrator.run_audio_chunks() == [0, 1]
 
-        llm_model.run_model.assert_called_once_with(test_chunk, [0, 1])
+        llm_model.run_model.assert_called_once_with(test_chunk, [0])
 
     def test_run_audio_chunks_bypasses_llm_in_interactive_mode_when_missing(self, monkeypatch: pytest.MonkeyPatch):
         privacy_module, orchestrator_module = _import_orchestrator(monkeypatch)

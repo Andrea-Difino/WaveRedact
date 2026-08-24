@@ -20,7 +20,6 @@ class GlinerExtractor(BaseExtractor):
         self.model = model
 
     def extract(self, text: str) -> List[Tuple[int, int, float]]:
-        print("[STEP 2] Using GLiNER2 extractor")
         output = self.model.extract_entities(text, self.target_labels, threshold=self.threshold, include_spans=True, include_confidence=True)
 
         entities_dict = output.get("entities", {})

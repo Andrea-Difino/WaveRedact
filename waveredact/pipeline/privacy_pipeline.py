@@ -23,10 +23,10 @@ class DataPrivacyPipeline:
         self.llm_extractors: list[Model] = [llm_extractor] if llm_extractor else []
 
     def extract_sensitive_data(
-        self, mapper: ChunkMapper, lock_threshold: float = 0.99
+        self, mapper: ChunkMapper, lock_threshold: float = 0.75
     ) -> tuple[set[int], set[int]]:
         """
-        Call sequentially extractors inside simple_extractor and lock the idx of the sensitive data with a confidence higher than 0.99
+        Call sequentially extractors inside simple_extractor and lock the idx of the sensitive data with a confidence higher than 0.95
 
         Params:
             mapper          - ChunkMapper that preserves all the information and word-idx correspondence of a chunk
@@ -63,7 +63,6 @@ class DataPrivacyPipeline:
         Return:
             set of integers representing the final sensitive indices
         """
-        
 
         total_idx: set[int] = set()
 
