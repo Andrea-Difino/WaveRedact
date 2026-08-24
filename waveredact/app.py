@@ -60,7 +60,7 @@ class WaveRedactApplication:
         self.gliner_model = gliner_model
         self.gpu_setup = gpu_setup
         
-        self.MODEL_NAME = "Qwen2.5-7B-Instruct-Q5_K_M.gguf"
+        self.MODEL_NAME = "Qwen2.5-7B-Instruct-Q4_K_M.gguf"
         self.REPO_ID = "bartowski/Qwen2.5-7B-Instruct-GGUF"
         self.SERVER_PORT = 8080
 
