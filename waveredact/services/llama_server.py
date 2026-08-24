@@ -205,7 +205,7 @@ class LlamaServerService:
             console.print("[error]❌ Server didn't start in time[/error]")
             raise RuntimeError("Server didn't start in time")
 
-        console.print("[success]✅ Server ready[/success]")
+        console.print("[success]✅ Server ready[/success]\n")
 
     def _get_optimal_ngl(self) -> str:
         """Dinamically process the number of layer to load in the GPU"""

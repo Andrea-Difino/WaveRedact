@@ -133,12 +133,12 @@ class Orchestrator:
             checked_idx.update(res)
 
         checked_idx.update(locked_idx)
-        final_words_found = [self.iw_pair[idx] for idx in sorted(checked_idx)]
+        #final_words_found = [self.iw_pair[idx] for idx in sorted(checked_idx)]
 
-        console.print(
-            "\n🧠 [info][LLM Final Results] Sensitive words identified:[/info]"
-        )
-        print(final_words_found)
+        #console.print(
+        #    "\n🧠 [info][LLM Final Results] Sensitive words identified:[/info]"
+        #)
+        #print(final_words_found)
 
         return sorted(checked_idx)
 
