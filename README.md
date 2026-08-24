@@ -217,15 +217,7 @@ When processing finishes, the CLI prints the path of the generated file. You wil
 
 ## Performance & Benchmarks
 
-WaveRedact has been evaluated against a synthetic "Golden Dataset" of 120 diverse phrases containing multiple categories of PII across different contexts. The architecture provides two modes depending on your security needs:
-
-| Mode | Precision | Recall | F1-Score |
-| :--- | :---: | :---: | :---: |
-| **Fast Mode** (Regex + GLiNER2) | 44.04% | 39.55% | 41.68% |
-| **Max Security** (Regex + GLiNER2 + LLM) | 68.82% | 90.05% | 78.02% |
-
-**Why the LLM makes a difference:**
-As shown in the benchmarks, while compact models (GLiNER2) are incredibly fast, they can sometimes over-censor generic words (False Positives) or miss highly ambiguous context. By adding the local LLM as a final verification layer, WaveRedact actively fixes hallucinations and guarantees maximum surgical precision, ensuring you only redact what is truly sensitive.
+I am currently in the process of running extensive benchmarks for the new architecture. Because the pipeline is strictly offline and relies heavily on local AI inference, evaluating the models (especially the 7B LLMs) on local hardware is extremely time-consuming. Thank you for your patience while I gather and validate the final metrics.
 
 ## 🙏 Acknowledgments & Core Technologies
 
