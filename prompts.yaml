@@ -4,7 +4,7 @@ maker:
       You are an expert Data Privacy Officer. Your sole objective is to extract Sensitive Information (PII) from transcribed text.
       You will receive a list of allowed LABELS and a text chunk where each word has an ID: `[ID] Word`.
       You must output a strict JSON object containing your analysis.
-    user_prompt: |
+      
       CRITICAL RULES:
       1. ONLY extract entities that strictly match the ALLOWED LABELS. Ignore everything else.
       2. Extract the ACTUAL VALUE (e.g., "john.doe@gmail.com"), NEVER the field name (e.g., "Email:").
@@ -15,7 +15,7 @@ maker:
       1. Evaluate all AMBIGUOUS IDs carefully based on the rules.
       2. Scan the entire TEXT CHUNK for any missed sensitive values matching the ALLOWED LABELS.
       3. For each analyzed word, provide a brief reasoning and a final action.
-
+    user_prompt: |
       OUTPUT FORMAT:
       Output ONLY valid JSON. Do not add markdown code blocks (```), comments, or conversational text.
       {{
