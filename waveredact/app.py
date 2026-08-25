@@ -120,10 +120,11 @@ class WaveRedactApplication:
                 REPO_ID = "bartowski/Qwen2.5-7B-Instruct-GGUF"
 
             
-            if self.config.use_llm:        
+            if self.config.use_llm:
+                model = GGUFModel(MODEL_NAME, REPO_ID, server_port=self.SERVER_PORT)        
+
                 try:
-                    server = LlamaServerService(MODEL_NAME, server_port=self.SERVER_PORT, device=gpu_setup.device)
-                    model = GGUFModel(MODEL_NAME, REPO_ID, server_port=self.SERVER_PORT)
+                    server = LlamaServerService(MODEL_NAME, server_port=self.SERVER_PORT, device=gpu_setup.device)    
                     server.start_server()
                 except Exception as exc:
                     logger.warning("LLM server unavailable, continuing without LLM: %s", exc)

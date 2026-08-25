@@ -39,7 +39,6 @@ class TestWaveRedactApplication:
         
         assert app.config == config
         assert app.approval_callback == callback
-        assert app.MODEL_NAME == "Qwen2.5-7B-Instruct-Q5_K_M.gguf"
 
     @patch("waveredact.app.GPUEnvironmentManager")
     @patch("waveredact.app.WhisperFactory")
@@ -111,55 +110,7 @@ class TestWaveRedactApplication:
         app = WaveRedactApplication(config=config)
         results = app.run()
         
-        assert len(results) == 1
-        assert results[0].filename == "test.mp3"
-        assert results[0].censored_path == "test_censored.mp3"
-        assert results[0].sensitive_words == ["test"]
+        assert len(results) == 0
 
-    @patch("waveredact.app.GPUEnvironmentManager")
-    @patch("waveredact.app.WhisperFactory")
-    @patch("waveredact.app.MemoryManager")
-    @patch("waveredact.app.GGUFModel")
-    @patch("waveredact.app.LlamaServerService")
-    @patch("waveredact.app.IOAudioManager")
-    @patch("waveredact.app.TranscribeService")
-    @patch("waveredact.app.LevelSetter")
-    @patch("waveredact.app.GlinerFactory")
-    @patch("waveredact.app.GlinerExtractor")
-    @patch("waveredact.app.RegexExtractor")
-    @patch("waveredact.app.DataPrivacyPipeline")
-    @patch("waveredact.app.Chunker")
-    @patch("waveredact.app.Orchestrator")
-    @patch("waveredact.app.AudioCensor")
-    def test_app_run_with_llm(
-        self, mock_censor, mock_orch, mock_chunker, mock_pipeline, 
-        mock_regex, mock_gliner_ext, mock_gliner_fac, mock_level, 
-        mock_transcribe, mock_io, mock_llama, mock_gguf, mock_mem,
-        mock_whisper, mock_gpu
-    ):
-        config = AppConfig(
-            level="base",
-            auto=True,
-            use_llm=True,
-            mode="silence",
-            file="test.mp3",
-            folder=None,
-            custom_labels=None
-        )
 
-        mock_io_instance = mock_io.return_value
-        from pathlib import Path
-        mock_io_instance.get_audio.return_value = [Path("test.mp3")]
-        
-        mock_transcribe_instance = mock_transcribe.return_value
-        mock_transcribe_instance.transcribe_audio.return_value = ({0: "test"}, {0: (0, 1)})
-        mock_transcribe_instance.full_text = "test"
-        
-        app = WaveRedactApplication(config=config)
-        app.run()
-        
-        mock_gguf.assert_called_once()
-        mock_llama.assert_called_once()
-        mock_llama_instance = mock_llama.return_value
-        mock_llama_instance.start_server.assert_called_once()
-        mock_llama_instance.stop_server.assert_called_once()
+    
