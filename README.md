@@ -53,9 +53,9 @@ WaveRedact relies on three main AI components. Below is the breakdown of the mod
 | :--- | :--- | :---: | :--- |
 | **Transcription** | `faster-whisper` (default: `large-v3-turbo`) | ~1.5 GB | CPU or GPU (CUDA/MPS) |
 | **PII Extraction** | `fastino/gliner2-privacy-filter-PII-multi` | ~1.2 GB | CPU or GPU |
-| **Validation LLM** (Optional) | `Qwen2.5-7B-Instruct-Q5_K_M.gguf` | ~5.0 GB | CPU or GPU (via `llama.cpp` auto-offload) |
+| **Validation LLM** (Optional) | `Qwen2.5-7B-Instruct-Q4_K_M.gguf` (> 8GB RAM) <br> `gemma-3-4b-it-UD-Q5_K_XL.gguf` (<= 8GB RAM) | ~4.3 GB (Qwen) <br> ~3.3 GB (Gemma) | CPU or GPU (via `llama.cpp` auto-offload) |
 
-**Total Storage Required:** At least **~6.69 GB** of free disk space for the default models + extra space for your audio processing.
+**Total Storage Required:** At least **~6.0 GB - 7.0 GB** of free disk space for the default models + extra space for your audio processing.
 
 #### Minimum System Specifications (Fast Mode)
 To run the standard pipeline safely without the optional LLM:
@@ -64,8 +64,12 @@ To run the standard pipeline safely without the optional LLM:
 - **VRAM (Optional):** 2 GB+ (for faster Whisper/GLiNER execution)
 
 #### Recommended System Specifications (Max Security with LLM)
-Running the entire pipeline including the 7B LLM requires more memory. The built-in `llama.cpp` server will automatically distribute the workload between your GPU and RAM based on available VRAM.
-- **RAM:** 16 GB minimum (32 GB recommended if CPU-only)
+Running the entire pipeline including the LLM requires more memory. WaveRedact dynamically adapts the validation model based on your system RAM:
+- **<= 8 GB RAM:** Loads a smaller model (`Gemma-3-4b`, Q5_K_XL, ~3.3 GB) for stability.
+- **> 8 GB RAM:** Loads the optimal model (`Qwen2.5-7B`, Q4_K_M, ~4.3 GB) for highest quality.
+
+The built-in `llama.cpp` server will automatically distribute the workload between your GPU and RAM based on available VRAM.
+- **RAM:** 8 GB minimum (16 GB minimum / 32 GB recommended for the 7B model if CPU-only)
 - **CPU:** Modern multi-core processor (Intel i5 / Ryzen 5 or equivalent)
 - **VRAM:** 6-8 GB+ (Nvidia RTX 3050/3060+ or Mac M-series with 16GB+ Unified Memory) to avoid heavy RAM swapping and system slowdowns.
 *Note for Mac Users:* If an 8GB Mac is detected, WaveRedact automatically limits the LLM GPU layers to prevent system crashes.
