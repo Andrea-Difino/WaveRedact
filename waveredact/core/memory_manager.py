@@ -1,10 +1,10 @@
 import gc
+import psutil
 
 import torch
 
 
-class MemoryManager():
-
+class MemoryManager:
     def __init__(self):
         pass
 
@@ -16,3 +16,9 @@ class MemoryManager():
 
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+
+    def get_available_ram(self) -> float:
+        try:
+            return psutil.virtual_memory().available / (1024**3)
+        except Exception:
+            return 8.0

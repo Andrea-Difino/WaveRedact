@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import re
-from typing import Dict
 
 import yaml
 from dotenv import load_dotenv
@@ -78,7 +77,7 @@ class GGUFModel(Model):
         else:
             print("Model already downloaded")
 
-    def _parse_llm_response(self, text_response: str) -> Dict | None:
+    def _parse_llm_response(self, text_response: str) -> dict | None:
         """
         Transform the model response in a correct JSON object
 
@@ -116,7 +115,7 @@ class GGUFModel(Model):
                     
                 return None
 
-    def _extract_ids_with_healing(self, parsed_data: Dict, chunk: Dict[int, str]) -> list[int]:
+    def _extract_ids_with_healing(self, parsed_data: dict, chunk: dict[int, str]) -> list[int]:
         """
         Extract sensitive IDs and check possible hallucinations of the model
         
@@ -149,7 +148,7 @@ class GGUFModel(Model):
         
         return list_sensitive_ids
 
-    def run_model(self, chunk: Dict[int, str], ambiguous_idx: list[int] | None) -> list[int]:
+    def run_model(self, chunk: dict[int, str], ambiguous_idx: list[int] | None) -> list[int]:
         couple_str = "".join([f"[{k}] {v.replace(chr(10), ' ').replace(chr(13), '')}\n" for k, v in chunk.items()])
         user_prompt = self.user_prompt.format(labels=self.labels, ambiguous=ambiguous_idx, idx_couples=couple_str)
 

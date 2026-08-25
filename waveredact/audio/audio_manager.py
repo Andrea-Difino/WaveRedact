@@ -77,8 +77,6 @@ class IOAudioManager:
         name_without_extension, extension = os.path.splitext(filename)
         output_filename = f"{name_without_extension}_censored{extension}"
         output_path = os.path.join(output_dir, output_filename)
-        
-        console.print("[info]Exporting censored file...[/info]")
 
         format_export = extension.replace(".", "")
 
