@@ -6,8 +6,8 @@ import zipfile
 
 import torch
 
-from waveredact.utils.path_utils import get_app_data_dir
 from waveredact.utils.console import console
+from waveredact.utils.path_utils import get_app_data_dir
 
 logger = logging.getLogger(__name__)
 

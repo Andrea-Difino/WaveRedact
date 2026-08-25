@@ -12,8 +12,8 @@ import zipfile
 
 import requests
 
-from waveredact.utils.path_utils import get_app_data_dir
 from waveredact.utils.console import console
+from waveredact.utils.path_utils import get_app_data_dir
 
 FORMAT = '%(asctime)s %(message)s'
 logging.basicConfig(datefmt=FORMAT,level=logging.WARNING, force=True)
