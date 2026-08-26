@@ -2,6 +2,7 @@
 from PyInstaller.utils.hooks import collect_all
 
 datas_gliner, binaries_gliner, hiddenimports_gliner = collect_all('gliner2')
+datas_quest, binaries_quest, hiddenimports_quest = collect_all('questionary')
 
 custom_datas = [
     ('prompts.yaml', '.')
@@ -12,7 +13,7 @@ a = Analysis(
     pathex=[],
     binaries=binaries_gliner,
     datas=custom_datas + datas_gliner,
-    hiddenimports=hiddenimports_gliner, 
+    hiddenimports=hiddenimports_gliner + hiddenimports_quest + ['peft'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
