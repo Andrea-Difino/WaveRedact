@@ -73,6 +73,7 @@ class AudioCensor:
         console.print(f"🎵 [info]Loading audio for censor: {input_path}[/info]")
         try:
             audio = AudioSegment.from_file(input_path)
+            audio = audio.set_sample_width(2)
         except FileNotFoundError:
             from rich.panel import Panel
             error_msg = "[bold red]FATAL ERROR: FFmpeg not found in the system![/bold red]\n\n"
