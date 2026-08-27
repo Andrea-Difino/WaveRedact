@@ -219,7 +219,11 @@ When processing finishes, the CLI prints the path of the generated file. You wil
 
 ## Performance & Benchmarks
 
-I am currently in the process of running extensive benchmarks for the new architecture. Because the pipeline is strictly offline and relies heavily on local AI inference, evaluating the models (especially the 7B LLMs) on local hardware is extremely time-consuming. Thank you for your patience while I gather and validate the final metrics.
+Because WaveRedact is a 100% offline pipeline, benchmarking 7B models purely on local hardware is extremely time-consuming. To give you immediate context, I ran an initial micro-benchmark on a 100-sample dataset.
+
+While some specific labels didn't appear enough times to generate statistically perfect absolute metrics, the relative performance is clear. For example, moving to our new default Qwen2.5-7B-Instruct-Q4_K_M yielded a Recall of ~85% and an F1-Score of ~0.59, practically matching heavier quantized models while saving ~1GB of RAM.
+
+I am sharing these early metrics so you can judge the reliability baseline. Full-scale benchmarks will take more time to compute.
 
 ## 🙏 Acknowledgments & Core Technologies
 
