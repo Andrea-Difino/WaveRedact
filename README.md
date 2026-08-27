@@ -215,8 +215,6 @@ When processing finishes, the CLI prints the path of the generated file. You wil
      xattr -cr /path/to/your/waveredact_folder/
      ```
 
-- **Nothing happens**: Make sure there are supported audio files inside `audio/`.
-
 - **LLM Server doesn't start**: If you use `--use-llm` and the LLM server fails to initialize (e.g., due to port conflicts or missing files), WaveRedact will safely fallback and continue without that component.
 
 ## Performance & Benchmarks
