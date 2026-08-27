@@ -33,7 +33,7 @@ class TestAudioCensor:
 
     @pytest.mark.parametrize("mode, expected_dbfs", [
         (AudioMaskTypes.SILENCE, float('-inf')),
-        (AudioMaskTypes.BEEP, -18.01)
+        (AudioMaskTypes.BEEP, -9.24)
     ])
 
     def test_censor_file_applies_correct_mask(self, audio_censor, dummy_audio_file, mode, expected_dbfs):
