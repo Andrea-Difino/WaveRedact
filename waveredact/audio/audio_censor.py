@@ -4,12 +4,11 @@ import sys
 from enum import Enum
 from pathlib import Path
 
-import click
-from waveredact.utils.console import console
 from pydub import AudioSegment
-from pydub.generators import Sine
 
+import waveredact_core
 from waveredact.audio.audio_manager import IOAudioManager
+from waveredact.utils.console import console
 
 logger = logging.getLogger(__name__)
 
@@ -85,31 +84,21 @@ class AudioCensor:
 
         timestamps = self._get_interval_to_censor()
 
-        timestamps = sorted(timestamps, key=lambda x: x[0])
+        raw_bytes: bytes = audio.raw_data
+        sample_rate: int = audio.frame_rate
+        channels: int = audio.channels
+        sample_width: int = audio.sample_width
 
-        pad_start = 50
-        pad_end = 130
+        censored_audio_bytes = waveredact_core.censor_audio(
+            raw_bytes,
+            sample_rate,
+            channels,
+            sample_width,
+            timestamps,
+            mode.value
+        )
 
-        for start_sec, end_sec in timestamps:
-            start_ms = int(start_sec * 1000)
-            safe_start = max(0, start_ms - pad_start)
-
-            end_ms = int(end_sec * 1000)
-            safe_end = min(len(audio), end_ms + pad_end)
-
-            safe_duration = safe_end - safe_start
-
-            if safe_duration <= 0:
-                continue
-
-            if mode.value == "beep":
-                censor = Sine(600).to_audio_segment(duration=safe_duration).apply_gain(-15)
-            else:
-                censor = AudioSegment.silent(duration=safe_duration)
-                
-            censor = censor.fade_in(12).fade_out(20)
-
-            audio = audio[:safe_start] + censor + audio[safe_end:]
+        audio = audio._spawn(censored_audio_bytes)
 
         if self.output_dir:
             final_output_dir = self.output_dir
