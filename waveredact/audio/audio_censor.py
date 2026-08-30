@@ -83,7 +83,16 @@ class AudioCensor:
             console.print(Panel(error_msg, title="Dependencies Error", border_style="red"))
             sys.exit(1)
 
-        timestamps = self._get_interval_to_censor()
+        original_timestamps = self._get_interval_to_censor()
+
+        pad_start_sec = 0.05  
+        pad_end_sec = 0.2    
+        
+        padded_timestamps = []
+        for start, end in original_timestamps:
+            safe_start = max(0.0, start - pad_start_sec)
+            safe_end = end + pad_end_sec
+            padded_timestamps.append((safe_start, safe_end))
 
         raw_bytes: bytes = audio.raw_data
         sample_rate: int = audio.frame_rate
@@ -95,7 +104,7 @@ class AudioCensor:
             sample_rate,
             channels,
             sample_width,
-            timestamps,
+            padded_timestamps,
             mode.value
         )
 
