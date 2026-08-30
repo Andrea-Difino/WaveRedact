@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 from gliner2 import GLiNER2
 
 from .base_extractor import BaseExtractor
@@ -14,12 +12,12 @@ class GlinerExtractor(BaseExtractor):
         threshold       - Confidence threshold for entity extraction
         model           - GLiNER2 model instance
     """
-    def __init__(self, model: GLiNER2, target_labels: List[str], threshold: float):
+    def __init__(self, model: GLiNER2, target_labels: list[str], threshold: float):
         self.target_labels = target_labels
         self.threshold = threshold
         self.model = model
 
-    def extract(self, text: str) -> List[Tuple[int, int, float]]:
+    def extract(self, text: str) -> list[tuple[int, int, float]]:
         output = self.model.extract_entities(text, self.target_labels, threshold=self.threshold, include_spans=True, include_confidence=True)
 
         entities_dict = output.get("entities", {})

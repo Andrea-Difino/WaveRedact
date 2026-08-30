@@ -96,6 +96,16 @@ class LevelSetter:
 
     @staticmethod
     def parse_labels(json_path: str, all_labels: list[str]) -> list[str]:
+        """
+        Parse the json file passed by the user to validate the labels inside
+
+        Params:
+            json_path   - string representing the position of the file in the device
+            all_labels  - all available labels
+
+        Return: 
+            list of the labels given by the user
+        """
 
         path_obj = Path(json_path).resolve()
 

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List, Tuple
 
 
 class BaseExtractor(ABC):
@@ -7,7 +6,7 @@ class BaseExtractor(ABC):
     Abstract base class for all sensitive data extractors.
     """
     @abstractmethod
-    def extract(self, text: str) -> List[Tuple[int, int, float]]:
+    def extract(self, text: str) -> list[tuple[int, int, float]]:
         """
         Extract coordinates corresponding to the position of sensitive data
 

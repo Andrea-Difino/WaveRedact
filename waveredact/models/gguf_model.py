@@ -33,9 +33,9 @@ class GGUFModel(Model):
         user_prompt     - User prompt template for the LLM
         client          - OpenAI API client instance connected to the local server
     """
-    def __init__(self, gguf_file_name: str, repo_id: str, model_dir: str | None = None, server_port: int = 8080):
+    def __init__(self, gguf_file_name: str, repo_id: str, server_port: int = 8080):
         project_root = get_project_root()
-        self.model_dir = model_dir if model_dir else str(get_app_data_dir() / "files" / "gguf_models")
+        self.model_dir = str(get_app_data_dir() / "files" / "gguf_models")
         
         self.file_gguf = gguf_file_name
         self.path = f"{self.model_dir}/{self.file_gguf}"

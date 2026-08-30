@@ -8,6 +8,8 @@ from pathlib import Path
 from gliner2 import GLiNER2
 from huggingface_hub import snapshot_download
 
+from waveredact.utils.path_utils import get_app_data_dir
+
 from .factory import Factory
 
 logger = logging.getLogger(__name__)
@@ -28,18 +30,13 @@ class GlinerFactory(Factory):
         self,
         target_labels: list[str],
         model_id: str = "fastino/gliner2-privacy-filter-PII-multi",
-        cache_dir: str = "",
         threshold: float = 0.50,
     ):
         self.model_id = model_id
         self.threshold = threshold
 
-        if not cache_dir:
-            from waveredact.utils.path_utils import get_app_data_dir
-            safe_cache_dir = get_app_data_dir() / "files" / "gliner_models" / "gliner2"
-            self.cache_dir = str(safe_cache_dir)
-        else:
-            self.cache_dir = cache_dir
+        safe_cache_dir = get_app_data_dir() / "files" / "gliner_models" / "gliner2"
+        self.cache_dir = str(safe_cache_dir)
 
         self.target_labels = target_labels
 
