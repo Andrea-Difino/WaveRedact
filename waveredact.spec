@@ -3,7 +3,6 @@ from PyInstaller.utils.hooks import collect_all
 
 datas_gliner, binaries_gliner, hiddenimports_gliner = collect_all('gliner2')
 datas_quest, binaries_quest, hiddenimports_quest = collect_all('questionary')
-datas_core, binaries_core, hiddenimports_core = collect_all('waveredact_core')
 
 custom_datas = [
     ('prompts.yaml', '.')
@@ -12,9 +11,9 @@ custom_datas = [
 a = Analysis(
     ['cli/main.py'],
     pathex=[],
-    binaries=binaries_gliner + binaries_core,
-    datas=custom_datas + datas_gliner + datas_core,
-    hiddenimports=hiddenimports_gliner + hiddenimports_quest + hiddenimports_core + ['peft'],
+    binaries=binaries_gliner,
+    datas=custom_datas + datas_gliner,
+    hiddenimports=hiddenimports_gliner + hiddenimports_quest + ['peft', 'waveredact_core'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
