@@ -30,6 +30,10 @@ jobs:
         run: |
           python -m pip install uv
           uv venv
+          uv pip install maturin
+          cd waveredact_core
+          uv run maturin develop --release
+          cd ..
           uv pip install .
           uv pip install pyinstaller
 
