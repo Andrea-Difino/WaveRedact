@@ -19,16 +19,16 @@ class RegexExtractor(BaseExtractor):
             "phone_number": r'(?<!\w)(?:\+?\d{1,3}[-.\s]?)?(?:\(?\d{2,4}\)?[-.\s]?){1,3}\d{4,6}(?!\w)',
         }
         
-        selected_patterns = []
+        self.patterns: list[tuple[re.Pattern, str]] = []
         if target_labels:
             for label in target_labels:
-                if label in pattern_mapping and pattern_mapping[label] not in selected_patterns:
-                    selected_patterns.append(pattern_mapping[label])
+                lower_label = label.lower()
+                if lower_label in pattern_mapping:
+                    self.patterns.append((re.compile(pattern_mapping[lower_label]), label))
             
-        if selected_patterns:
-            self.total_regex = "|".join([f"({p})" for p in selected_patterns])
-        else:
-            self.total_regex = r'(?!x)x'
-            
-    def extract(self, text: str) -> list[tuple[int, int, float]]:
-        return [(match.start(), match.end(), 1.0) for match in re.finditer(self.total_regex, text)]
+    def extract(self, text: str) -> list[tuple[int, int, float, str]]:
+        results = []
+        for pattern, label in self.patterns:
+            for match in pattern.finditer(text):
+                results.append((match.start(), match.end(), 1.0, label))
+        return results

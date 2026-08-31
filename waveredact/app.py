@@ -5,7 +5,7 @@ from pathlib import Path
 
 from faster_whisper import WhisperModel
 from gliner2 import GLiNER2
-
+from datetime import datetime, timezone
 from waveredact.audio.audio_censor import AudioCensor, AudioMaskTypes
 from waveredact.audio.audio_manager import IOAudioManager
 from waveredact.config.level import LevelSetter
@@ -22,6 +22,7 @@ from waveredact.pipeline.orchestrator import Orchestrator
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
 from waveredact.services.llama_server import LlamaServerService
 from waveredact.services.transcribe import TranscribeService
+from waveredact.services.compliance import ComplianceManager
 from waveredact.utils.console import console
 
 logger = logging.getLogger(__name__)
@@ -41,6 +42,7 @@ class RedactResult:
     filename: str
     censored_path: str
     sensitive_words: list[str]
+    redactions: list[dict]
 
 class WaveRedactApplication:
     def __init__(
@@ -175,8 +177,9 @@ class WaveRedactApplication:
                     approval_callback=self.approval_callback
                 )
 
-                full_idx = orchestrator.run_audio_chunks()
-                sensitive_words = [index_word[idx] for idx in sorted(full_idx)]
+                full_idx_labels = orchestrator.run_audio_chunks()
+                full_idx = sorted(full_idx_labels.keys())
+                sensitive_words = [index_word[idx] for idx in full_idx]
 
                 censor_manager = AudioCensor(audio_manager, index_interval, full_idx)
                 if self.config.mode == 'beep':
@@ -189,12 +192,49 @@ class WaveRedactApplication:
 
                 censored_file = censor_manager.censor_file(str(audio_path), mode=censor_mode)
                 
+                merged_redactions = []
+                current_redaction = None
+
+                for idx in full_idx:
+                    start_str, end_str = index_interval[idx].split("-")
+                    start_sec = float(start_str)
+                    end_sec = float(end_str)
+                    entity_type = full_idx_labels.get(idx, "UNKNOWN")
+
+                    if current_redaction is None:
+                        current_redaction = {
+                            "start_sec": start_sec,
+                            "end_sec": end_sec,
+                            "entity_type": entity_type
+                        }
+                    else:
+                        if current_redaction["entity_type"] == entity_type and (start_sec - current_redaction["end_sec"] < 0.5):
+                            current_redaction["end_sec"] = end_sec
+                        else:
+                            merged_redactions.append(current_redaction)
+                            current_redaction = {
+                                "start_sec": start_sec,
+                                "end_sec": end_sec,
+                                "entity_type": entity_type
+                            }
+                if current_redaction:
+                    merged_redactions.append(current_redaction)
+
                 results.append(RedactResult(
                     filename=audio_path.name,
                     censored_path=censored_file,
-                    sensitive_words=sensitive_words
+                    sensitive_words=sensitive_words,
+                    redactions=merged_redactions
                 ))
                 
+            if results:
+                import os
+                first_censored_dir = os.path.dirname(results[0].censored_path)
+                compliance_manager = ComplianceManager()
+                compliance_path = os.path.join(first_censored_dir, f"compliance_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}.json")
+                compliance_manager.generate_report(results, compliance_path)
+                console.print(f"📄 [success]Compliance report saved at {compliance_path}[/success]")
+
             return results
         except (FileNotFoundError, ValueError) as e:
             console.print(f"[bold red]❌ Configuration Error:[/bold red] {e}")

@@ -17,16 +17,16 @@ class GlinerExtractor(BaseExtractor):
         self.threshold = threshold
         self.model = model
 
-    def extract(self, text: str) -> list[tuple[int, int, float]]:
+    def extract(self, text: str) -> list[tuple[int, int, float, str]]:
         output = self.model.extract_entities(text, self.target_labels, threshold=self.threshold, include_spans=True, include_confidence=True)
 
         entities_dict = output.get("entities", {})
 
         extracted_tuples = set()
 
-        for entities_list in entities_dict.values():
+        for label, entities_list in entities_dict.items():
             for entity in entities_list:
                 score = float(entity.get("confidence", 0.0))
-                extracted_tuples.add((entity["start"], entity["end"], score))
+                extracted_tuples.add((entity["start"], entity["end"], score, label))
 
         return sorted(extracted_tuples, key=lambda x: x[0])
