@@ -6,7 +6,7 @@
   </p>
 
   <p>
-    WaveRedact leverages a hybrid pipeline combining compact NER models (GLiNER) with <strong>strictly local Large Language Models</strong> (via <i>llama.cpp</i>). Designed to identify, validate, and redact personal information with surgical precision and auto-correction of hallucinations, ensuring your data <strong>never</strong> leaves your machine.
+    WaveRedact leverages a hybrid pipeline combining compact NER models (GLiNER) with <strong>strictly local Large Language Models</strong> (via <i>llama.cpp</i>). Designed to identify, validate, and redact personal information with high precision, mitigating hallucinations, ensuring your data <strong>never</strong> leaves your machine.
   </p>
 
 </div>
