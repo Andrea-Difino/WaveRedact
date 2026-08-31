@@ -34,7 +34,7 @@ class TestOrchestrator:
     def _build_pipeline(self, privacy_module, llm_extractor=None):
         class FakeExtractor:
             def extract(self, _text: str):
-                return [(0, 4, 0.5), (5, 9, 0.95)]
+                return [(0, 4, 0.5, "name"), (5, 9, 0.95, "token")]
 
         return privacy_module.DataPrivacyPipeline(
             simple_extractors=[FakeExtractor()],
@@ -52,13 +52,13 @@ class TestOrchestrator:
             interactive_mode=False,
         )
 
-        assert orchestrator.run_audio_chunks() == [0, 1]
+        assert orchestrator.run_audio_chunks() == {0: "name", 1: "token"}
 
     def test_run_audio_chunks_uses_llm_when_configured(self, monkeypatch: pytest.MonkeyPatch):
         privacy_module, orchestrator_module = _import_orchestrator(monkeypatch)
         llm_model = MagicMock()
 
-        llm_model.run_model.return_value = [0, 1]
+        llm_model.run_model.return_value = {0: "name", 1: "token"}
         
         test_chunk = {0: "name", 1: "token"}
         
@@ -71,7 +71,7 @@ class TestOrchestrator:
             interactive_mode=False,
         )
 
-        assert orchestrator.run_audio_chunks() == [0, 1]
+        assert orchestrator.run_audio_chunks() == {0: "name", 1: "token"}
 
         llm_model.run_model.assert_called_once_with(test_chunk, [0])
 
@@ -87,4 +87,4 @@ class TestOrchestrator:
             approval_callback=lambda _words: False,
         )
 
-        assert orchestrator.run_audio_chunks() == [0, 1]
+        assert orchestrator.run_audio_chunks() == {0: "name", 1: "token"}

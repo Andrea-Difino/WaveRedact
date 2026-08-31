@@ -34,7 +34,7 @@ class TestPrivacyPipeline:
 
         class FakeSimpleExtractor:
             def extract(self, _text: str):
-                return [(0, 4, 0.5)]
+                return [(0, 4, 0.5, "name")]
 
         pipeline = module.DataPrivacyPipeline(
             simple_extractors=[RegexExtractor(["email", "iban", "postal_code"]), FakeSimpleExtractor()],
@@ -44,14 +44,14 @@ class TestPrivacyPipeline:
         mapper = ChunkMapper({0: "name ", 1: "foo@example.com ", 2: "12345"})
         total_idx, locked_idx = pipeline.extract_sensitive_data(mapper)
 
-        assert total_idx == {0, 1, 2}
-        assert locked_idx == {1, 2}
+        assert total_idx == {0: "name", 1: "email"}
+        assert locked_idx == {1}
 
     def test_extract_sensitive_with_llm_returns_indices(self, monkeypatch: pytest.MonkeyPatch):
         module = _import_privacy_pipeline(monkeypatch)
 
         llm_model = MagicMock()
-        llm_model.run_model.return_value = [0, 2]
+        llm_model.run_model.return_value = {0: "foo", 2: "bar"}
 
         pipeline = module.DataPrivacyPipeline(
             simple_extractors=[MagicMock()],
@@ -61,7 +61,7 @@ class TestPrivacyPipeline:
         mapper = ChunkMapper({0: "alpha", 1: "beta"})
         result = pipeline.extract_sensitive_with_llm(mapper, [1])
 
-        assert result == {0, 2}
+        assert result == {0: "foo", 2: "bar"}
         llm_model.run_model.assert_called_once_with(mapper.chunk, [1])
 
     def test_extract_sensitive_with_llm_returns_empty_without_llm(self, monkeypatch: pytest.MonkeyPatch):
@@ -72,5 +72,5 @@ class TestPrivacyPipeline:
         mapper = ChunkMapper({0: "alpha", 1: "beta"})
         result = pipeline.extract_sensitive_with_llm(mapper, [1])
 
-        assert result == set()
+        assert result == {}
         assert pipeline.llm_extractors == []

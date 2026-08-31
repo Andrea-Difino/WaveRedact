@@ -40,10 +40,10 @@ class TestGlinerExtractor:
         mock_model.extract_entities.return_value = {
             "entities": {
                 "access_token": [
-                    {"text": "Bearer_12345", "start": 38, "end": 50, "confidence": 0.90}
+                    {"text": "Bearer_12345", "start": 38, "end": 50, "confidence": 0.90, "label": "access_token"}
                 ],
                 "email": [
-                    {"text": "mario@email.com", "start": 14, "end": 29, "confidence": 0.90}
+                    {"text": "mario@email.com", "start": 14, "end": 29, "confidence": 0.90, "label": "email"}
                 ],
                 "password": []
             }
@@ -66,7 +66,7 @@ class TestGlinerExtractor:
             include_confidence=True
         )
 
-        assert result == [(14, 29, 0.9), (38, 50, 0.9)]
+        assert result == [(14, 29, 0.9, "email"), (38, 50, 0.9, "access_token")]
 
 
     def test_extract_handles_duplicates(self):
@@ -74,16 +74,18 @@ class TestGlinerExtractor:
         mock_model = MagicMock()
         mock_model.extract_entities.return_value = {
             "entities": {
-                "secret": [{"text": "12345", "start": 12, "end": 17, "confidence": 0.90}],
-                "password": [{"text": "12345", "start": 12, "end": 17, "confidence": 0.90}]
+                "secret": [{"text": "12345", "start": 12, "end": 17, "confidence": 0.90, "label": "secret"}],
+                "password": [{"text": "12345", "start": 12, "end": 17, "confidence": 0.90, "label": "password"}]
             }
         }
         
         extractor = GlinerExtractor(mock_model, ["secret", "password"], 0.8)
         result = extractor.extract("Il codice è 12345")
 
-        assert len(result) == 1
-        assert result == [(12, 17, 0.9)]
+        assert len(result) == 2
+        # Now duplicates map to two different labels, both should be preserved in extractor return
+        # The result might be sorted, so let's use a set
+        assert set(result) == {(12, 17, 0.9, "password"), (12, 17, 0.9, "secret")}
 
 
     def test_extract_empty_results(self):
