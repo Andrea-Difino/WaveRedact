@@ -39,7 +39,11 @@ jobs:
           uv pip install pyinstaller
 
       - name: Compiling with PyInstaller
-        run: uv run pyinstaller waveredact.spec --clean
+        shell: bash
+        run: | 
+          rm -rf waveredact_core
+          rm -f waveredact_core.pyi
+          uv run pyinstaller waveredact.spec --clean
 
       - name: Zip and divide in Volumes (Windows)
         if: runner.os == 'Windows'
