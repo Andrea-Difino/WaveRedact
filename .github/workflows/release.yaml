@@ -27,6 +27,7 @@ jobs:
           python-version: '3.11'
 
       - name: Downloading dependecies
+        shell: bash
         run: |
           python -m pip install uv
           uv venv
