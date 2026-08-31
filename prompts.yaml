@@ -25,6 +25,7 @@ maker:
             "word": "<string>",
             "reason": "<string>",
             "action": "<string, exactly 'SENSITIVE' or 'IGNORE'>"
+            "label": "<string, label of the word if SENSITIVE else "">"
           }}
         ]
       }}

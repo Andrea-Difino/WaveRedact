@@ -19,12 +19,11 @@ class DataPrivacyPipeline:
         llm_extractor: Model | None = None,
     ):
         self.simple_extractors: list[BaseExtractor] = simple_extractors
-
         self.llm_extractors: list[Model] = [llm_extractor] if llm_extractor else []
 
     def extract_sensitive_data(
         self, mapper: ChunkMapper, lock_threshold: float = 0.75
-    ) -> tuple[set[int], set[int]]:
+    ) -> tuple[dict[int, str], set[int]]:
         """
         Call sequentially extractors inside simple_extractor and lock the idx of the sensitive data with a confidence higher than 0.95
 
@@ -33,26 +32,27 @@ class DataPrivacyPipeline:
             lock_threshold  - Threshold used to lock idx that must be redacted
 
         Returns:
-            tuple with two sets. The first set has all the possible sensitive idx and the second only the locked ones
+            tuple with dict of total idxs mapped to labels and set of locked idxs
         """
-        total_idx: set[int] = set()
+        total_idx_labels: dict[int, str] = {}
         locked_idx: set[int] = set()
 
         for extractor in self.simple_extractors:
             coords = extractor.extract(mapper.text)
 
-            for start, end, score in coords:
+            for start, end, score, label in coords:
                 word_indices = mapper.get_original_idxs(start, end)
-                total_idx.update(word_indices)
+                for idx in word_indices:
+                    total_idx_labels[idx] = label
 
                 if score >= lock_threshold:
                     locked_idx.update(word_indices)
 
-        return total_idx, locked_idx
+        return total_idx_labels, locked_idx
 
     def extract_sensitive_with_llm(
         self, mapper: ChunkMapper, ambiguous_idx: list[int]
-    ) -> set[int]:
+    ) -> dict[int, str]:
         """
         Use LLM extractors to find sensitive data in the ambiguous indices.
 
@@ -61,14 +61,14 @@ class DataPrivacyPipeline:
             ambiguous_idx   - list of indices that are ambiguous
 
         Return:
-            set of integers representing the final sensitive indices
+            dict mapping integers representing the final sensitive indices to their labels
         """
 
-        total_idx: set[int] = set()
+        total_idx_labels: dict[int, str] = {}
 
         for extractor in self.llm_extractors:
-            idx = extractor.run_model(mapper.chunk, ambiguous_idx)
+            idx_labels = extractor.run_model(mapper.chunk, ambiguous_idx)
 
-            total_idx.update(idx)
+            total_idx_labels.update(idx_labels)
 
-        return total_idx
+        return total_idx_labels

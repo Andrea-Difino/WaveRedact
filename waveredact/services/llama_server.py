@@ -125,8 +125,7 @@ class LlamaServerService:
         response.raise_for_status()
 
         with open(archive_path, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                f.write(chunk)
+            f.writelines(response.iter_content(chunk_size=8192))
 
         console.print("[info]Extracting Llama engine...[/info]")
         if is_zip:

@@ -55,12 +55,13 @@ class TestGGUFModel:
         monkeypatch.setattr(module, "OpenAI", MagicMock(return_value=mock_client))
         download_mock = MagicMock()
         monkeypatch.setattr(module, "hf_hub_download", download_mock)
+        monkeypatch.setattr(module, "get_app_data_dir", lambda: tmp_path)
         monkeypatch.setattr(module.os.path, "exists", lambda _path: True)
         monkeypatch.setattr("builtins.open", mock_open(read_data=json.dumps(PROMPTS)))
 
-        model = module.GGUFModel("model.gguf", "repo/name", model_dir=str(tmp_path), server_port=9090)
+        model = module.GGUFModel("model.gguf", "repo/name", server_port=9090)
 
-        assert model.path == f"{tmp_path.resolve()}/model.gguf"
+        assert model.path == f"{tmp_path / 'files' / 'gguf_models'}/model.gguf"
         assert model.sys_prompt == "system prompt"
         assert model.user_prompt.startswith("labels=")
         download_mock.assert_not_called()
@@ -73,16 +74,17 @@ class TestGGUFModel:
         monkeypatch.setattr(module, "OpenAI", MagicMock(return_value=mock_client))
         download_mock = MagicMock(return_value=str(tmp_path / "model.gguf"))
         monkeypatch.setattr(module, "hf_hub_download", download_mock)
+        monkeypatch.setattr(module, "get_app_data_dir", lambda: tmp_path)
         monkeypatch.setattr(module.os.path, "exists", lambda _path: False)
         monkeypatch.setenv("HF_TOKEN", "secret-token")
         monkeypatch.setattr("builtins.open", mock_open(read_data=json.dumps(PROMPTS)))
 
-        module.GGUFModel("model.gguf", "repo/name", model_dir=str(tmp_path))
+        module.GGUFModel("model.gguf", "repo/name")
 
         download_mock.assert_called_once_with(
             repo_id="repo/name",
             filename="model.gguf",
-            local_dir=str(tmp_path.resolve()),
+            local_dir=str(tmp_path / "files" / "gguf_models"),
             token="secret-token",
         )
 
@@ -92,16 +94,17 @@ class TestGGUFModel:
         monkeypatch.setattr(module, "OpenAI", MagicMock(return_value=mock_client))
         download_mock = MagicMock(return_value=str(tmp_path / "model.gguf"))
         monkeypatch.setattr(module, "hf_hub_download", download_mock)
+        monkeypatch.setattr(module, "get_app_data_dir", lambda: tmp_path)
         monkeypatch.setattr(module.os.path, "exists", lambda _path: False)
         monkeypatch.delenv("HF_TOKEN", raising=False)
         monkeypatch.setattr("builtins.open", mock_open(read_data=json.dumps(PROMPTS)))
 
-        module.GGUFModel("model.gguf", "repo/name", model_dir=str(tmp_path))
+        module.GGUFModel("model.gguf", "repo/name")
 
         download_mock.assert_called_once_with(
             repo_id="repo/name",
             filename="model.gguf",
-            local_dir=str(tmp_path.resolve()),
+            local_dir=str(tmp_path / "files" / "gguf_models"),
             token=None,
         )
 
@@ -110,10 +113,11 @@ class TestGGUFModel:
         mock_client = MagicMock()
         monkeypatch.setattr(module, "OpenAI", MagicMock(return_value=mock_client))
         monkeypatch.setattr(module, "hf_hub_download", MagicMock())
+        monkeypatch.setattr(module, "get_app_data_dir", lambda: tmp_path)
         monkeypatch.setattr(module.os.path, "exists", lambda _path: True)
         monkeypatch.setattr("builtins.open", mock_open(read_data=json.dumps(PROMPTS)))
 
-        model = module.GGUFModel("model.gguf", "repo/name", model_dir=str(tmp_path))
+        model = module.GGUFModel("model.gguf", "repo/name")
         assert model.labels == []
 
         model.labels = ["email", "phone_number"]
@@ -134,7 +138,8 @@ class TestGGUFModel:
                     "id": 1,
                     "word": "world",
                     "reason": "Matches a sensitive label.",
-                    "action": "SENSITIVE"
+                    "action": "SENSITIVE",
+                    "label": "email"
                 }
             ]
         })
@@ -151,16 +156,17 @@ class TestGGUFModel:
         mock_client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=mock_create)))
         monkeypatch.setattr(module, "OpenAI", MagicMock(return_value=mock_client))
         monkeypatch.setattr(module, "hf_hub_download", MagicMock())
+        monkeypatch.setattr(module, "get_app_data_dir", lambda: tmp_path)
         monkeypatch.setattr(module.os.path, "exists", lambda _path: True)
 
         monkeypatch.setattr("builtins.open", mock_open(read_data=json.dumps(PROMPTS)))
 
-        model = module.GGUFModel("model.gguf", "repo/name", model_dir=str(tmp_path))
+        model = module.GGUFModel("model.gguf", "repo/name")
         model.labels = ["email"]
 
         result = model.run_model({0: "hello", 1: "world"}, [0])
 
-        assert result == [1]
+        assert result == {1: "email"}
         
         mock_create.assert_called_once()
         kwargs = mock_create.call_args.kwargs
@@ -173,9 +179,10 @@ class TestGGUFModel:
         mock_client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=mock_create)))
         monkeypatch.setattr(module, "OpenAI", MagicMock(return_value=mock_client))
         monkeypatch.setattr(module, "hf_hub_download", MagicMock())
+        monkeypatch.setattr(module, "get_app_data_dir", lambda: tmp_path)
         monkeypatch.setattr(module.os.path, "exists", lambda _path: True)
         monkeypatch.setattr("builtins.open", mock_open(read_data=json.dumps(PROMPTS)))
 
-        model = module.GGUFModel("model.gguf", "repo/name", model_dir=str(tmp_path))
+        model = module.GGUFModel("model.gguf", "repo/name")
 
-        assert model.run_model({0: "hello"}, None) == []
+        assert model.run_model({0: "hello"}, None) == {}

@@ -43,14 +43,14 @@ class Orchestrator:
         self.progress_callback = progress_callback
         self.approval_callback = approval_callback
 
-    def run_audio_chunks(self) -> list[int]:
+    def run_audio_chunks(self) -> dict[int, str]:
         """
         Use Regex and GLiNER to censor data for each chunk of the audios
 
         Return:
-            list of integers corresponding to the words to censor
+            dict mapping indices to their entity types
         """
-        full_idx: set[int] = set()
+        full_idx_labels: dict[int, str] = {}
         full_locked_idx: set[int] = set()
 
         chunk_ambiguous_list: list[list[int]] = []
@@ -66,16 +66,17 @@ class Orchestrator:
                     percent,
                 )
 
-            res, locked_res = self.data_pipeline.extract_sensitive_data(self.mappers[i])
+            res_labels, locked_res = self.data_pipeline.extract_sensitive_data(self.mappers[i])
 
-            chunk_ambiguous = list(set(res) - set(locked_res))
+            chunk_ambiguous = list(set(res_labels.keys()) - set(locked_res))
             chunk_ambiguous_list.append(chunk_ambiguous)
 
-            words_found.extend([self.iw_pair[idx] for idx in sorted(res)])
-            full_idx.update(res)
+            words_found.extend([self.iw_pair[idx] for idx in sorted(res_labels.keys())])
+            full_idx_labels.update(res_labels)
             full_locked_idx.update(locked_res)
 
-        ordered_idx = sorted(full_idx)
+        # we can still return full_idx_labels, maybe sort keys where we need them.
+        ordered_idx = sorted(full_idx_labels.keys())
 
         if self.interactive_mode:
             if self.approval_callback:
@@ -84,39 +85,40 @@ class Orchestrator:
                 is_approved = True
 
             if is_approved:
-                return ordered_idx
+                return full_idx_labels
             else:
                 if self.data_pipeline.llm_extractors:
                     return self.run_llm_extraction(
-                        chunk_ambiguous_list, full_locked_idx
+                        chunk_ambiguous_list, full_locked_idx, full_idx_labels
                     )
                 else:
                     console.print("[warning]⚠️-You answered 'N', but no LLM is configured to refine the search.[/warning]")
                     console.print("[info]💡 Hint: Restart the pipeline adding the '--use-llm' flag for better precision.[/info]")
                     console.print("[warning]Proceeding with the current redaction list to ensure data safety.\n[/warning]")
-                    return ordered_idx
+                    return full_idx_labels
         else:
             if self.use_llm and self.data_pipeline.llm_extractors:
                 console.print("[info]Automatic mode: Executing LLM to maximize security...[/info]")
-                return self.run_llm_extraction(chunk_ambiguous_list, full_locked_idx)
+                return self.run_llm_extraction(chunk_ambiguous_list, full_locked_idx, full_idx_labels)
             else:
                 console.print("[info]Fast mode: LLM bypassed.\n[/info]")
-                return ordered_idx
+                return full_idx_labels
 
     def run_llm_extraction(
-        self, chunk_ambiguous_list: list[list[int]], locked_idx: set[int]
-    ) -> list[int]:
+        self, chunk_ambiguous_list: list[list[int]], locked_idx: set[int], initial_labels: dict[int, str]
+    ) -> dict[int, str]:
         """
         Use LLM to check the answers given by the GLiNER model and find missed sensitive words
 
         Params:
             chunk_ambiguous_list    - list of the indices for each chunk that had a confidence score lower than 0.99 in the GLiNER step
             locked_idx              - set of the indices that must be censored because had a nearly 1.0 confidence score
+            initial_labels          - initial dict mapping indices to their entity types found by simple extractors
 
         Return:
-            list of the final sensitive indices
+            dict of the final sensitive indices mapped to their entity types
         """
-        checked_idx: set[int] = set()
+        checked_idx_labels: dict[int, str] = {}
         n_chunks = len(self.mappers)
 
         for i in rich.progress.track(range(n_chunks), description="Running LLM analysis...", console=console):
@@ -127,19 +129,15 @@ class Orchestrator:
                 self.progress_callback(
                     f"Running LLM analysis on chunk {i + 1}/{n_chunks}...", percent
                 )
-            res = self.data_pipeline.extract_sensitive_with_llm(
+            res_labels = self.data_pipeline.extract_sensitive_with_llm(
                 self.mappers[i], chunk_ambiguous
             )
-            checked_idx.update(res)
+            checked_idx_labels.update(res_labels)
 
-        checked_idx.update(locked_idx)
-        #final_words_found = [self.iw_pair[idx] for idx in sorted(checked_idx)]
+        for idx in locked_idx:
+            if idx in initial_labels:
+                checked_idx_labels[idx] = initial_labels[idx]
 
-        #console.print(
-        #    "\n🧠 [info][LLM Final Results] Sensitive words identified:[/info]"
-        #)
-        #print(final_words_found)
-
-        return sorted(checked_idx)
+        return checked_idx_labels
 
 

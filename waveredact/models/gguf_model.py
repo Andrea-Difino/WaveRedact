@@ -33,9 +33,9 @@ class GGUFModel(Model):
         user_prompt     - User prompt template for the LLM
         client          - OpenAI API client instance connected to the local server
     """
-    def __init__(self, gguf_file_name: str, repo_id: str, model_dir: str | None = None, server_port: int = 8080):
+    def __init__(self, gguf_file_name: str, repo_id: str, server_port: int = 8080):
         project_root = get_project_root()
-        self.model_dir = model_dir if model_dir else str(get_app_data_dir() / "files" / "gguf_models")
+        self.model_dir = str(get_app_data_dir() / "files" / "gguf_models")
         
         self.file_gguf = gguf_file_name
         self.path = f"{self.model_dir}/{self.file_gguf}"
@@ -115,40 +115,41 @@ class GGUFModel(Model):
                     
                 return None
 
-    def _extract_ids_with_healing(self, parsed_data: dict, chunk: dict[int, str]) -> list[int]:
+    def _extract_ids_with_healing(self, parsed_data: dict, chunk: dict[int, str]) -> dict[int, str]:
         """
-        Extract sensitive IDs and check possible hallucinations of the model
+        Extract sensitive IDs and labels and check possible hallucinations of the model
         
         Params:
             parsed_data     - JSON object with the model output
             chunk           - dict with the right correspondece of id-word
         """
-        list_sensitive_ids = []
+        list_sensitive_ids = {}
 
         if "word_analysis" not in parsed_data:
-            logger.error("The output JSON doesn't have 'word_analysis' array. Returning empty list")
-            return []
+            logger.error("The output JSON doesn't have 'word_analysis' array. Returning empty dict")
+            return {}
 
         for analysis in parsed_data["word_analysis"]:
             if analysis.get("action") == "SENSITIVE":
                 reported_id = analysis.get("id")
                 reported_word = analysis.get("word")
-                
+                reported_label = analysis.get("label", "UNKNOWN")
+
                 if reported_id is not None and reported_word is not None:
                     if reported_id in chunk and reported_word in chunk[reported_id]:
-                        list_sensitive_ids.append(reported_id)
+                        list_sensitive_ids[reported_id] = reported_label
                         
                     else:
                         logger.warning(f"LLM hallucinated ID {reported_id} for word '{reported_word}'. Attempting recovery...")
                         for real_id, real_word in chunk.items():
                             if reported_word in real_word:
-                                list_sensitive_ids.append(real_id)
+                                list_sensitive_ids[real_id] = reported_label
                                 logger.warning("ID recovered")
                                 break
         
         return list_sensitive_ids
 
-    def run_model(self, chunk: dict[int, str], ambiguous_idx: list[int] | None) -> list[int]:
+    def run_model(self, chunk: dict[int, str], ambiguous_idx: list[int] | None) -> dict[int, str]:
         couple_str = "".join([f"[{k}] {v.replace(chr(10), ' ').replace(chr(13), '')}\n" for k, v in chunk.items()])
         user_prompt = self.user_prompt.format(labels=self.labels, ambiguous=ambiguous_idx, idx_couples=couple_str)
 
@@ -170,10 +171,10 @@ class GGUFModel(Model):
                     return self._extract_ids_with_healing(parsed_data, chunk)
                 else:
                     logger.warning("No valid JSON structure found in the LLM response.")
-                    return []
+                    return {}
             else:
-                return []
+                return {}
 
         except Exception as e:
             logger.warning(f"Error during LLM inference: {e}")
-            return []
+            return {}

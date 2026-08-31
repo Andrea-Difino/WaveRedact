@@ -13,6 +13,7 @@ class IOAudioManager:
     Attributes:
         SUPPORTED_EXTENSIONS - Set of supported audio file formats
         path                 - Absolute path to the audio directory
+        is_file              - Boolean value to check if is file or not
     """
     
 

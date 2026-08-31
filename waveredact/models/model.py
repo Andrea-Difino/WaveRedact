@@ -8,7 +8,7 @@ class Model(ABC):
     
 
     @abstractmethod
-    def run_model(self, chunk: dict[int,str], ambiguous_idx: list[int] | None) -> list[int]:
+    def run_model(self, chunk: dict[int,str], ambiguous_idx: list[int] | None) -> dict[int, str]:
         """
         Execute the model on a given text chunk to identify sensitive indices.
 
@@ -17,6 +17,6 @@ class Model(ABC):
             ambiguous_idx   - List of indices that the primary extractor was unsure about
 
         Return:
-            List of integers corresponding to the sensitive indices
+            Dictionary mapping sensitive indices to their entity type labels
         """
         ...

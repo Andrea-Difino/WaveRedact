@@ -1,6 +1,6 @@
 import gc
-import psutil
 
+import psutil
 import torch
 
 

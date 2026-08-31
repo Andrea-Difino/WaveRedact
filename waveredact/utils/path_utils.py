@@ -11,7 +11,7 @@ def get_project_root() -> Path:
     Otherwise, returns the project root.
     """
     if getattr(sys, 'frozen', False):
-        return Path(sys._MEIPASS)
+        return Path(sys._MEIPASS) # type: ignore
     else:
         return Path(__file__).resolve().parent.parent.parent
 
