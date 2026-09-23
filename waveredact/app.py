@@ -1,11 +1,13 @@
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 from faster_whisper import WhisperModel
 from gliner2 import GLiNER2
-from datetime import datetime, timezone
+from laya import Router
+
 from waveredact.audio.audio_censor import AudioCensor, AudioMaskTypes
 from waveredact.audio.audio_manager import IOAudioManager
 from waveredact.config.level import LevelSetter
@@ -13,16 +15,17 @@ from waveredact.core.gpu_setup import GPUEnvironmentManager
 from waveredact.core.memory_manager import MemoryManager
 from waveredact.factories.gliner_factory import GlinerFactory
 from waveredact.factories.whisper_factory import WhisperFactory
-from waveredact.models.gguf_model import GGUFModel
+from waveredact.models.gguf import GGUFModel
+from waveredact.models.laya import Laya
 from waveredact.pipeline.chunk import Chunker
 from waveredact.pipeline.extractors.gliner_extractor import GlinerExtractor
 from waveredact.pipeline.extractors.regex_extractor import RegexExtractor
 from waveredact.pipeline.mapper import ChunkMapper
 from waveredact.pipeline.orchestrator import Orchestrator
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
+from waveredact.services.compliance import ComplianceManager
 from waveredact.services.llama_server import LlamaServerService
 from waveredact.services.transcribe import TranscribeService
-from waveredact.services.compliance import ComplianceManager
 from waveredact.utils.console import console
 
 logger = logging.getLogger(__name__)
@@ -153,10 +156,13 @@ class WaveRedactApplication:
             )
                         
             regex_extractor = RegexExtractor(levels_setter.target_labels)
-                        
+
+            router = Router(preload=True)
+            validator = Laya(router)
             privacy_pipeline = DataPrivacyPipeline(
                 simple_extractors=[regex_extractor, gliner_extractor],
-                llm_extractor=model
+                validator=validator,
+                llm_extractor=model,
             )
             
             results = []

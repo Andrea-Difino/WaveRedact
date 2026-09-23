@@ -1,4 +1,5 @@
 from waveredact.models.model import Model
+from waveredact.models.laya import Laya
 
 from .extractors.base_extractor import BaseExtractor
 from .mapper import ChunkMapper
@@ -16,10 +17,12 @@ class DataPrivacyPipeline:
     def __init__(
         self,
         simple_extractors: list[BaseExtractor],
+        validator: Laya,
         llm_extractor: Model | None = None,
     ):
         self.simple_extractors: list[BaseExtractor] = simple_extractors
         self.llm_extractors: list[Model] = [llm_extractor] if llm_extractor else []
+        self.validator = validator
 
     def extract_sensitive_data(
         self, mapper: ChunkMapper, lock_threshold: float = 0.75
@@ -42,10 +45,11 @@ class DataPrivacyPipeline:
 
             for start, end, score, label in coords:
                 word_indices = mapper.get_original_idxs(start, end)
+
                 for idx in word_indices:
                     total_idx_labels[idx] = label
 
-                if score >= lock_threshold:
+                if score >= lock_threshold or (extractor.__class__.__name__ == "GlinerExtractor" and self.validator.validate_entity("".join([mapper.chunk[idx] for idx in word_indices]), label, mapper.text)):
                     locked_idx.update(word_indices)
 
         return total_idx_labels, locked_idx
@@ -72,3 +76,5 @@ class DataPrivacyPipeline:
             total_idx_labels.update(idx_labels)
 
         return total_idx_labels
+
+    
