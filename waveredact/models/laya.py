@@ -17,7 +17,7 @@ class Laya:
         questions = {
             "pii_validation": {
                 "type": "choice",
-                "instructions" : f"L'elemento '{entity}' rappresenta un dato sensibile di tipo {entity_label} nel constesto fornito?",
+                "instructions" : f"Does the element '{entity}' represent a sensitive element of type {entity_label} in the given context?",
                 "criteria": {
                 "true_positive": f"Yes, '{entity}' is a real sensitive data to censor.",
                 "false_positive": f"No, '{entity}' It is harmless, a figure of speech, or a system error."

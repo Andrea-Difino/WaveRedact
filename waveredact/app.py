@@ -157,7 +157,7 @@ class WaveRedactApplication:
                         
             regex_extractor = RegexExtractor(levels_setter.target_labels)
 
-            router = Router(preload=True)
+            router = Router(preload=["multilingual"])
             validator = Laya(router)
             privacy_pipeline = DataPrivacyPipeline(
                 simple_extractors=[regex_extractor, gliner_extractor],
