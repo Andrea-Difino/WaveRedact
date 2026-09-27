@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
+import laya
 from faster_whisper import WhisperModel
 from gliner2 import GLiNER2
-from laya import Router
 
 from waveredact.audio.audio_censor import AudioCensor, AudioMaskTypes
 from waveredact.audio.audio_manager import IOAudioManager
@@ -157,11 +157,11 @@ class WaveRedactApplication:
                         
             regex_extractor = RegexExtractor(levels_setter.target_labels)
 
-            router = Router(preload=["multilingual"])
-            validator = Laya(router)
+            agente_multilingua = laya.load("convaiinnovations/laya", subfolder="multilingual") 
+            laya_validator = Laya(agente_multilingua)
             privacy_pipeline = DataPrivacyPipeline(
                 simple_extractors=[regex_extractor, gliner_extractor],
-                validator=validator,
+                validator=laya_validator,
                 llm_extractor=model,
             )
             
