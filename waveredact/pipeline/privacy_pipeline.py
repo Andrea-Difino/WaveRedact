@@ -49,7 +49,18 @@ class DataPrivacyPipeline:
                 for idx in word_indices:
                     total_idx_labels[idx] = label
 
-                if score >= lock_threshold or (self.validator and extractor.__class__.__name__ == "GlinerExtractor" and self.validator.validate_entity("".join([mapper.chunk[idx] for idx in word_indices]), label, mapper.text)):
+                entity_text = " ".join([mapper.chunk[idx] for idx in word_indices])
+                
+                is_locked = False
+                
+                if self.validator and extractor.__class__.__name__ == "GlinerExtractor":
+                    if self.validator.validate_entity(entity_text, label, mapper.text):
+                        is_locked = True
+                else:
+                    if score >= lock_threshold:
+                        is_locked = True
+                        
+                if is_locked:
                     locked_idx.update(word_indices)
 
         return total_idx_labels, locked_idx

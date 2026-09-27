@@ -179,8 +179,7 @@ class LlamaServerService:
             "--flash-attn", "auto",
             "-c", "4096",
             "-b", "2048",
-            "-ub", "2048",
-            "--seed", "42"
+            "-ub", "2048"
         ]
 
         self.process = subprocess.Popen(
