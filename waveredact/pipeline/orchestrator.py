@@ -75,7 +75,6 @@ class Orchestrator:
             full_idx_labels.update(res_labels)
             full_locked_idx.update(locked_res)
 
-        # we can still return full_idx_labels, maybe sort keys where we need them.
         ordered_idx = sorted(full_idx_labels.keys())
 
         if self.interactive_mode:

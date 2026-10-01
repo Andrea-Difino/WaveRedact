@@ -1,3 +1,4 @@
+from faster_whisper import feature_extractor
 import json
 import logging
 import os
@@ -150,7 +151,7 @@ class GGUFModel(Model):
         return list_sensitive_ids
 
     def run_model(self, chunk: dict[int, str], ambiguous_idx: list[int] | None) -> dict[int, str]:
-        couple_str = "".join([f"[{k}] {v.replace(chr(10), ' ').replace(chr(13), '')}\n" for k, v in chunk.items()])
+        couple_str = "".join([f"[{k}] \"{v.replace(chr(10), ' ').replace(chr(13), '')}\"\n" for k, v in chunk.items()])
         user_prompt = self.user_prompt.format(labels=self.labels, ambiguous=ambiguous_idx, idx_couples=couple_str)
 
         try:
@@ -160,7 +161,8 @@ class GGUFModel(Model):
                     {"role": "system", "content": self.sys_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                temperature=0.0
+                temperature=0.0,
+                response_format={"type": "json_object"}
             )
             
             text_response = response.choices[0].message.content

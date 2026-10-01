@@ -21,7 +21,7 @@ PROMPTS = {
 
 def _import_gguf_model(monkeypatch: pytest.MonkeyPatch):
     for name in [
-        "waveredact.models.gguf_model",
+        "waveredact.models.gguf",
         "openai",
         "huggingface_hub",
         "dotenv",
@@ -45,7 +45,7 @@ def _import_gguf_model(monkeypatch: pytest.MonkeyPatch):
     fake_yaml.safe_load = lambda *_args, **_kwargs: PROMPTS
     monkeypatch.setitem(sys.modules, "yaml", fake_yaml)
 
-    return importlib.import_module("waveredact.models.gguf_model")
+    return importlib.import_module("waveredact.models.gguf")
 
 
 class TestGGUFModel:

@@ -42,6 +42,7 @@ class DataPrivacyPipeline:
 
             for start, end, score, label in coords:
                 word_indices = mapper.get_original_idxs(start, end)
+
                 for idx in word_indices:
                     total_idx_labels[idx] = label
 
@@ -72,3 +73,5 @@ class DataPrivacyPipeline:
             total_idx_labels.update(idx_labels)
 
         return total_idx_labels
+
+    

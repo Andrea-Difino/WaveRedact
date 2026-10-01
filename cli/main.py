@@ -1,5 +1,6 @@
 import logging
 import multiprocessing
+import warnings
 from pathlib import Path
 
 import click
@@ -21,6 +22,7 @@ logging.getLogger("gliner").setLevel(logging.WARNING)
 logging.getLogger("gliner.model").setLevel(logging.WARNING)
 logging.getLogger("transformers").setLevel(logging.ERROR)
 logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
+warnings.filterwarnings("ignore", category=RuntimeWarning, message=".*this checkpoint ships invalid temperatures.*")
 
 def ask_user_approval(sensitive_words: list[str]) -> bool:
     """
