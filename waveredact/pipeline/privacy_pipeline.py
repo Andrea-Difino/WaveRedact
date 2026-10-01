@@ -1,5 +1,4 @@
 from waveredact.models.model import Model
-from waveredact.models.laya import Laya
 
 from .extractors.base_extractor import BaseExtractor
 from .mapper import ChunkMapper
@@ -17,12 +16,10 @@ class DataPrivacyPipeline:
     def __init__(
         self,
         simple_extractors: list[BaseExtractor],
-        validator: Laya | None = None,
         llm_extractor: Model | None = None,
     ):
         self.simple_extractors: list[BaseExtractor] = simple_extractors
         self.llm_extractors: list[Model] = [llm_extractor] if llm_extractor else []
-        self.validator = validator if validator else None
 
     def extract_sensitive_data(
         self, mapper: ChunkMapper, lock_threshold: float = 0.75

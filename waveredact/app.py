@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-import laya
 from faster_whisper import WhisperModel
 from gliner2 import GLiNER2
 
@@ -16,7 +15,6 @@ from waveredact.core.memory_manager import MemoryManager
 from waveredact.factories.gliner_factory import GlinerFactory
 from waveredact.factories.whisper_factory import WhisperFactory
 from waveredact.models.gguf import GGUFModel
-from waveredact.models.laya import Laya
 from waveredact.pipeline.chunk import Chunker
 from waveredact.pipeline.extractors.gliner_extractor import GlinerExtractor
 from waveredact.pipeline.extractors.regex_extractor import RegexExtractor
@@ -157,11 +155,8 @@ class WaveRedactApplication:
                         
             regex_extractor = RegexExtractor(levels_setter.target_labels)
 
-            agente_multilingua = laya.load("convaiinnovations/laya", subfolder="multilingual") 
-            laya_validator = Laya(agente_multilingua)
             privacy_pipeline = DataPrivacyPipeline(
                 simple_extractors=[regex_extractor, gliner_extractor],
-                validator=laya_validator,
                 llm_extractor=model,
             )
             
