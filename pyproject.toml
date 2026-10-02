@@ -1,6 +1,6 @@
 [project]
 name = "WaveRedact"
-version = "2.0.0"
+version = "2.1.0"
 description = "A local data privacy pipeline."
 readme = "README.md"
 requires-python = "==3.11.*"
@@ -22,6 +22,7 @@ dependencies = [
     "torchaudio>=2.2.0",
     "torchvision>=0.17.0",
     "transformers>=4.40.0",
+    "waveredact-core",
 ]
 
 [project.optional-dependencies]
@@ -81,7 +82,8 @@ dev = [
     "pytest>=9.1.0",
     "pytest-cov>=7.1.0",
     "datasets>=3.3.0",
-    "Faker>=33.3.0"
+    "Faker>=33.3.0",
+    "pyinstaller>=6.22.3",
 ]
 
 [[tool.uv.index]]
@@ -98,4 +100,10 @@ torchvision = [
 ]
 torchaudio = [
   { index = "pytorch-cu124", marker = "sys_platform == 'win32' or sys_platform == 'linux'" },
+]
+waveredact-core = { workspace = true }
+
+[tool.uv.workspace]
+members = [
+    "waveredact_core",
 ]
