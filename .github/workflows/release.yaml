@@ -35,9 +35,7 @@ jobs:
 
       - name: Compiling with PyInstaller
         shell: bash
-        run: | 
-          rm -rf waveredact_core
-          rm -f waveredact_core.pyi
+        run: |
           uv run pyinstaller waveredact.spec --clean
 
       - name: Zip and divide in Volumes (Windows)
