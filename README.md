@@ -237,12 +237,12 @@ When analyzing the metrics mapped specifically to WaveRedact's strict entity cla
 
 | Class Label | Precision | Recall | F1-Score | FP Count |
 | :--- | :---: | :---: | :---: | :---: |
-| `street_address` | 100% | 96.9% | 0.984 | **1** |
-| `city` | 100% | 94.3% | 0.970 | **0** |
-| `username` | 100% | 93.7% | 0.968 | **0** |
-| `email` | 100% | 93.4% | 0.966 | **0** |
-| `passport_number` | 100% | 87.0% | 0.930 | **0** |
-| `ip_address` | 98.1% | 87.7% | 0.926 | **2** |
+| `street_address` | 100% | 96.9% | 98.4% | **1** |
+| `city` | 100% | 94.3% | 97% | **0** |
+| `username` | 100% | 93.7% | 96.8% | **0** |
+| `email` | 100% | 93.4% | 96.6% | **0** |
+| `passport_number` | 100% | 87.0% | 93% | **0** |
+| `ip_address` | 98.1% | 87.7% | 92.6% | **2** |
 | `state_or_region` | 100% | 92.39% | 96.05% | **0** |
 | `country` | 100% | 83.81% | 91.19% | **0** |
 | `sensitive_date` | 100% | 82.26% | 90.27% | **0** |
