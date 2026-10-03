@@ -219,15 +219,15 @@ When processing finishes, the CLI prints the path of the generated file. You wil
 
 ## Performance & Benchmarks
 
-Because WaveRedact is a 100% offline pipeline, large-scale benchmarking of 7B LLM models on local hardware is time-consuming. To provide a solid reliability baseline, we ran a comprehensive evaluation on a sampled subset (currently 300 sentences, soon scaling to 600+) of the `ai4privacy` dataset, combining the default LLM (`Qwen2.5-7B-Instruct-Q4_K_M`) with Regex and GLiNER extraction.
+Because WaveRedact is a 100% offline pipeline, large-scale benchmarking of 7B LLM models on local hardware is time-consuming. To provide a solid reliability baseline, I ran a comprehensive evaluation on a sampled subset of 600 of the `ai4privacy` dataset, combining the default LLM (`Qwen2.5-7B-Instruct-Q4_K_M`) with Regex and GLiNER extraction.
 
 ### Global Pipeline Metrics (Full Pipeline)
 
 | Metric | Score | True Positives (TP) | False Positives (FP)* | False Negatives (FN) |
 | :--- | :---: | :---: | :---: | :---: |
-| **Recall** | **91.40%** | 1361 | - | 128 |
-| **Precision** | 50.59% | 1361 | 1329 | - |
-| **F1-Score** | **0.6514** | - | - | - |
+| **Recall** | **91.33%** | 2611 | - | 248 |
+| **Precision** | **50.56%** | 2611 | 2553 | - |
+| **F1-Score** | **65.09%** | - | - | - |
 
 *(Note: The high number of overall False Positives is an artifact of the evaluation methodology and dataset mapping, as explained below).*
 
@@ -237,22 +237,28 @@ When analyzing the metrics mapped specifically to WaveRedact's strict entity cla
 
 | Class Label | Precision | Recall | F1-Score | FP Count |
 | :--- | :---: | :---: | :---: | :---: |
-| `street_address` | 100% (1.000) | 96.9% (0.969) | 0.984 | **0** |
-| `city` | 100% (1.000) | 94.3% (0.943) | 0.970 | **0** |
-| `username` | 100% (1.000) | 93.7% (0.937) | 0.968 | **0** |
-| `email` | 100% (1.000) | 93.4% (0.934) | 0.966 | **0** |
-| `passport_number` | 100% (1.000) | 87.0% (0.870) | 0.930 | **0** |
-| `ip_address` | 98.1% (0.981) | 87.7% (0.877) | 0.926 | **2** |
+| `street_address` | 100% | 96.9% | 0.984 | **1** |
+| `city` | 100% | 94.3% | 0.970 | **0** |
+| `username` | 100% | 93.7% | 0.968 | **0** |
+| `email` | 100% | 93.4% | 0.966 | **0** |
+| `passport_number` | 100% | 87.0% | 0.930 | **0** |
+| `ip_address` | 98.1% | 87.7% | 0.926 | **2** |
+| `state_or_region` | 100% | 92.39% | 96.05% | **0** |
+| `country` | 100% | 83.81% | 91.19% | **0** |
+| `sensitive_date` | 100% | 82.26% | 90.27% | **0** |
+| `expiration_date` | 100% | 100% | 100% | **0** |
+| `sensitive_account_id` | 100% | 100% | 100% | **0** |
+| `routing_number` | 100% | 100% | 100% | **0** |
 
 ### Understanding the False Positives (FP) Anomaly
 
-While the **Recall of ~91.4%** confirms that the pipeline successfully intercepts almost all sensitive data, the global **Precision (~50.6%)** appears artificially deflated. This discrepancy is caused by structural differences between the `ai4privacy` ground-truth dataset and WaveRedact's internal taxonomy:
+While the **Recall of ~91.33%** confirms that the pipeline successfully intercepts almost all sensitive data, the global **Precision (~50.56%)** appears artificially deflated. This discrepancy is caused by structural differences between the `ai4privacy` ground-truth dataset and WaveRedact's internal taxonomy:
 
 1. **Filtered Entities in Dataset Generation**: The `ai4privacy` dataset contains broadly annotated entities such as `COMPANY`, `ORGANIZATION`, and `JOBTITLE`. Our dataset generation script (`generate_dataset.py`) intentionally filters these out because they do not map 1:1 to WaveRedact's specific target classes (defined in `config/level.py`). Thus, they are absent from our benchmark's "ground truth".
 2. **Aggressive Detection**: WaveRedact's pipeline (particularly GLiNER and the LLM) is designed to be highly conservative regarding privacy. It often successfully detects and redacts these unmapped entities (e.g., safely redacting a Company name, treating it as sensitive), or discovers valid PII that the original dataset creators missed.
 3. **"Unknown" Class Attribution**: Because these correctly redacted words are missing from our filtered ground truth, the evaluation script (`evaluate_advanced.py`) penalizes the model, categorizing them as False Positives and attributing them to an `"unknown"` class, which accumulates silently in the global total.
 
-Consequently, the 1327 global False Positives are almost entirely "ghost" errors—they are valid entities that were either filtered out from the benchmark's ground truth or unannotated PII, rather than actual mistakes on our target classes. The class-wise table confirms that on supported labels, WaveRedact achieves near-perfect precision.
+Consequently, the 2553 global False Positives are almost entirely "ghost" errors—they are valid entities that were either filtered out from the benchmark's ground truth or unannotated PII, rather than actual mistakes on our target classes. The class-wise table confirms that on supported labels, WaveRedact achieves near-perfect precision.
 
 ## 🙏 Acknowledgments & Core Technologies
 
