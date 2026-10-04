@@ -219,15 +219,15 @@ When processing finishes, the CLI prints the path of the generated file. You wil
 
 ## Performance & Benchmarks
 
-Because WaveRedact is a 100% offline pipeline, large-scale benchmarking of 7B LLM models on local hardware is time-consuming. To provide a solid reliability baseline, I ran a comprehensive evaluation on a sampled subset of 600 of the `ai4privacy` dataset, combining the default LLM (`Qwen2.5-7B-Instruct-Q4_K_M`) with Regex and GLiNER extraction.
+Because WaveRedact is a 100% offline pipeline, large-scale benchmarking of 7B LLM models on local hardware is time-consuming. To provide a solid reliability baseline, I ran a comprehensive evaluation on a sampled subset of **1000** of the `ai4privacy` dataset, combining the default LLM (`Qwen2.5-7B-Instruct-Q4_K_M`) with Regex and GLiNER extraction.
 
 ### Global Pipeline Metrics (Full Pipeline)
 
 | Metric | Score | True Positives (TP) | False Positives (FP)* | False Negatives (FN) |
 | :--- | :---: | :---: | :---: | :---: |
-| **Recall** | **91.33%** | 2611 | - | 248 |
-| **Precision** | **50.56%** | 2611 | 2553 | - |
-| **F1-Score** | **65.09%** | - | - | - |
+| **Recall** | **91%** | 4157 | - | 424 |
+| **Precision** | **49.86%** | 4157 | 4181 | - |
+| **F1-Score** | **64.35%** | - | - | - |
 
 *(Note: The high number of overall False Positives is an artifact of the evaluation methodology and dataset mapping, as explained below).*
 
@@ -237,16 +237,18 @@ When analyzing the metrics mapped specifically to WaveRedact's strict entity cla
 
 | Class Label | Precision | Recall | F1-Score | FP Count |
 | :--- | :---: | :---: | :---: | :---: |
-| `street_address` | 100% | 96.9% | 98.4% | **1** |
-| `city` | 100% | 94.3% | 97% | **0** |
-| `username` | 100% | 93.7% | 96.8% | **0** |
-| `email` | 100% | 93.4% | 96.6% | **0** |
-| `passport_number` | 100% | 87.0% | 93% | **0** |
+| `street_address` | 99.88% | 94.42% | 97% | **1** |
+| `city` | 100% | 93.8% | 96.8% | **0** |
+| `username` | 99.8% | 86.07% | 92.4% | **1** |
+| `email` | 100% | 97.82% | 98.9% | **0** |
+| `passport_number` | 99.78% | 88.43% | 93.76% | **1** |
+| `address` | 100% | 100% | 100% | **0** |
 | `ip_address` | 98.1% | 87.7% | 92.6% | **2** |
-| `state_or_region` | 100% | 92.39% | 96.05% | **0** |
-| `country` | 100% | 83.81% | 91.19% | **0** |
-| `sensitive_date` | 100% | 82.26% | 90.27% | **0** |
+| `state_or_region` | 100% | 92.31% | 96% | **0** |
+| `country` | 100% | 84.72% | 91.73% | **0** |
+| `sensitive_date` | 99.47% | 84.77% | 91.53% | **2** |
 | `expiration_date` | 100% | 100% | 100% | **0** |
+| `card_expiry` | 100% | 100% | 100% | **0** |
 | `sensitive_account_id` | 100% | 100% | 100% | **0** |
 | `routing_number` | 100% | 100% | 100% | **0** |
 
@@ -258,7 +260,7 @@ While the **Recall of ~91.33%** confirms that the pipeline successfully intercep
 2. **Aggressive Detection**: WaveRedact's pipeline (particularly GLiNER and the LLM) is designed to be highly conservative regarding privacy. It often successfully detects and redacts these unmapped entities (e.g., safely redacting a Company name, treating it as sensitive), or discovers valid PII that the original dataset creators missed.
 3. **"Unknown" Class Attribution**: Because these correctly redacted words are missing from our filtered ground truth, the evaluation script (`evaluate_advanced.py`) penalizes the model, categorizing them as False Positives and attributing them to an `"unknown"` class, which accumulates silently in the global total.
 
-Consequently, the 2553 global False Positives are almost entirely "ghost" errors—they are valid entities that were either filtered out from the benchmark's ground truth or unannotated PII, rather than actual mistakes on our target classes. The class-wise table confirms that on supported labels, WaveRedact achieves near-perfect precision.
+Consequently, the 4181 global False Positives are almost entirely "ghost" errors—they are valid entities that were either filtered out from the benchmark's ground truth or unannotated PII, rather than actual mistakes on our target classes. The class-wise table confirms that on supported labels, WaveRedact achieves near-perfect precision.
 
 ## 🙏 Acknowledgments & Core Technologies
 
