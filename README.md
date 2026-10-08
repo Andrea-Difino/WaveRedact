@@ -219,7 +219,7 @@ When processing finishes, the CLI prints the path of the generated file. You wil
 
 ## Performance & Benchmarks
 
-Because WaveRedact is a 100% offline pipeline, large-scale benchmarking of 7B LLM models on local hardware is time-consuming. To provide a solid reliability baseline, I ran a comprehensive evaluation on a sampled subset of **1000** of the `ai4privacy` dataset, combining the default LLM (`Qwen2.5-7B-Instruct-Q4_K_M`) with Regex and GLiNER extraction.
+Because WaveRedact is a 100% offline pipeline, large-scale benchmarking of 7B LLM models on local hardware is time-consuming. To provide a solid reliability baseline, the benchmarks below were conducted using a subset of 1000 samples from the AI4Privacy dataset. All rights to the dataset belong to **[Ai4privacy](https://huggingface.co/datasets/ai4privacy/pii-masking-300k)**.
 
 ### Global Pipeline Metrics (Full Pipeline)
 
