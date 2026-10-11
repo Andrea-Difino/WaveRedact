@@ -1,4 +1,8 @@
-from faster_whisper import WhisperModel
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from faster_whisper import WhisperModel
 
 
 class TranscribeService:
@@ -12,7 +16,7 @@ class TranscribeService:
 
     def __init__(self, model: WhisperModel):
         self.model = model
-        self.full_text: str
+        self.full_text: str = ''
 
     def transcribe_audio(self, audio_path: str) -> tuple[dict[int, str], dict[int, str]]:
         """
@@ -33,10 +37,10 @@ class TranscribeService:
         for segment in segments:
             if segment.words:
                 for word in segment.words:
+                    self.full_text += word.word
                     words_list.append(word.word)
                     intervals_list.append(f"{word.start}-{word.end}")
 
-        self.full_text = "".join(words_list)
         return (self._compute_idx_pair(words_list), self._compute_idx_pair(intervals_list))
     
     def _compute_idx_pair(self, data: list[str]) -> dict[int, str]:

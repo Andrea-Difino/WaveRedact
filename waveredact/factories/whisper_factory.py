@@ -34,7 +34,6 @@ class WhisperFactory(Factory):
         Return:
             WhisperModel object ready for inference
         """
-        self.gpu_manager.ensure_gpu_ready()
         device = self.gpu_manager.get_device()
         return WhisperModel(
             self.model_name,

@@ -1,11 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from faster_whisper import WhisperModel
+    from gliner2 import GLiNER2
+
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-
-from faster_whisper import WhisperModel
-from gliner2 import GLiNER2
 
 from waveredact.audio.audio_censor import AudioCensor, AudioMaskTypes
 from waveredact.audio.audio_manager import IOAudioManager
@@ -71,6 +76,7 @@ class WaveRedactApplication:
         else:
             gpu_setup = self.gpu_setup
 
+        gpu_setup.ensure_gpu_ready()
         if self.whisper_model is None:
             whisper_factory = WhisperFactory(gpu_setup)
             whisper_model = whisper_factory.build()
