@@ -185,7 +185,7 @@ audio/*
 audio/censored/*
 files/*
 test_result.csv
-
+web/*
 
 tests/benchmark_data/*
 tests/advanced_censor_test/*
