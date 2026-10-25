@@ -23,6 +23,7 @@ dependencies = [
     "torchvision>=0.17.0",
     "transformers>=4.40.0",
     "waveredact-core",
+    "pillow>=13.0.0",
 ]
 
 
