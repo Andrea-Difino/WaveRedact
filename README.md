@@ -94,18 +94,6 @@ Then run the CLI directly from the project environment:
 waveredact
 ```
 
-If you also want the web interface:
-
-```bash
-uv sync --extra web
-```
-
-And then:
-
-```bash
-waveredact-web
-```
-
 If your shell does not pick up the commands directly, use uv run waveredact or activate the generated .venv first.
 
 ### With `venv` and `pip`
@@ -114,12 +102,6 @@ If your shell does not pick up the commands directly, use uv run waveredact or a
 python -m venv .venv
 .venv\Scripts\activate
 pip install -e .
-```
-
-If you also want the web interface:
-
-```bash
-pip install -e ".[web]"
 ```
 
 ## Using the CLI
@@ -179,30 +161,12 @@ waveredact --file path/to/audio.mp3 --use-llm
 
 3. Retrieve the result from the newly created `censored/` folder next to your original file.
 
-## Using the web interface
-The project also includes a FastAPI server with a simple web interface.
-
-Start it with:
-
-```bash
-waveredact-web
-```
-
-The server runs locally at `http://127.0.0.1:8000`.
-
-The interface lets you upload an audio file and receive the analysis of the sensitive content it found.
-
 ## Expected output
 When processing finishes, the CLI prints the path of the generated file. You will usually see a message like:
 
 ```plaintext
 ✅ File saved: path/to/your/audio/censored/file_name_censored.mp3
 ```
-
-## Folder structure
-
-- `files/`: uploads and temporary data for the web interface.
-- `web/`: web interface and API.
 
 *Note: Heavy machine learning models (GLiNER, LLMs) are downloaded automatically on first run and stored in a persistent application data folder (`~/.waveredact` on Unix or `%APPDATA%\WaveRedact` on Windows).*
 
