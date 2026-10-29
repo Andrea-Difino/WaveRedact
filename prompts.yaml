@@ -14,7 +14,7 @@ maker:
       6. SILENT IGNORE: To save output tokens, ONLY include words that are SENSITIVE in your JSON output. If a word is not sensitive, DO NOT include it in the JSON array at all.
       
       INSTRUCTIONS:
-      1. Evaluate all AMBIGUOUS IDs carefully based on the rules.
+      1. Evaluate all AMBIGUOUS IDs carefully based on the rules. These are low-confidence suspected items from a primary scanner; validate if they truly match an ALLOWED LABEL based on context.
       2. Scan the entire TEXT CHUNK for any missed sensitive values matching the ALLOWED LABELS.
       3. Output the JSON array ONLY for the sensitive words found.
     user_prompt: |

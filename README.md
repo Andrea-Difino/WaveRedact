@@ -142,16 +142,21 @@ waveredact --file path/to/audio.mp3 --use-llm
     - **Labels:** `password`, `api_key`, `secret`, `access_token`, `recovery_code`, `iban`, `bank_account`, `account_number`, `routing_number`, `payment_card`, `card_number`, `card_expiry`, `card_cvv`
 
   - `medium` adds names, email addresses, phone numbers, and documents.
-    - **Labels:** (All from base) + `person`, `full_name`, `first_name`, `middle_name`, `last_name`, `username`, `email`, `phone_number`, `ip_address`, `account_id`, `sensitive_account_id`, `government_id`, `national_id_number`, `passport_number`, `drivers_license_number`, `tax_id`, `tax_number`, `date_of_birth`
+    - **Labels:** (All from base) + `person`, `username`, `email`, `phone_number`, `ip_address`, `account_id`, `sensitive_account_id`, `government_id`, `national_id_number`, `passport_number`, `tax_id`, `date_of_birth`
 
   - `total` extends redaction to addresses and time-related references. (default)
-    - **Labels:** (All from medium) + `address`, `street_address`, `city`, `state_or_region`, `postal_code`, `country`, `sensitive_date`, `document_date`, `expiration_date`, `transaction_date`, `license_number`
+    - **Labels:** (All from medium) + `street_address`, `city`, `state_or_region`, `postal_code`, `country`, `sensitive_date`, `document_date`, `expiration_date`, `transaction_date`, `license_number`
 
 - `--use-llm` enables the optional LLM component to improve detection.
 - `--mode` defines how to censor the sensitive data.
   - `muted`replace sensitive data with silence. (default)
   - `beep` replace sensitive data with beep sound.
 - `--custom-labels` specifies a JSON file that contains a list of allowed custom labels
+  
+> **⚠️ Note on Custom Labels & Model Performance**
+> The labels listed for the levels above are carefully curated for optimal performance and do not represent the exhaustive list of supported entities. If you require finer granularity, you can consult the complete list of supported classes on the [fastino/gliner2-privacy-filter-PII-multi](https://huggingface.co/fastino/gliner2-privacy-filter-PII-multi) model page.
+> 
+> **Important:** Proceed with caution when using `--custom-labels` to pass a large number of highly granular categories (e.g., splitting `person` into `first_name`, `middle_name`, `last_name`). Because the underlying models are relatively small to ensure local execution, providing too many overlapping semantic classes simultaneously can cause **attention dilution**. This cognitive overload confuses the model, leading to missed entities (False Negatives) and a significant drop in the overall Recall rate.
 
 ### Example workflow
 

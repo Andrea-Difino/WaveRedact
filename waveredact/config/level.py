@@ -24,15 +24,13 @@ class Levels(Enum):
         ]
         
         medium_additions = [
-            "person", "full_name", "first_name", "middle_name", "last_name", 
-            "username", "email", "phone_number", "ip_address", "account_id",
+            "person", "username", "email", "phone_number", "ip_address", "account_id",
             "sensitive_account_id", "government_id", "national_id_number", 
-            "passport_number", "drivers_license_number", "tax_id", "tax_number", 
-            "date_of_birth"
+            "passport_number", "tax_id", "date_of_birth"
         ]
         
         total_additions = [
-            "address", "street_address", "city", "state_or_region", "postal_code", 
+            "street_address", "city", "state_or_region", "postal_code", 
             "country", "sensitive_date", "document_date", "expiration_date", 
             "transaction_date", "license_number"
         ]
