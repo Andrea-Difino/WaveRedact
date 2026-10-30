@@ -19,7 +19,6 @@ from waveredact.core.gpu_setup import GPUEnvironmentManager
 from waveredact.core.memory_manager import MemoryManager
 from waveredact.factories.gliner_factory import GlinerFactory
 from waveredact.factories.whisper_factory import WhisperFactory
-from waveredact.models.gguf import GGUFModel
 from waveredact.pipeline.chunk import Chunker
 from waveredact.pipeline.extractors.gliner_extractor import GlinerExtractor
 from waveredact.pipeline.extractors.regex_extractor import RegexExtractor
@@ -27,7 +26,6 @@ from waveredact.pipeline.mapper import ChunkMapper
 from waveredact.pipeline.orchestrator import Orchestrator
 from waveredact.pipeline.privacy_pipeline import DataPrivacyPipeline
 from waveredact.services.compliance import ComplianceManager
-from waveredact.services.llama_server import LlamaServerService
 from waveredact.services.transcribe import TranscribeService
 from waveredact.utils.console import console
 
@@ -115,21 +113,24 @@ class WaveRedactApplication:
             del whisper_model
             del transcribe_serv
             memory_manager.clean_memory()
-
-            avail_ram = memory_manager.get_available_ram()
-            if avail_ram <= 8:
-                console.print(f"[yellow]⚠️  Detected {avail_ram:.1f}GB of available RAM (<= 8GB)[/yellow]")
-                console.print("[info]📉 Loading smaller model (Gemma-3-4b) for better performance and stability.[/info]")
-                MODEL_NAME = "gemma-3-4b-it-UD-Q5_K_XL.gguf"
-                REPO_ID = "unsloth/gemma-3-4b-it-GGUF"
-            else:
-                console.print(f"[green]✅ Detected {avail_ram:.1f}GB of available RAM (> 8GB)[/green]")
-                console.print("[info]🚀 Loading the optimal model (Qwen2.5-7B) for best quality.[/info]")
-                MODEL_NAME = "Qwen2.5-7B-Instruct-Q4_K_M.gguf"
-                REPO_ID = "bartowski/Qwen2.5-7B-Instruct-GGUF"
-
             
             if self.config.use_llm:
+                from waveredact.models.gguf import GGUFModel
+                from waveredact.services.llama_server import LlamaServerService
+
+                avail_ram = memory_manager.get_available_ram()
+
+                if avail_ram <= 8:
+                    console.print(f"[yellow]⚠️  Detected {avail_ram:.1f}GB of available RAM (<= 8GB)[/yellow]")
+                    console.print("[info]📉 Loading smaller model (Gemma-3-4b) for better performance and stability.[/info]")
+                    MODEL_NAME = "gemma-3-4b-it-UD-Q5_K_XL.gguf"
+                    REPO_ID = "unsloth/gemma-3-4b-it-GGUF"
+                else:
+                    console.print(f"[green]✅ Detected {avail_ram:.1f}GB of available RAM (> 8GB)[/green]")
+                    console.print("[info]🚀 Loading the optimal model (Qwen2.5-7B) for best quality.[/info]")
+                    MODEL_NAME = "Qwen2.5-7B-Instruct-Q4_K_M.gguf"
+                    REPO_ID = "bartowski/Qwen2.5-7B-Instruct-GGUF"
+
                 model = GGUFModel(MODEL_NAME, REPO_ID, server_port=self.SERVER_PORT)        
 
                 try:

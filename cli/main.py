@@ -1,5 +1,6 @@
 import logging
 import multiprocessing
+import time
 import warnings
 from pathlib import Path
 
@@ -7,7 +8,6 @@ import click
 import questionary
 from dotenv import load_dotenv
 
-from waveredact.app import AppConfig, WaveRedactApplication
 from waveredact.utils.console import console
 
 project_root = Path(__file__).resolve().parent.parent
@@ -61,12 +61,15 @@ def ask_user_approval(sensitive_words: list[str]) -> bool:
 @click.option('--folder', type=click.Path(exists=True, file_okay=False), help='Folder containing audio files to process.')
 @click.option('--custom-labels', type=click.Path(exists=True, dir_okay=False), help='Specific custom labels file for censor')
 def main(level: str, auto: bool, use_llm: bool, mode: str, file: str, folder: str, custom_labels: str) -> None:
+    start = time.time()
     if not file and not folder:
         console.print("[error]Error: You must provide either --file or --folder.[/error]")
         return
     if file and folder:
         console.print("[error]Error: You cannot provide both --file and --folder.[/error]")
         return
+    
+    from waveredact.app import AppConfig, WaveRedactApplication
 
     config = AppConfig(
         level=level,
@@ -80,8 +83,9 @@ def main(level: str, auto: bool, use_llm: bool, mode: str, file: str, folder: st
 
     app = WaveRedactApplication(config=config, approval_callback=ask_user_approval)
     app.run()
-    
+    end = time.time()
     console.print("[info]Thanks for using waveredact! 🌊[/info]")
+    print(f"Pipeline duration: {end-start:.3f}")
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
