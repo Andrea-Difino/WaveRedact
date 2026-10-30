@@ -56,14 +56,19 @@ The bar chart below shows all the labels that got a recall greater than 90%.
 
 **The Weaknesses (Bottlenecks):**
 
-* `person` (Recall: 0.7446, FN: 3,685): The most problematic entity. The model frequently discards proper nouns.
-
-* `password` (Recall: 0.7967, FN: 634): Random strings are often ignored by the LLM because they lack semantic context.
-
-* `sensitive_date` (Recall: 0.8049, FN: 1,832): Struggles with textual or typical Italian date formats.
-
-* `national_id_number` (Recall: 0.8582, FN: 3,284): Difficulty mapping local documents (e.g., the Italian "Codice Fiscale") to the generic English label.
-
+* `person` (Recall: 0.7446, FN: 3,685).
+* `password` (Recall: 0.7967, FN: 634).
+* `sensitive_date` (Recall: 0.8049, FN: 1,832).
+* `country` (Recall: 0.8324, FN: 1,091).
+* `state_or_region` (Recall: 0.8448, FN: 1,068).
+* `national_id_number` (Recall: 0.8582, FN: 3,284).
+* `account_number` (Recall: 0.8625, FN: 55).
+* `username` (Recall: 0.8674, FN: 1,382).
+* `routing_number` (Recall: 0.8800, FN: 48).
+* `ip_address` (Recall: 0.8820, FN: 857).
+* `bank_account` (Recall: 0.8950, FN: 42).
+* `recovery_code` (Recall: 0.9000, FN: 40).
+  
 The bar chart below shows all the labels that got a recall lower or equal to 90%.
 
 ![](imgs/recall_label_let90.png)
